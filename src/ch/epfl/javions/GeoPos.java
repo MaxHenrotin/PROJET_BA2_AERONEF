@@ -1,12 +1,14 @@
 package ch.epfl.javions;
 
 public record GeoPos(int longitudeT32, int latitudeT32) {
-    public static boolean isValidLatitudeT32(int latitudeT32){
-        if(latitudeT32< -Math.scalb(1,30) || latitudeT32> Math.pow(1,30)){
+
+    public GeoPos{
+        if(!isValidLatitudeT32(latitudeT32)){
             throw new IllegalArgumentException();
-        }else{
-            return true;
         }
+    }
+    public static boolean isValidLatitudeT32(int latitudeT32){
+        return latitudeT32>= Math.scalb(-1,30) && latitudeT32<= Math.scalb(1,30);
     }
 
     public double longitude(){
