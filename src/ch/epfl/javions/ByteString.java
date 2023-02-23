@@ -62,11 +62,8 @@ public final class ByteString {
      * @author Erbland Julien (SCIPER : 346893)
      */
     public int byteAt(int index){
-        if(index<0||index>= tab.length){
-            throw new IndexOutOfBoundsException();
-        }else{
-            return tab[index]&0xFF; //évite les problèmes de signes
-        }
+        Objects.checkIndex(index,tab.length);
+        return tab[index]&0xFF; //évite les problèmes de signes
     }
 
 
@@ -85,9 +82,9 @@ public final class ByteString {
         Objects.checkFromToIndex(fromIndex,toIndex,tab.length);
         Preconditions.checkArgument(toIndex-fromIndex<Long.SIZE);
 
-        byte[] output=java.util.Arrays.copyOfRange(tab,fromIndex,toIndex);
+        byte[] output = java.util.Arrays.copyOfRange(tab,fromIndex,toIndex);
 
-        long number=output[0];
+        long number = output[0];
 
         for(int i = 1; i<output.length; ++i){
             number = number << 8;
@@ -111,7 +108,6 @@ public final class ByteString {
     @Override
     public boolean equals(Object object) {
         Preconditions.checkArgument(object instanceof ByteString);
-
         return Arrays.equals(tab,((ByteString) object).tab);
     }
 
