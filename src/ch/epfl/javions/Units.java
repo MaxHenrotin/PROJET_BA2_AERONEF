@@ -1,22 +1,66 @@
 package ch.epfl.javions;
 
+/**
+ * Classe modélisant certaines unités du système SI utiles au projet
+ * @author Erbland Julien (SCIPER : 346893)
+ */
+
 public final class Units {
     private Units(){}
 
+    /**
+     * Préfixes utiles pour calculer les unités en fonction de l'unité de base
+     *
+     * @author Erbland Julien (SCIPER : 346893)
+     */
     public static final double CENTI=10e-2;
     public static final double KILO=10e3;
 
+
+    /**
+     * Convertit la valeur donnée, exprimée dans l'unité fromUnit, en l'unité toUnit
+     * @param value : Valeur à convertir
+     * @param fromUnit : Unité de départ de la conversion
+     * @param toUnit : Unité dans laquelle on veut convertir la valeur
+     * @return : la valeur exprimée dans l'unité toUnit
+     *
+     * @author Erbland Julien (SCIPER : 346893)
+     */
     public static double convert(double value,double fromUnit ,double toUnit){
         return value*(fromUnit/toUnit);
     }
 
+
+    /**
+     * Equivalente à convert lorsque l'unité d'arrivée (toUnit) est l'unité de base et vaut donc 1
+     * @param value : valeur à convertir exprimée dans l'unité fromUnit
+     * @param fromUnit : unité en laquelle est exprimée value
+     * @return : value exprimée en l'unité de référence (exemple : mètre)
+     *
+     * @author Erbland Julien (SCIPER : 346893)
+     */
     public static double convertFrom(double value, double fromUnit){
         return value*fromUnit;
     }
 
+    /**
+     * Equivalente à convert lorsque l'unité de départ (fromUnit) est l'unité de base et vaut donc 1
+     * @param value : valeur à convertir exprimée dans l'unité de base
+     * @param toUnit : unité en laquelle on veut convertir value
+     * @return : value exprimée en l'unité toUnit
+     *
+     * @author Erbland Julien (SCIPER : 346893)
+     */
     public static double convertTo(double value, double toUnit){
         return value*(1/toUnit);
     }
+
+
+    /**
+     * Modélise les unités de longueurs avec comme référence le mètre
+     *
+     * @author Erbland Julien (SCIPER : 346893)
+     */
 
     public static class Length{
 
@@ -30,6 +74,11 @@ public final class Units {
 
     }
 
+    /**
+     * Modélise les unités de temps avec comme référence la seconde
+     *
+     * @author Erbland Julien (SCIPER : 346893)
+     */
     public static class Time{
         private Time(){}
 
@@ -40,6 +89,12 @@ public final class Units {
 
     }
 
+    /**
+     * Modélise les unités d'angles avec comme référence le radian
+     *
+     * @author Erbland Julien (SCIPER : 346893)
+     */
+
     public static class Angle{
         private Angle(){}
         public static final int RADIAN =1;
@@ -49,6 +104,12 @@ public final class Units {
         public static final double T32=TURN/Math.scalb(1,32);
 
     }
+
+    /**
+     * Modélise les unités de vitesse en utilisant le rapport en distance et temps correspondant à chaque unité
+     *
+     * @author Erbland Julien (SCIPER : 346893)
+     */
 
     public static class Speed{
         private Speed(){}
