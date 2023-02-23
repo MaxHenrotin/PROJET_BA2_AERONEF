@@ -80,7 +80,7 @@ public final class ByteString {
      */
     public long bytesInRange(int fromIndex, int toIndex){
         Objects.checkFromToIndex(fromIndex,toIndex,tab.length);
-        Preconditions.checkArgument(toIndex-fromIndex<Long.SIZE);
+        Preconditions.checkArgument(toIndex-fromIndex<(Long.SIZE/8));
 
         byte[] output = java.util.Arrays.copyOfRange(tab,fromIndex,toIndex);
 
