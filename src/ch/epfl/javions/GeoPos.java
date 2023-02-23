@@ -8,7 +8,7 @@ public record GeoPos(int longitudeT32, int latitudeT32) {
         }
     }
     public static boolean isValidLatitudeT32(int latitudeT32){
-        return latitudeT32>= Math.scalb(-1,30) && latitudeT32<= Math.scalb(1,30);
+        return latitudeT32>= (int)Math.scalb(-1,30) && latitudeT32<= (int)Math.scalb(1,30);     //casté en int pour pas crée des problèmes talle de bit aux limites
     }
 
     public double longitude(){

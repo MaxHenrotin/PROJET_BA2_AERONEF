@@ -17,7 +17,7 @@ public class Bits {
 
     public static boolean testBit(long value, int index){
         Objects.checkIndex(index,Long.SIZE); //vérifie que index est bien entre 0 et 64
-        int maskIndex = 1 << index;  //voir notes de cours "Types entiers" 5.5.1
+        long maskIndex = 1L << index;  //voir notes de cours "Types entiers" 5.5.1
         return (value & maskIndex) == maskIndex;    //voir notes de cours "Types entiers" 5.5.2
     }
 }
