@@ -7,7 +7,8 @@ import java.util.Objects;
 /**
  * Classe qui représente un tableau d'octets, immuable et non signée
  *
- * @author Erbland Julien (SCIPER : 346893)
+ * @author Julien Erbland (346893)
+ * @author Max Henrotin (341463)
  */
 
 public final class ByteString {
@@ -17,8 +18,6 @@ public final class ByteString {
     /**
      * Constructeur de byte en utilisant la fonction clone() pour éviter les problèmes de références
      * @param bytes : tableau de bytes
-     *
-     * @author Erbland Julien (SCIPER : 346893)
      */
     public ByteString(byte[] bytes){
         tab = bytes.clone();
@@ -30,8 +29,6 @@ public final class ByteString {
      * @throws NumberFormatException : si la chaîne de charactère n'est pas en hexadéciaml
      * @throws IllegalArgumentException : si hexString n'est pas de longueur pair
      * @return : un ByteString correspondant à la représentation hexadécimal passée en paramètre
-     *
-     * @author Erbland Julien (SCIPER : 346893)
      */
     public static ByteString ofHexadecimalString(String hexString){
         Preconditions.checkArgument((hexString.length()%2)==0);
@@ -47,8 +44,6 @@ public final class ByteString {
     /**
      * Retourne la taille du tableau de bytes
      * @return : la taille de tab
-     *
-     * @author Erbland Julien (SCIPER : 346893)
      */
     public int size(){return tab.length;}
 
@@ -58,8 +53,6 @@ public final class ByteString {
      * @param index : index voulu dans le tableau
      * @throws IndexOutOfBoundsException : si l'index n'existe pas dans le tableau
      * @return : l'octet correspondant à l'index dans le tableau
-     *
-     * @author Erbland Julien (SCIPER : 346893)
      */
     public int byteAt(int index){
         Objects.checkIndex(index,tab.length);
@@ -75,24 +68,21 @@ public final class ByteString {
      * @throws IndexOutOfBoundsException : si la plage décrite par fromIndex et toIndex n'est pas totalement comprise entre 0 et la taille de la chaîne
      * @throws IllegalArgumentException : si la différence entre toIndex et fromIndex n'est pas strictement inférieure à au nombre d'octets contenus dans une valeur de type long
      * @return : valeur de type long construite par les bytes compris entre fromIndex et toIndex
-     *
-     * @author Erbland Julien (SCIPER : 346893)
      */
     public long bytesInRange(int fromIndex, int toIndex){
         Objects.checkFromToIndex(fromIndex,toIndex,tab.length);
-        Preconditions.checkArgument(toIndex-fromIndex<(Long.SIZE/8));
+        Preconditions.checkArgument(toIndex-fromIndex<(Long.SIZE/Byte.SIZE));
 
         byte[] output = java.util.Arrays.copyOfRange(tab,fromIndex,toIndex);
 
         long number = output[0];
 
         for(int i = 1; i<output.length; ++i){
-            number = number << 8;
+            number = number << Byte.SIZE;
             long unsigned = output[i] & 0xFF;  //évite les problèmes de signes
             number = number | unsigned;
         }
         return number;
-
     }
 
 
@@ -101,9 +91,7 @@ public final class ByteString {
      *  et que ses octets sont identiques à ceux du récepteur
      * @param object : objet à comparer
      * @throws IllegalArgumentException : si object n'est pas de type ByteString
-     * @return : vrai si les tableau de chaque ByteString sont égaux ou faux sinon
-     *
-     * @author Erbland Julien (SCIPER : 346893)
+     * @return : vrai si les tableaux de chaque ByteString sont égaux ou faux sinon
      */
     @Override
     public boolean equals(Object object) {
@@ -111,12 +99,9 @@ public final class ByteString {
         return Arrays.equals(tab,((ByteString) object).tab);
     }
 
-
     /**
      * Retourne une représentation des octets de la chaîne en hexadécimal, chaque octet occupant exactement deux caractères
      * @return : la représentation de tab en un String en hexadécimal
-     *
-     * @author Erbland Julien (SCIPER : 346893)
      */
     @Override
     public String toString(){
@@ -124,12 +109,9 @@ public final class ByteString {
         return hexFormat.formatHex(tab);
     }
 
-
     /**
      * Retourne la valeur retournée par la méthode hashCode de Arrays appliquée au tableau contenant les octets
      * @return : la valeur de hachage appliquée à tab
-     *
-     * @author Erbland Julien (SCIPER : 346893)
      */
     @Override
     public int hashCode(){
