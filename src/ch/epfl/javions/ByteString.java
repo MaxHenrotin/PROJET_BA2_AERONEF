@@ -34,8 +34,7 @@ public final class ByteString {
         Preconditions.checkArgument((hexString.length()%2)==0);
 
         try{
-            ByteString output = new ByteString(HexFormat.of().parseHex(hexString));
-            return output;
+            return new ByteString(HexFormat.of().parseHex(hexString));
         }catch(IllegalArgumentException e){ //la méthode parseHex throw IllegalArgumentException si la string n'est pas hexadécimal
             throw new NumberFormatException(); //on souhaite pourtant throw NumberFormatException dans ce cas la donc on catch et throw le bon type d'exception voulu
         }
