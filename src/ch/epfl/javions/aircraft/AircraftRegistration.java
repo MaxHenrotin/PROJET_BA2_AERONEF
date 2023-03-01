@@ -4,12 +4,12 @@ import ch.epfl.javions.Preconditions;
 
 import java.util.regex.Pattern;
 
-public record AircraftRegistration(String OACIAddress) {
+public record AircraftRegistration(String aircraftRegistration) {
 
     private final static Pattern aircraftRegistrationExpression=Pattern.compile("[A-Z0-9 .?/_+-]+");
 
     public AircraftRegistration {
-        Preconditions.checkArgument(!OACIAddress.isEmpty());
-        Preconditions.checkArgument(aircraftRegistrationExpression.matcher(OACIAddress).matches());
+        Preconditions.checkArgument(!aircraftRegistration.isEmpty());
+        Preconditions.checkArgument(aircraftRegistrationExpression.matcher(aircraftRegistration).matches());
     }
 }

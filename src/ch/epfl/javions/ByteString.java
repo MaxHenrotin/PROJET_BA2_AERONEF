@@ -25,14 +25,13 @@ public final class ByteString {
 
     /**
      * Retourne la chaîne d'octets dont la chaîne passée en argument est la représentation hexadécimale
-     * @param hexString : chaîne de charactère représentant un nombre em  base 16
-     * @throws NumberFormatException : si la chaîne de charactère n'est pas en hexadéciaml
-     * @throws IllegalArgumentException : si hexString n'est pas de longueur pair
+     * @param hexString : chaîne de caractère représentant un nombre en base 16
+     * @throws NumberFormatException : si la chaîne de caractère n'est pas en hexadécimale
+     * @throws IllegalArgumentException : si hexString n'est pas de longueur paire
      * @return : un ByteString correspondant à la représentation hexadécimal passée en paramètre
      */
     public static ByteString ofHexadecimalString(String hexString){
         Preconditions.checkArgument((hexString.length()%2)==0);
-
         try{
             return new ByteString(HexFormat.of().parseHex(hexString));
         }catch(IllegalArgumentException e){ //la méthode parseHex throw IllegalArgumentException si la string n'est pas hexadécimal
@@ -61,9 +60,9 @@ public final class ByteString {
 
     /**
      * Retourne les octets compris entre les index fromIndex (inclus) et toIndex (exclu)
-     * sous la forme d'une valeur de type long,l'octet d'index toIndex - 1 constituant l'octet de poids faible du résultat
+     * sous la forme d'une valeur de type long, l'octet d'index toIndex - 1 constituant l'octet de poids faible du résultat
      * @param fromIndex : index de départ (inclus)
-     * @param toIndex : index finale(exclu)
+     * @param toIndex : index final(exclu)
      * @throws IndexOutOfBoundsException : si la plage décrite par fromIndex et toIndex n'est pas totalement comprise entre 0 et la taille de la chaîne
      * @throws IllegalArgumentException : si la différence entre toIndex et fromIndex n'est pas strictement inférieure à au nombre d'octets contenus dans une valeur de type long
      * @return : valeur de type long construite par les bytes compris entre fromIndex et toIndex

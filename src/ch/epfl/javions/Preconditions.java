@@ -7,7 +7,7 @@ package ch.epfl.javions;
  * @author Julien Erbland (346893)
  */
 public final class Preconditions {
-    private Preconditions(){}   //constructeurs private pour rendre la classe non instanciable
+    private Preconditions(){}   //constructeurs private pour rendre la classe non instantiable
 
     /**
      * lève une exception si l'argument est faux

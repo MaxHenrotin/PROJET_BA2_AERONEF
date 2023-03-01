@@ -17,9 +17,8 @@ public final class Math2 {
      * @return min si v est inférieure à min, max si v est supérieure à max
      */
     public static int clamp(int min, int v, int max) {
-        if(min>max){
-            throw new IllegalArgumentException();
-        }else if(v<min){
+        Preconditions.checkArgument(min<=max);
+        if(v<min){
             return min;
         }else if(v>max){
             return max;

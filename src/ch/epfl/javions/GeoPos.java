@@ -14,9 +14,7 @@ public record GeoPos(int longitudeT32, int latitudeT32) {
      * @throws IllegalArgumentException si la longitude ou la latitude n'est pas dans l'intervalle [-2^30,2^30]
      */
     public GeoPos{
-        if(!isValidLatitudeT32(latitudeT32)){
-            throw new IllegalArgumentException();
-        }
+        Preconditions.checkArgument(isValidLatitudeT32(latitudeT32));
     }
 
     /**

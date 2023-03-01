@@ -21,9 +21,7 @@ public class Bits {
      * @return vecteur contenant la plage de bit extraite
      */
     public static int extractUInt(long value, int start, int size){
-        if(size<=0 || size>=Integer.SIZE){
-            throw new IllegalArgumentException();       //voir 3.9
-        }
+        Preconditions.checkArgument((size>0) && (size<Integer.SIZE));
         Objects.checkFromIndexSize(start,size,Long.SIZE);   //throw un IndexOutOfBundsException
         value = value << Long.SIZE - size- start; // supprime tous les bits supplémentaires à gauche
         value = value >>> Long.SIZE - size;       // supprime tous les bits supplémentaires à droite (mets des 0)
