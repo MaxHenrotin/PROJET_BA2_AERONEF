@@ -2,6 +2,7 @@ package ch.epfl.javions.aircraft;
 //  Author:    Max Henrotin
 
 import ch.epfl.javions.ByteString;
+import org.w3c.dom.ls.LSOutput;
 
 import java.io.*;
 import java.util.zip.ZipFile;
@@ -22,24 +23,20 @@ public final class AircraftDatabase {
     public AircraftData get(IcaoAddress address) throws IOException {
 
         //extreaction des deux derniers bits de l'adresse Icao
-        ByteString adressInBit = ByteString.ofHexadecimalString(address.toString());
-        int fileIndex = adressInBit.byteAt(0); //on récupère les 8 derniers bits de l'adresse Icao (=2 hexadécimaux)
-        String fileAdress = fileIndex + ".csv";
+        String fileAdress = address.toString().substring(4,6) + ".csv";
 
         String dataBaseAdress = getClass().getResource(fileName).getFile();
 
         try (ZipFile dataBase = new ZipFile(dataBaseAdress);
-
-            InputStream stream = dataBase.getInputStream(dataBase.getEntry(fileAdress));
+            InputStream stream = dataBase.getInputStream(dataBase.getEntry(fileAdress));    //fonctionne si je remplace par 14.csv
             Reader reader = new InputStreamReader(stream, UTF_8);
             BufferedReader bufferedReader = new BufferedReader(reader)){
-
             String line;
             //vérifier que la premiere ligne commence bien par l'adresse Icao
             do{
                 line = bufferedReader.readLine();
-            }while(line.substring(0,6).compareTo(address.toString())<0);
-            if(line.startsWith(address.toString())){
+            }while(line != null && line.substring(0,6).compareTo(address.toString())<0);
+            if(line != null && line.startsWith(address.toString())){
 
                 String[] data = line.split(",");
                 return new AircraftData(new AircraftRegistration(data[1]), new AircraftTypeDesignator(data[2]), data[3], new AircraftDescription(data[4]), WakeTurbulenceCategory.of(data[5]));
