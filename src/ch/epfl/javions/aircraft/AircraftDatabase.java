@@ -23,7 +23,7 @@ public final class AircraftDatabase {
     public AircraftData get(IcaoAddress address) throws IOException {
 
         //extreaction des deux derniers bits de l'adresse Icao
-        String fileAdress = address.toString().substring(4,6) + ".csv";
+        String fileAdress = address.OACIAddress().substring(4,6) + ".csv";
 
         String dataBaseAdress = getClass().getResource(fileName).getFile();
 
@@ -35,17 +35,17 @@ public final class AircraftDatabase {
             //vérifier que la premiere ligne commence bien par l'adresse Icao
             do{
                 line = bufferedReader.readLine();
-            }while(line != null && line.substring(0,6).compareTo(address.toString())<0);
-            if(line != null && line.startsWith(address.toString())){
+            }while(line != null && line.substring(0,6).compareTo(address.OACIAddress())<0);
+            if(line != null && line.startsWith(address.OACIAddress())){
 
-                String[] data = line.split(",");
+                String[] data = line.split(",",-1);
                 return new AircraftData(new AircraftRegistration(data[1]), new AircraftTypeDesignator(data[2]), data[3], new AircraftDescription(data[4]), WakeTurbulenceCategory.of(data[5]));
 
             }else{
                 return null;    //si l'avion n'est pas dans la dataBase
             }
         }catch (Exception e){
-            throw new IOException();
+            throw e;    //throw new IOException(); serait mieux mais on perd l'information de l'exception...
         }
     }
 }

@@ -9,6 +9,6 @@ public record AircraftTypeDesignator(String TypeDesignator) {
     private final static Pattern aircraftTypeDesignatorExpression=Pattern.compile("[0-9A-Z]{2,4}");
 
     public AircraftTypeDesignator {
-        Preconditions.checkArgument(aircraftTypeDesignatorExpression.matcher(TypeDesignator).matches());
+        Preconditions.checkArgument(aircraftTypeDesignatorExpression.matcher(TypeDesignator).matches() || TypeDesignator.isEmpty());
     }
 }
