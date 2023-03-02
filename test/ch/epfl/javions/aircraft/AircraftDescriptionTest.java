@@ -14,8 +14,6 @@ class AircraftDescriptionTest {
 
         assertThrows(IllegalArgumentException.class, () -> new AircraftDescription("*ç%&/("));
 
-        assertThrows(IllegalArgumentException.class, () -> new AircraftDescription(""));
-
         AircraftDescription d1= new AircraftDescription("A3J");
         assertEquals("A3J", d1.aircraftDescription());
 

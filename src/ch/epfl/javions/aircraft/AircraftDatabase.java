@@ -5,6 +5,7 @@ import ch.epfl.javions.ByteString;
 import org.w3c.dom.ls.LSOutput;
 
 import java.io.*;
+import java.net.URLDecoder;
 import java.util.zip.ZipFile;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -26,7 +27,7 @@ public final class AircraftDatabase {
         String fileAdress = address.OACIAddress().substring(4,6) + ".csv";
 
         String dataBaseAdress = getClass().getResource(fileName).getFile();
-
+        dataBaseAdress = URLDecoder.decode(dataBaseAdress, UTF_8);
         try (ZipFile dataBase = new ZipFile(dataBaseAdress);
             InputStream stream = dataBase.getInputStream(dataBase.getEntry(fileAdress));    //fonctionne si je remplace par 14.csv
             Reader reader = new InputStreamReader(stream, UTF_8);
@@ -44,8 +45,8 @@ public final class AircraftDatabase {
             }else{
                 return null;    //si l'avion n'est pas dans la dataBase
             }
-        }catch (Exception e){
-            throw e;    //throw new IOException(); serait mieux mais on perd l'information de l'exception...
+        }catch (Exception IOException){
+            throw new IOException(); //attention on perd l'information de l'exception si elle n'est pas de type IOException
         }
     }
 }

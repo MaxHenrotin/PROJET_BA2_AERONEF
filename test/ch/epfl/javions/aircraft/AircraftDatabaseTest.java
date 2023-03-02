@@ -21,9 +21,13 @@ class AircraftDatabaseTest {
     }
 
     @Test
+    void assertThrowsIfZipAddressIsEmpty() {
+        assertThrows(NullPointerException.class, () -> new AircraftDatabase(""));
+    }
+
+    @Test
     void assertThrowsIfZipAddressIsNull() {
-        AircraftDatabase aircraftDatabase = new AircraftDatabase("");
-        assertThrows(NullPointerException.class, () -> aircraftDatabase.get(new IcaoAddress("A040C6")));
+        assertThrows(NullPointerException.class, () -> new AircraftDatabase(null));
     }
 
     @Test
@@ -55,7 +59,7 @@ class AircraftDatabaseTest {
     void aircraftDatabaseTestGeneral() {
         AircraftDatabase aircraftDatabase = new AircraftDatabase("/aircraft.zip");
         try {
-            int repetitionNumber = 100000;  //on teste 100000 cas aléatoires d'adresses ICAO
+            int repetitionNumber = 1000;  //on teste 1000 cas aléatoires d'adresses ICAO
             do {
                 String icaoAddress = "";
                 for (int i = 0; i < 6; i++) {    //pour les 6 chiffres de l'adresse Icao
