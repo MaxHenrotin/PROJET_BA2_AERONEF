@@ -4,7 +4,7 @@ public final class Crc24 {
 
     public final static int GENERATOR = 0xFFF409;
 
-    private final static int CRCLENGTH = 24;
+    private final static int CRC24LENGTH = 24;
 
     private final int generator;
 
@@ -20,24 +20,36 @@ public final class Crc24 {
 
         int crc24 = 0;
 
-        int maskCrc24= 1 << CRCLENGTH;
+        int maskCrc24= 1 << CRC24LENGTH;
 
-        ByteString byteString=new ByteString(bytes);
+        int b;
 
-        for (int i=0; i< bytes.length ;++i){
+        for (int elem : bytes){
+            for (int j=0 ; j<Byte.SIZE ; ++j){
+                b=Bits.extractUInt(elem,j,1);
 
-            int b=Bits.extractUInt(bytes[i]);
+                crc24 = (crc24 << 1) | b;
 
-            crc24 = (crc24 << 1) | byteString.byteAt(i);
+                if(Bits.testBit(crc24,CRC24LENGTH)){
+                    crc24 = crc24 ^ generator;
+                }
 
-            if(Bits.testBit(crc24,CRCLENGTH)){
+                crc24 = crc24 & (maskCrc24-1);
+            }
+        }
+
+        for (int k=0; k<CRC24LENGTH ;++k){
+            crc24 = (crc24 << 1);
+
+            if(Bits.testBit(crc24,CRC24LENGTH)){
                 crc24 = crc24 ^ generator;
             }
 
             crc24 = crc24 & (maskCrc24-1);
+
         }
 
-        return Bits.extractUInt(crc24,Long.SIZE-CRCLENGTH,CRCLENGTH);
+        return crc24;
     }
 
 }
