@@ -22,32 +22,27 @@ public final class Crc24 {
 
         int maskCrc24= 1 << CRC24LENGTH;
 
+        int mask23=1<<(CRC24LENGTH-1);
+
         int b;
+
+        int newGenerator=(generator & (maskCrc24-1));
+
+        int[] table = {0,newGenerator};
 
         for (int elem : bytes){
             for (int j=0 ; j<Byte.SIZE ; ++j){
                 b = Bits.extractUInt(elem,Byte.SIZE - (j+1),1);
 
-                if(Bits.testBit(crc24,CRC24LENGTH-1)){
-
-                    crc24 = ((crc24 << 1) | b) ^ (generator & (maskCrc24-1));
-
-                }else {
-                    crc24= (crc24 << 1) | b;
-                }
+                crc24 = ((crc24 << 1) | b) ^ table[(crc24 & mask23)>>>(CRC24LENGTH-1)];
 
                 crc24 = crc24 & (maskCrc24-1);
             }
         }
 
         for (int k=0; k<CRC24LENGTH ;++k){
-            if(Bits.testBit(crc24,CRC24LENGTH-1)){
 
-                crc24 = (crc24 << 1) ^ (generator & (maskCrc24-1));
-
-            }else {
-                crc24= crc24 << 1;
-            }
+            crc24 = (crc24 << 1) ^ table[(crc24 & mask23)>>>(CRC24LENGTH-1)];
 
             crc24 = crc24 & (maskCrc24-1);
 
