@@ -18,7 +18,7 @@ public record IcaoAddress(String string) {
     private final static Pattern icaoAddressExpression=Pattern.compile("[0-9A-F]{6}");
 
     /**
-     * Constructeur
+     * Constructeur compact
      * @param string : adresse ICAO de l'aéronef
      * @throws IllegalArgumentException: si l'adresse est vide
      * @throws IllegalArgumentException : si l'adresse ne respecte pas la syntaxe

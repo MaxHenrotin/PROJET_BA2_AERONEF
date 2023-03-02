@@ -15,6 +15,12 @@ public record AircraftRegistration(String string) {
 
     private final static Pattern aircraftRegistrationExpression=Pattern.compile("[A-Z0-9 .?/_+-]+");
 
+    /**
+     * Constructeur compact
+     * @param string
+     * @throws IllegalArgumentException : si l'immatriculation est vide
+     * @throws IllegalArgumentException : si le numéro d'immatriculation ne respecte pas la syntaxe
+     */
     public AircraftRegistration {
         Preconditions.checkArgument(!string.isEmpty());
         Preconditions.checkArgument(aircraftRegistrationExpression.matcher(string).matches());

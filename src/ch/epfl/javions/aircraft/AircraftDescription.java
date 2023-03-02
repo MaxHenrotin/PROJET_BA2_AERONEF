@@ -18,7 +18,7 @@ public record AircraftDescription(String string) {
     private final static Pattern aircraftDescriptionExpression = Pattern.compile("[ABDGHLPRSTV-][0123468][EJPT-]");
 
     /**
-     * Constructeur
+     * Constructeur compact
      * @param string : description
      * @throws IllegalArgumentException : si la description ne respecte pas la syntaxe
      */

@@ -4,7 +4,6 @@ import ch.epfl.javions.Preconditions;
 
 import java.util.regex.Pattern;
 
-public record AircraftTypeDesignator(String string) {
 /**
  * Rprésente un indicateur de type d'aéronef
  * @param string : type de l'aéronef
@@ -12,12 +11,14 @@ public record AircraftTypeDesignator(String string) {
  * @author Julien Erbland (346893)
  * @author Max Henrotin (341463)
  */
+public record AircraftTypeDesignator(String string) {
+
     private final static Pattern aircraftTypeDesignatorExpression=Pattern.compile("[0-9A-Z]{2,4}");
 
     /**
-     * Constructeur
+     * Constructeur compact
      * @param string
-     * @throws IllegalArgumentException : si l'indicateur de type de ne respecte pas la syntaxe établi
+     * @throws IllegalArgumentException : si l'indicateur de type de ne respecte pas la syntaxe établie
      */
     public AircraftTypeDesignator {
         Preconditions.checkArgument(aircraftTypeDesignatorExpression.matcher(string).matches() || string.isEmpty());
