@@ -6,17 +6,17 @@ import java.util.regex.Pattern;
 
 /**
  * Représente le numéro d'immatriculation d'un aéronef
- * @param aircraftRegistration : numéro d'immatriculation
+ * @param string : numéro d'immatriculation
  *
  * @author Julien Erbland (346893)
  * @author Max Henrotin (341463)
  */
-public record AircraftRegistration(String aircraftRegistration) {
+public record AircraftRegistration(String string) {
 
     private final static Pattern aircraftRegistrationExpression=Pattern.compile("[A-Z0-9 .?/_+-]+");
 
     public AircraftRegistration {
-        Preconditions.checkArgument(!aircraftRegistration.isEmpty());
-        Preconditions.checkArgument(aircraftRegistrationExpression.matcher(aircraftRegistration).matches());
+        Preconditions.checkArgument(!string.isEmpty());
+        Preconditions.checkArgument(aircraftRegistrationExpression.matcher(string).matches());
     }
 }

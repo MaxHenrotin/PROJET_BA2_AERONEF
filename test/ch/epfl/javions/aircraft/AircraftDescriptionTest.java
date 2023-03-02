@@ -1,6 +1,5 @@
 package ch.epfl.javions.aircraft;
 
-import ch.epfl.javions.adsb.CallSign;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,7 +14,7 @@ class AircraftDescriptionTest {
         assertThrows(IllegalArgumentException.class, () -> new AircraftDescription("*ç%&/("));
 
         AircraftDescription d1= new AircraftDescription("A3J");
-        assertEquals("A3J", d1.aircraftDescription());
+        assertEquals("A3J", d1.string());
 
     }
 
