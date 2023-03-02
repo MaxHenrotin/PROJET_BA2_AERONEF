@@ -1,7 +1,9 @@
 package ch.epfl.javions;
 
+import java.util.concurrent.LinkedBlockingDeque;
+
 /**
- * Classe Crc24 permettant de calculer un crc24 à partir d'un generator donné
+ * Représente un calculateur de CRC de 24 bits
  *
  * @author Julien Erbland (346893)
  * @author Max Henrotin (341463)
@@ -30,6 +32,11 @@ public final class Crc24 {
         this.generator=generator;
     }
 
+    /**
+     * Retourne le CRC24 du tableau donné avec un algorithme octet par octet
+     * @param bytes : tableau de bytes représentant le message
+     * @return le crc correspondant au message donné
+     */
     public int crc(byte[] bytes){
         int[] table= buildTable();
 
@@ -56,6 +63,12 @@ public final class Crc24 {
         return crc_bitwise(generator,bytes);
     }
 
+    /**
+     * Retourne le CRC24 du tableau donné avec un algorithme bit à bit
+     * @param generator : générateur utilisé pour calculer le crc
+     * @param bytes : message donné
+     * @return le crc corespondant au message donné calculé à l'aide du generator
+     */
     private static int crc_bitwise(int generator,byte[] bytes){
 
         int crc24 = 0;
@@ -66,6 +79,8 @@ public final class Crc24 {
 
         int b;
 
+        int index;
+
         int newGenerator=(generator &  mask24-1);
 
         int[] table = {0,newGenerator};
@@ -74,7 +89,9 @@ public final class Crc24 {
             for (int j=0 ; j<Byte.SIZE ; ++j){
                 b = Bits.extractUInt(elem,Byte.SIZE - (j+1),1);
 
-                crc24 = ((crc24 << 1) | b) ^ table[(crc24 & mask23)>>>(CRC24LENGTH-1)];
+                index=(crc24 & mask23)>>>(CRC24LENGTH-1);
+
+                crc24 = ((crc24 << 1) | b) ^ table[index];
 
                 crc24 = crc24 &  mask24-1;
             }
@@ -82,7 +99,9 @@ public final class Crc24 {
 
         for (int k=0; k<CRC24LENGTH ;++k){
 
-            crc24 = (crc24 << 1) ^ table[(crc24 & mask23)>>>(CRC24LENGTH-1)];
+            index=(crc24 & mask23)>>>(CRC24LENGTH-1);
+
+            crc24 = (crc24 << 1) ^ table[index];
 
             crc24 = crc24 &  mask24-1;
 
@@ -92,6 +111,7 @@ public final class Crc24 {
     }
 
 
+    //Construit la table de tous les CRC24 possible
     private int[] buildTable(){
         int[] output= new int[256];
 
