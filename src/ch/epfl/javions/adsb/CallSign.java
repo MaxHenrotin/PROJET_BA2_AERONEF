@@ -4,10 +4,10 @@ import ch.epfl.javions.Preconditions;
 
 import java.util.regex.Pattern;
 
-public record CallSign(String callSign) {
+public record CallSign(String string) {
     private static Pattern callSignExpression=Pattern.compile("[A-Z0-9 ]{0,8}");
 
     public CallSign{
-        Preconditions.checkArgument(callSignExpression.matcher(callSign).matches());
+        Preconditions.checkArgument(callSignExpression.matcher(string).matches());
     }
 }
