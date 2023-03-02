@@ -12,11 +12,4 @@ public record IcaoAddress(String OACIAddress) {
         Preconditions.checkArgument(!OACIAddress.isEmpty());
         Preconditions.checkArgument(icaoAddressExpression.matcher(OACIAddress).matches());
     }
-
-
-    //ajout non demandé (fait entre autre pour la classe AircraftData)
-    @Override
-    public String toString(){
-        return OACIAddress;
-    }
 }
