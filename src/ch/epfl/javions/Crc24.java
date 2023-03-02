@@ -26,7 +26,7 @@ public final class Crc24 {
 
         for (int elem : bytes){
             for (int j=0 ; j<Byte.SIZE ; ++j){
-                b=Bits.extractUInt(elem,j,1);
+                b = Bits.extractUInt(elem,Byte.SIZE - (j+1),1);
 
                 crc24 = (crc24 << 1) | b;
 
