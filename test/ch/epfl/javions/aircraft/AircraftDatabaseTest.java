@@ -3,7 +3,9 @@ package ch.epfl.javions.aircraft;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AircraftDatabaseTest {
@@ -20,7 +22,9 @@ class AircraftDatabaseTest {
 
     @Test
     void aircraftDatabaseTestAdresseIcaoOk() throws IOException {
-        AircraftDatabase aircraftDatabase = new AircraftDatabase("/aircraft.zip");
+        String dataBaseAdress = getClass().getResource("/aircraft.zip").getFile();
+        dataBaseAdress = URLDecoder.decode(dataBaseAdress, UTF_8);
+        AircraftDatabase aircraftDatabase = new AircraftDatabase(dataBaseAdress);
         AircraftData aircraftData = aircraftDatabase.get(new IcaoAddress("A040C6"));
         System.out.println(aircraftData);   //possible car AircraftData est un enregistrement
         assertEquals(new AircraftData(new AircraftRegistration("N115WM"), new AircraftTypeDesignator("GLST"), "GLASAIR SH-4 GlaStar", new AircraftDescription("L1P"), WakeTurbulenceCategory.LIGHT), aircraftData);
@@ -28,7 +32,9 @@ class AircraftDatabaseTest {
 
     @Test
     void aircraftDatabaseTestLimite() throws IOException {
-        AircraftDatabase aircraftDatabase = new AircraftDatabase("/aircraft.zip");
+        String dataBaseAdress = getClass().getResource("/aircraft.zip").getFile();
+        dataBaseAdress = URLDecoder.decode(dataBaseAdress, UTF_8);
+        AircraftDatabase aircraftDatabase = new AircraftDatabase(dataBaseAdress);
         AircraftData aircraftData = aircraftDatabase.get(new IcaoAddress("FFFFFF"));
         System.out.println(aircraftData);
         aircraftData = aircraftDatabase.get(new IcaoAddress("A00000"));
@@ -37,7 +43,9 @@ class AircraftDatabaseTest {
 
     @Test
     void aircraftDatabaseTestGeneral() throws IOException{
-        AircraftDatabase aircraftDatabase = new AircraftDatabase("/aircraft.zip");
+        String dataBaseAdress = getClass().getResource("/aircraft.zip").getFile();
+        dataBaseAdress = URLDecoder.decode(dataBaseAdress, UTF_8);
+        AircraftDatabase aircraftDatabase = new AircraftDatabase(dataBaseAdress);
         int repetitionNumber = 1000;  //on teste 1000 cas aléatoires d'adresses ICAO
         do {
             String icaoAddress = "";
@@ -53,7 +61,9 @@ class AircraftDatabaseTest {
 
     @Test
     void aircraftDatabaseTestCasSpecial() throws IOException{ //trouvé grâce à aircraftDatabaseTestGeneral()
-        AircraftDatabase aircraftDatabase = new AircraftDatabase("/aircraft.zip");
+        String dataBaseAdress = getClass().getResource("/aircraft.zip").getFile();
+        dataBaseAdress = URLDecoder.decode(dataBaseAdress, UTF_8);
+        AircraftDatabase aircraftDatabase = new AircraftDatabase(dataBaseAdress);
         AircraftData aircraftData = aircraftDatabase.get(new IcaoAddress("A8E250"));
         System.out.println(aircraftData);
         aircraftData = aircraftDatabase.get(new IcaoAddress("C07848"));
