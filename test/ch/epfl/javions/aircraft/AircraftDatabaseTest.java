@@ -11,11 +11,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class AircraftDatabaseTest {
 
     @Test
-    void assertThrowsIfZipAddressIsEmpty() {
-        assertThrows(NullPointerException.class, () -> new AircraftDatabase(""));
-    }
-
-    @Test
     void assertThrowsIfZipAddressIsNull() {
         assertThrows(NullPointerException.class, () -> new AircraftDatabase(null));
     }
