@@ -2,29 +2,43 @@ package ch.epfl.javions.aircraft;
 //  Author:    Max Henrotin
 
 import java.io.*;
-import java.net.URLDecoder;
+import java.util.Objects;
 import java.util.zip.ZipFile;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public final class AircraftDatabase {
 
+
+/**
+ * Classe qui représente la base de données mictronics des aéronefs.
+ *
+ * @author Julien Erbland (346893)
+ * @author Max Henrotin (341463)
+ */
+public final class AircraftDatabase {
     private String fileName;
 
+    /**
+     * Constructeur qui retourne un objet représentant la base de données mictronics, stockée dans le fichier de nom filename
+     * @param fileName : nom du fichier dans lequel est stockée la base de donnée
+     * @throws NullPointerException si filename est nul
+     */
     public AircraftDatabase(String fileName) {  //pour la base de donnée mictronics de notre projet : fileName = aircraft.zip
-        if(fileName.isEmpty()){
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(fileName);
         this.fileName = fileName;
     }
+
+    /**
+     * Classe qui retourne les données de l'aéronef dont l'adresse OACI est celle donnée, ou null si aucune entrée n'existe dans la base pour cette adresse
+     * @param address : adresse Icao de l'avion qui recherche dans  la base de donnée
+     * @return les données de l'aéronef dont l'adresse OACI est celle donnée, ou null si aucune entrée n'existe dans la base pour cette adresse
+     * @throws IOException en cas d'erreur d'entrée/sortie
+     */
 
     public AircraftData get(IcaoAddress address) throws IOException {
 
         //extreaction des deux derniers bits de l'adresse Icao
-        String fileAdress = address.string().substring(4,6) + ".csv";
-
-        //String dataBaseAdress = getClass().getResource(fileName).getFile();
-        //dataBaseAdress = URLDecoder.decode(dataBaseAdress, UTF_8);
+        String fileAdress = address.string().substring(4) + ".csv";
 
         try (ZipFile dataBase = new ZipFile(fileName);
             InputStream stream = dataBase.getInputStream(dataBase.getEntry(fileAdress));    //fonctionne si je remplace par 14.csv
@@ -35,7 +49,7 @@ public final class AircraftDatabase {
             //vérifier que la premiere ligne commence bien par l'adresse Icao
             do{
                 line = bufferedReader.readLine();
-            }while(line != null && line.substring(0,6).compareTo(address.string())<0);
+            }while(line != null && line.compareTo(address.string())<0);
             if(line != null && line.startsWith(address.string())){
 
                 String[] data = line.split(",",-1);
