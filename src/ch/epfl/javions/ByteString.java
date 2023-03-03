@@ -77,7 +77,7 @@ public final class ByteString {
 
         for(int i = 1; i<output.length; ++i){
             number = number << Byte.SIZE;
-            number = number | (output[i]&0xFF); //évite les problèmes de signes
+            number = number | Byte.toUnsignedInt(output[i]); //évite les problèmes de signes
         }
         return number;
     }
