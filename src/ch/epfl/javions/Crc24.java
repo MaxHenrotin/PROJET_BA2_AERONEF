@@ -47,13 +47,15 @@ public final class Crc24 {
 
         int crc = 0;
 
+        ByteString byteString=new ByteString(bytes);
+
         int index;
 
-        for (byte aByte : bytes) {
+        for (int i=0 ; i < byteString.size() ; ++i) {
 
             index = Bits.extractUInt(crc, CRC24LENGTH - Byte.SIZE, Byte.SIZE);
 
-            crc = ((crc << Byte.SIZE) | (aByte & 0xFF)) ^ table[index];
+            crc = ((crc << Byte.SIZE) | byteString.byteAt(i)) ^ table[index];
 
         }
 
