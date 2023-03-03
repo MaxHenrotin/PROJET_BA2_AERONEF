@@ -1,4 +1,4 @@
-package ch.epfl.aircraft;
+package ch.epfl.javions.aircraft;
 
 import ch.epfl.javions.aircraft.WakeTurbulenceCategory;
 import org.junit.jupiter.api.Assertions;
