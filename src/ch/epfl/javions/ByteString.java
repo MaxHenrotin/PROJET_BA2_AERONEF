@@ -13,7 +13,7 @@ import java.util.Objects;
 
 public final class ByteString {
 
-    private byte[] tab;
+    private final byte[] tab;
 
     /**
      * Constructeur de byte en utilisant la fonction clone() pour éviter les problèmes de références
