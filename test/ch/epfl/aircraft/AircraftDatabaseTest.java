@@ -1,5 +1,6 @@
-package ch.epfl.javions.aircraft;
+package ch.epfl.aircraft;
 
+import ch.epfl.javions.aircraft.*;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -64,5 +65,4 @@ class AircraftDatabaseTest {
         aircraftData = aircraftDatabase.get(new IcaoAddress("C07848"));
         System.out.println(aircraftData);
     }
-
 }

@@ -15,14 +15,11 @@ public enum WakeTurbulenceCategory {
      * @return le type de turbulence correspondant à la chaîne passée en argument
      */
     public static WakeTurbulenceCategory of(String s){
-        switch(s){
-            case "L" :
-                return WakeTurbulenceCategory.LIGHT;
-            case "M":
-                return WakeTurbulenceCategory.MEDIUM;
-            case "H" :
-                return WakeTurbulenceCategory.HEAVY;
-        }
-        return WakeTurbulenceCategory.UNKNOWN;
+        return switch (s) {
+            case "L" -> WakeTurbulenceCategory.LIGHT;
+            case "M" -> WakeTurbulenceCategory.MEDIUM;
+            case "H" -> WakeTurbulenceCategory.HEAVY;
+            default -> WakeTurbulenceCategory.UNKNOWN;
+        };
     }
 }

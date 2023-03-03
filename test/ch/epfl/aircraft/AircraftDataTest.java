@@ -1,5 +1,9 @@
-package ch.epfl.javions.aircraft;
+package ch.epfl.aircraft;
 
+import ch.epfl.javions.aircraft.AircraftData;
+import ch.epfl.javions.aircraft.AircraftDescription;
+import ch.epfl.javions.aircraft.AircraftRegistration;
+import ch.epfl.javions.aircraft.WakeTurbulenceCategory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

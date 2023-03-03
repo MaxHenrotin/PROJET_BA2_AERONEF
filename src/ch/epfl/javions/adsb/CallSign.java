@@ -14,11 +14,11 @@ public record CallSign(String string) {
 
 
     //Pattern d'écriture d'un indicatif
-    private static Pattern callSignExpression=Pattern.compile("[A-Z0-9 ]{0,8}");
+    private static final Pattern callSignExpression=Pattern.compile("[A-Z0-9 ]{0,8}");
 
     /**
      * Constructeur compact
-     * @param string
+     * @param string : indicatif de l'aéronef
      * @throws IllegalArgumentException : si l'indicatif ne respecte pas la syntaxe
      */
     public CallSign{

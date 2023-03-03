@@ -1,6 +1,5 @@
 package ch.epfl.javions;
 
-import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * Représente un calculateur de CRC de 24 bits
@@ -27,7 +26,7 @@ public final class Crc24 {
     private final static int mask24= 1 << CRC24LENGTH;
 
     private final static int mask23bits=mask24-1;
-    private int[] table;
+    private final int[] table;
 
     /**
      * Constructeur de la classe qui prend le générateur en argument pour décoder le message et construit la table des crc24 correspondant

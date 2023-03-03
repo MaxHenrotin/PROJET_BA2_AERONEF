@@ -8,7 +8,7 @@ import java.util.Objects;
  * @param typeDesignator :indicateur de type
  * @param model : modèle (model), donnant généralement le nom du fabricant et celui du modèle spécifique de l'aéronef
  * @param description : description(description), un code de trois lettres donnant le type de l'aéronef, son nombre de moteurs et son type de propulsion
- * @param wakeTurbulenceCategory : atégorie de turbulence de sillage (wake turbulence category, souvent abrégée WTC), qui donne une indication de l'importance des turbulences produites dans le sillage de l'aéronef
+ * @param wakeTurbulenceCategory : catégorie de turbulence de sillage (wake turbulence category, souvent abrégée WTC), qui donne une indication de l'importance des turbulences produites dans le sillage de l'aéronef
  *
  * @author Julien Erbland (346893)
  * @author Max Henrotin (341463)
@@ -17,11 +17,11 @@ public record AircraftData(AircraftRegistration registration, AircraftTypeDesign
 
     /**
      * Constructeur compact
-     * @param registration
-     * @param typeDesignator
-     * @param model
-     * @param description
-     * @param wakeTurbulenceCategory
+     * @param registration : numéro d'immatriculation
+     * @param typeDesignator :indicateur de type
+     * @param model : modèle (model), donnant généralement le nom du fabricant et celui du modèle spécifique de l'aéronef
+     * @param description : description(description), un code de trois lettres donnant le type de l'aéronef, son nombre de moteurs et son type de propulsion
+     * @param wakeTurbulenceCategory : catégorie de turbulence de sillage (wake turbulence category, souvent abrégée WTC), qui donne une indication de l'importance des turbulences produites dans le sillage de l'aéronef
      * @throws IllegalArgumentException : si une des données est null
      */
     public AircraftData{
