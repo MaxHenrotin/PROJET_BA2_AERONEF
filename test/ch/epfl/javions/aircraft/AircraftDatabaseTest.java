@@ -1,6 +1,5 @@
 package ch.epfl.javions.aircraft;
 
-import ch.epfl.javions.aircraft.*;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -22,7 +21,6 @@ class AircraftDatabaseTest {
         dataBaseAdress = URLDecoder.decode(dataBaseAdress, UTF_8);
         AircraftDatabase aircraftDatabase = new AircraftDatabase(dataBaseAdress);
         AircraftData aircraftData = aircraftDatabase.get(new IcaoAddress("A040C6"));
-        System.out.println(aircraftData);   //possible car AircraftData est un enregistrement
         assertEquals(new AircraftData(new AircraftRegistration("N115WM"), new AircraftTypeDesignator("GLST"), "GLASAIR SH-4 GlaStar", new AircraftDescription("L1P"), WakeTurbulenceCategory.LIGHT), aircraftData);
     }
 
@@ -32,13 +30,13 @@ class AircraftDatabaseTest {
         dataBaseAdress = URLDecoder.decode(dataBaseAdress, UTF_8);
         AircraftDatabase aircraftDatabase = new AircraftDatabase(dataBaseAdress);
         AircraftData aircraftData = aircraftDatabase.get(new IcaoAddress("FFFFFF"));
-        System.out.println(aircraftData);
+        assertNull(aircraftData);
         aircraftData = aircraftDatabase.get(new IcaoAddress("A00000"));
-        System.out.println(aircraftData);
+        assertNull(aircraftData);
     }
 
     @Test
-    void aircraftDatabaseTestGeneral() throws IOException{
+    void aircraftDatabaseTestGeneral(){
         String dataBaseAdress = getClass().getResource("/aircraft.zip").getFile();
         dataBaseAdress = URLDecoder.decode(dataBaseAdress, UTF_8);
         AircraftDatabase aircraftDatabase = new AircraftDatabase(dataBaseAdress);
@@ -49,8 +47,10 @@ class AircraftDatabaseTest {
                 int randomNumber = (int) (16 * Math.random());    //random number between 0 and 15 (tous les hexadécimaux)
                 icaoAddress += Integer.toHexString(randomNumber).toUpperCase();
             }
-            AircraftData aircraftData = aircraftDatabase.get(new IcaoAddress(icaoAddress));
-            System.out.println(aircraftData);   //possible car AircraftData est un enregistrement
+            final String icaoAddressFinal = icaoAddress;
+            assertDoesNotThrow(() -> aircraftDatabase.get(new IcaoAddress(icaoAddressFinal)));
+            //AircraftData aircraftData = aircraftDatabase.get(new IcaoAddress(icaoAddress));   //utile pour savoir les adresses qui posent problème (si il y en a)
+            //System.out.println(aircraftData);   //possible car AircraftData est un enregistrement
             --repetitionNumber;
         }while(repetitionNumber > 0);
     }
@@ -61,8 +61,6 @@ class AircraftDatabaseTest {
         dataBaseAdress = URLDecoder.decode(dataBaseAdress, UTF_8);
         AircraftDatabase aircraftDatabase = new AircraftDatabase(dataBaseAdress);
         AircraftData aircraftData = aircraftDatabase.get(new IcaoAddress("A8E250"));
-        System.out.println(aircraftData);
-        aircraftData = aircraftDatabase.get(new IcaoAddress("C07848"));
-        System.out.println(aircraftData);
+        assertEquals(new AircraftData(new AircraftRegistration("N67137"), new AircraftTypeDesignator(""), "", new AircraftDescription(""), WakeTurbulenceCategory.UNKNOWN), aircraftData);
     }
 }
