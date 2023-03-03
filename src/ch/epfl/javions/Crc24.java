@@ -24,12 +24,18 @@ public final class Crc24 {
 
     private final int generator;
 
+    private final static int mask24= 1 << CRC24LENGTH;
+
+    private final static int mask23bits=mask24-1;
+    private int[] table;
+
     /**
-     * Constructeur de la classe qui prend le générateur en argument pour décoder le message
+     * Constructeur de la classe qui prend le générateur en argument pour décoder le message et construit la table des crc24 correspondant
      * @param generator : gémérateur utilisé pour calculer le crc24
      */
     public Crc24(int generator){
         this.generator=generator;
+        table= buildTable();
     }
 
     /**
@@ -38,72 +44,67 @@ public final class Crc24 {
      * @return le crc correspondant au message donné
      */
     public int crc(byte[] bytes){
-        int[] table= buildTable();
 
         int crc = 0;
 
         int index;
 
-        for (int i=0; i< bytes.length;++i){
+        for (byte aByte : bytes) {
 
-            index = Bits.extractUInt(crc,CRC24LENGTH-1,Byte.SIZE);
+            index = Bits.extractUInt(crc, CRC24LENGTH - Byte.SIZE, Byte.SIZE);
 
-            crc=((crc << 8) | bytes[i]) ^ table[index];
-
-        }
-
-        for (int k=0; k< CRC24LENGTH;++k){
-
-            index = Bits.extractUInt(crc,CRC24LENGTH-1,Byte.SIZE);
-
-            crc=(crc << 8) ^ table[index];
+            crc = ((crc << Byte.SIZE) | (aByte & 0xFF)) ^ table[index];
 
         }
 
-        return crc_bitwise(generator,bytes);
+        for (int k=0; k< (CRC24LENGTH/Byte.SIZE);++k){
+
+            index = Bits.extractUInt(crc,CRC24LENGTH-Byte.SIZE,Byte.SIZE);
+
+            crc=(crc << Byte.SIZE) ^ table[index];
+
+        }
+
+        return crc & mask23bits;
     }
 
     /**
      * Retourne le CRC24 du tableau donné avec un algorithme bit à bit
      * @param generator : générateur utilisé pour calculer le crc
      * @param bytes : message donné
-     * @return le crc corespondant au message donné calculé à l'aide du generator
+     * @return le crc corespondant au tableau de bytes donné calculé à l'aide du generator
      */
     private static int crc_bitwise(int generator,byte[] bytes){
 
         int crc24 = 0;
 
-        int mask24= 1 << CRC24LENGTH;
-
-        int mask23=1<<(CRC24LENGTH-1);
-
         int b;
 
         int index;
 
-        int newGenerator=(generator &  mask24-1);
+        int newGenerator=(generator &  mask23bits);
 
         int[] table = {0,newGenerator};
 
         for (byte elem : bytes){
             for (int j=0 ; j<Byte.SIZE ; ++j){
-                b = Bits.extractUInt(elem,Byte.SIZE - (j+1),1);
+                b = Bits.extractUInt(elem,Byte.SIZE - j - 1,1);
 
-                index=(crc24 & mask23)>>>(CRC24LENGTH-1);
+                index=(crc24 & mask23bits)>>>(CRC24LENGTH-1);
 
                 crc24 = ((crc24 << 1) | b) ^ table[index];
 
-                crc24 = crc24 &  mask24-1;
+                crc24 = crc24 &  mask23bits;
             }
         }
 
         for (int k=0; k<CRC24LENGTH ;++k){
 
-            index=(crc24 & mask23)>>>(CRC24LENGTH-1);
+            index=(crc24 & mask23bits)>>>(CRC24LENGTH-1);
 
             crc24 = (crc24 << 1) ^ table[index];
 
-            crc24 = crc24 &  mask24-1;
+            crc24 = crc24 &  mask23bits;
 
         }
 
