@@ -4,6 +4,7 @@ import ch.epfl.javions.Preconditions;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class PowerComputer {
@@ -24,8 +25,22 @@ public class PowerComputer {
     }
 
     public int readBatch(int[] batch) throws IOException {
+        Preconditions.checkArgument(batch.length==batchSize);
 
-        return 0;
+        short[] echantillons = new short[batchSize*8];
+        SamplesDecoder sample = new SamplesDecoder(stream,batchSize*8);
+
+        int nbrEchantillons = sample.readBatch(echantillons);
+
+
+
+        if(nbrEchantillons%8==0) {
+            for (int i = 0; i < echantillons.length;i+=8){
+                batch[i/8]=calculPuissanceEchantillon(echantillons[i+7],echantillons[i+6],echantillons[i+5],echantillons[i+4],echantillons[i+3],echantillons[i+2],echantillons[i+1],echantillons[i]);
+            }
+        }
+
+        return nbrEchantillons/8;
     }
 
     private int calculPuissanceEchantillon(int x7, int x6, int x5, int x4, int x3, int x2, int x1, int x0){
