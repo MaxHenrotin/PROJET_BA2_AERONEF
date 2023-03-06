@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,11 +18,13 @@ class SamplesDecoderTest {
 
         short [] actual=new short[expected.length];
 
-        InputStream stream = new FileInputStream("samples.bin");
+        InputStream stream = new FileInputStream("C:\\Users\\Petit\\Documents\\BA2 Prog\\ProjetBA2Aeronef\\resources\\samples.bin");
 
         SamplesDecoder sample = new SamplesDecoder(stream,10);
 
         assertEquals(10,sample.readBatch(actual));
+
+        System.out.println(Arrays.toString(actual));
 
         assertArrayEquals(expected,actual);
     }

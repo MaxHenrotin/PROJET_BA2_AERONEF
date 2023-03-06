@@ -27,8 +27,8 @@ public class PowerComputer {
     public int readBatch(int[] batch) throws IOException {
         Preconditions.checkArgument(batch.length==batchSize);
 
-        short[] echantillons = new short[batchSize*8];
-        SamplesDecoder sample = new SamplesDecoder(stream,batchSize*8);
+        short[] echantillons = new short[batchSize*2];
+        SamplesDecoder sample = new SamplesDecoder(stream,batchSize*2);
 
         int nbrEchantillons = sample.readBatch(echantillons);
 

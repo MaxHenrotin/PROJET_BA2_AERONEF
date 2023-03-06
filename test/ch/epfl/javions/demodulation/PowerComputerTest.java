@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,13 +14,15 @@ class PowerComputerTest {
     void samplesDecoderWorksOnNormalInput() throws IOException {
         int[] expected={73, 292, 65, 745, 98, 4226, 12244, 25722, 36818, 23825};
 
-        int [] actual=new int[expected.length];
+        int [] actual=new int[10];
 
-        InputStream stream = new FileInputStream("samples.bin");
+        InputStream stream = new FileInputStream("C:\\Users\\Petit\\Documents\\BA2 Prog\\ProjetBA2Aeronef\\resources\\samples.bin");
 
         PowerComputer sample = new PowerComputer(stream,10);
 
         assertEquals(10,sample.readBatch(actual));
+
+        System.out.println(Arrays.toString(actual));
 
         assertArrayEquals(expected,actual);
     }

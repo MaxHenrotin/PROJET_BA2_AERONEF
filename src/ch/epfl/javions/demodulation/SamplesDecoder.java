@@ -27,17 +27,18 @@ public final class SamplesDecoder {
     }
 
     public int readBatch(short[] batch) throws IOException {
-        Preconditions.checkArgument(batchSize==batch.length);
+        Preconditions.checkArgument(batchSize == batch.length);
         byte[] bytes = stream.readNBytes(batchSize*2);
 
         for (int i=0; i<bytes.length ; i += 2){
+            System.out.println(bytes[i]+" "+bytes[i+1]);
             batch[i/2]= calculEchantillon(bytes[i+1],bytes[i]);
         }
 
         return bytes.length/2;
     }
 
-    private short calculEchantillon(byte fort,byte faible){
-        return (short)((fort << Byte.SIZE) & (faible));
+    private short calculEchantillon(short fort,short faible){
+        return (short)((fort << Byte.SIZE) | faible);
     }
 }
