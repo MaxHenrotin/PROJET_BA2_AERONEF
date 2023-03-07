@@ -10,6 +10,7 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
 class SamplesDecoderTest {
 
     @Test
@@ -18,7 +19,7 @@ class SamplesDecoderTest {
 
         short [] actual=new short[expected.length];
 
-        InputStream stream = new FileInputStream("C:\\Users\\Petit\\Documents\\BA2 Prog\\ProjetBA2Aeronef\\resources\\samples.bin");
+        InputStream stream = new FileInputStream("resources\\samples.bin");
 
         SamplesDecoder sample = new SamplesDecoder(stream,10);
 

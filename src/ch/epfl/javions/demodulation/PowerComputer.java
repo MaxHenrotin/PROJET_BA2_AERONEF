@@ -12,8 +12,6 @@ public class PowerComputer {
 
     private final int batchSize;
 
-    private int indexAncienEchatillon;
-
     private int[] tabCirculaire = new int[8];
 
     private short[] echantillons;
@@ -33,14 +31,29 @@ public class PowerComputer {
         SamplesDecoder sample = new SamplesDecoder(stream,batchSize*2);
 
         int nbrEchantillons = sample.readBatch(echantillons);
+        int currentIndex;
 
-        return nbrEchantillons/8;
+        for (int i=0;i < nbrEchantillons;i+=2){
+            currentIndex = i%8;
+
+            tabCirculaire[currentIndex] = echantillons[i];
+            tabCirculaire[currentIndex+1] = echantillons[i+1];
+
+            batch[i/2]=calculPuissanceEchantillon(tabCirculaire,currentIndex);
+        }
+
+
+        return nbrEchantillons/2;
     }
 
-    private int calculPuissanceEchantillon(int x7, int x6, int x5, int x4, int x3, int x2, int x1, int x0){
-        int p1 = x6 - x4 + x2 - x0;
-        int p2 = x7 - x5 + x3 - x1;
-        return p1*p1 - p2*p2;
+    private int calculPuissanceEchantillon(int[] tab, int lastIndex){
+        int lastIndex0=lastIndex;
+        int lastIndex1=lastIndex+1;
+
+        int p1 = tab[(lastIndex1+2)%8] - tab[(lastIndex1+4)%8] + tab[(lastIndex1+6)%8] - tab[lastIndex1];
+        int p2 = tab[(lastIndex0+2)%8] - tab[(lastIndex0+4)%8] + tab[(lastIndex0+6)%8] - tab[lastIndex0];
+
+        return p1*p1 + p2*p2;
     }
 
 
