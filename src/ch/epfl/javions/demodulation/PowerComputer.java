@@ -16,26 +16,23 @@ public class PowerComputer {
 
     private int[] tabCirculaire = new int[8];
 
+    private short[] echantillons;
+
     public PowerComputer(InputStream stream, int batchSize){
         Preconditions.checkArgument(batchSize>0 && ((batchSize%8)==0));
         Objects.requireNonNull(stream);
 
         this.stream=stream;
         this.batchSize=batchSize;
+        echantillons=new short[batchSize*2];
     }
 
     public int readBatch(int[] batch) throws IOException {
         Preconditions.checkArgument(batch.length == batchSize);
 
-        short[] echantillons = new short[batchSize*2];
         SamplesDecoder sample = new SamplesDecoder(stream,batchSize*2);
 
         int nbrEchantillons = sample.readBatch(echantillons);
-
-        for (int i = 0; i < echantillons.length;i+=8){
-                batch[i/8]=calculPuissanceEchantillon(echantillons[i+7],echantillons[i+6],echantillons[i+5],echantillons[i+4],echantillons[i+3],echantillons[i+2],echantillons[i+1],echantillons[i]);
-        }
-
 
         return nbrEchantillons/8;
     }

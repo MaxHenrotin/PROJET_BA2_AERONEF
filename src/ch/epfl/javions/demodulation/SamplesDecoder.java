@@ -18,17 +18,20 @@ public final class SamplesDecoder {
 
     private InputStream stream;
 
+    private byte [] bytes;
+
     public SamplesDecoder(InputStream stream, int batchSize) throws IOException {
         Preconditions.checkArgument(batchSize>0);
         Objects.requireNonNull(stream);
 
         this.batchSize=batchSize;
         this.stream=stream;
+        bytes=new byte[batchSize*2];
     }
 
     public int readBatch(short[] batch) throws IOException {
         Preconditions.checkArgument(batchSize == batch.length);
-        byte[] bytes = stream.readNBytes(batchSize*2);
+        bytes = stream.readNBytes(batchSize*2);
 
         for (int i=0; i<bytes.length ; i += 2){
             batch[i/2]= (short) (calculEchantillon((short) (bytes[i+1]&0xFF), (short) (bytes[i]&0xFF)) - 2048);

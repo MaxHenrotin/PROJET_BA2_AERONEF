@@ -25,6 +25,8 @@ class SamplesDecoderTest {
         assertEquals(10,sample.readBatch(actual));
 
         assertArrayEquals(expected,actual);
+
+        stream.close();
     }
 
 }
