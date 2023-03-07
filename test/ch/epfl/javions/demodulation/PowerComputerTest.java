@@ -9,6 +9,9 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * 
+ */
 class PowerComputerTest {
     @Test
     void powerComputerWorksOnNormalInput() throws IOException {
