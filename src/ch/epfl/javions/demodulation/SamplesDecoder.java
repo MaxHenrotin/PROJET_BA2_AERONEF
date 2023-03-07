@@ -31,8 +31,7 @@ public final class SamplesDecoder {
         byte[] bytes = stream.readNBytes(batchSize*2);
 
         for (int i=0; i<bytes.length ; i += 2){
-            System.out.println(bytes[i]+" "+bytes[i+1]);
-            batch[i/2]= calculEchantillon(bytes[i+1],bytes[i]);
+            batch[i/2]= (short) (calculEchantillon((short) (bytes[i+1]&0xFF), (short) (bytes[i]&0xFF)) - 2048);
         }
 
         return bytes.length/2;

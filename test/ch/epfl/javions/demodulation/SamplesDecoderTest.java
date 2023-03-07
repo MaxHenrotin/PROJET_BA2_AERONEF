@@ -24,8 +24,6 @@ class SamplesDecoderTest {
 
         assertEquals(10,sample.readBatch(actual));
 
-        System.out.println(Arrays.toString(actual));
-
         assertArrayEquals(expected,actual);
     }
 
