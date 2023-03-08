@@ -19,7 +19,7 @@ public class PowerComputer {
 
     private final int batchSize; //taille des lots de puissance
 
-    private final SamplesDecoder sample; //décodeur d'échantillons
+    private SamplesDecoder sample; //décodeur d'échantillons
 
     private int[] tabCirculaire = new int[8]; //tableau stockant les 8 derniers échantillons utilisés pour calculer la puissance
 
