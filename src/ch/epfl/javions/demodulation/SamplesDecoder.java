@@ -22,13 +22,13 @@ public final class SamplesDecoder {
     private byte [] bytes; //stocke les bytes reçus par le flot
 
     /**
-     * Retourne un décodeur d'échantillons utilisant le flot d'entrée donné pour obtenir les octets de la radio AirSpy et produisant les échantillons par lots de taille donnée
+     * "Construit" un décodeur d'échantillons utilisant le flot d'entrée donné pour obtenir les octets de la radio AirSpy et produisant les échantillons par lots de taille donnée
      * @param stream : flot de bytes nécessaires pour construire les échantillons
      * @param batchSize : taille des lots
      * @throws IOException : si le flot est null
-     * @throws IllegalArgumentException : si la taille des lots n'est pas supérieur à 0
+     * @throws IllegalArgumentException : si la taille des lots n'est pas supérieure à 0
      */
-    public SamplesDecoder(InputStream stream, int batchSize) throws IOException {
+    public SamplesDecoder(InputStream stream, int batchSize) {
         Preconditions.checkArgument(batchSize>0);
         Objects.requireNonNull(stream);
 

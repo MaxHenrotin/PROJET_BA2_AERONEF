@@ -19,6 +19,8 @@ public class PowerComputer {
 
     private final int batchSize; //taille des lots de puissance
 
+    private final SamplesDecoder sample; //décodeur d'échantillons
+
     private int[] tabCirculaire = new int[8]; //tableau stockant les 8 derniers échantillons utilisés pour calculer la puissance
 
     private short[] echantillons; //stocke les échantillons
@@ -37,6 +39,7 @@ public class PowerComputer {
 
         this.stream=stream;
         this.batchSize=batchSize;
+        sample = new SamplesDecoder(stream,batchSize*2);
         echantillons=new short[batchSize*2]; //besoin de 2 échantillons pour calculer une puissance
     }
 
@@ -51,8 +54,6 @@ public class PowerComputer {
 
     public int readBatch(int[] batch) throws IOException {
         Preconditions.checkArgument(batch.length == batchSize);
-
-        SamplesDecoder sample = new SamplesDecoder(stream,batchSize*2);
 
         int nbrEchantillons = sample.readBatch(echantillons);
         int currentIndex;
