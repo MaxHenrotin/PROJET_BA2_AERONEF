@@ -68,7 +68,7 @@ public final class PowerWindow {
         echantillonsIndPair = new int[BATCH_SIZE];
         echantillonsIndImpair = new int[BATCH_SIZE];
 
-        powerComputer.readBatch(echantillonsIndPair);   //remplit le premier tableau
+        flotFini = powerComputer.readBatch(echantillonsIndPair) < BATCH_SIZE; //remplit le 1er tableau
         PremierTableauAIndexPair = true;
     }
 
