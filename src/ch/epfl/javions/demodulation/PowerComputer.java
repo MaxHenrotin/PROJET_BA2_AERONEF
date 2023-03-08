@@ -45,9 +45,9 @@ public class PowerComputer {
 
     /**
      * lit depuis le décodeur d'échantillons le nombre d'échantillons nécessaire au calcul d'un lot d'échantillons de puissance,
-     * puis les calcule au moyen de la formule donnée à la §2.4.6et les place dans le tableau passé en argument
+     * puis les calcule (au moyen de la formule donnée à la §2.4.6 de l'énoncé) et les place dans le tableau passé en argument
      * @param batch : tableau qui va contenir les puissances
-     * @return ; le nombre d'échantillons de puissance placés dans le tableau
+     * @return le nombre d'échantillons de puissance placés dans le tableau
      * @throws IOException : si le flot est illisible
      * @throws IllegalArgumentException : si la taille de batch n'est pas égale à la taille d'un lot
      */
@@ -81,6 +81,4 @@ public class PowerComputer {
 
         return p1*p1 + p2*p2;
     }
-
-
 }

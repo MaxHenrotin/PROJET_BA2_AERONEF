@@ -58,8 +58,6 @@ public final class AircraftDatabase {
             }else{
                 return null;    //si l'avion n'est pas dans la dataBase
             }
-        }catch (Exception IOException){
-            throw new IOException(); //attention on perd l'information de l'exception si elle n'est pas de type IOException
         }
     }
 }

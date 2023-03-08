@@ -16,13 +16,27 @@ import java.util.Objects;
 
 public final class PowerWindow {
 
+    //APPAREMENT PEUT VARIER (VOIR ED DISCUSSION) comment faire alors ??
+    private final int BATCH_SIZE = (int) Math.scalb(1,16);  //taille d'un lot d'échantillons de puissance
+
     private InputStream stream;
 
     private int windowSize;
     private PowerComputer powerComputer;
 
-    private int[] echantillonsIndPair; //1er tableau stockant les échantillons de puissance (ceux d'index pair)
-    private int[] echantillonsIndImpair; //2e tableau stockant les échantillons de puissance (ceux d'index impair)
+    private int[] echantillonsIndPair; //1er tableau stockant les lots d'index pair
+    private int[] echantillonsIndImpair; //2e tableau stockant les lots d'index impair
+
+    private long position = 0; //position actuelle de la fenêtre par rapport au début du flot
+
+    /**
+     * nombre de lots déjà traités (permet de garder une information sur quel tableau est le "premier" tableau)
+     * si nbrLotsTraites est pair, alors echantillonsIndPair est le premier tableau
+     */
+    private long nbrLotsTraites = 1;
+
+
+    private boolean flotFini = false; //indique si le flot a été entièrement lu
 
     /**
      * Construit une fenêtre de taille donnée sur la séquence d'échantillons de puissance (calculés à partir des octets fournis par le flot d'entrée donné)
@@ -32,14 +46,16 @@ public final class PowerWindow {
      * @throws IllegalArgumentException si la taille de la fenêtre donnée n'est pas comprise entre 0 (exclu) et 2^16 (inclu)
      */
     public PowerWindow(InputStream stream, int windowSize) throws IOException {
-        Preconditions.checkArgument(windowSize > 0 && windowSize <= Math.scalb(1, 16));
+        Preconditions.checkArgument(windowSize > 0 && windowSize <= BATCH_SIZE);
 
         this.stream = stream;
         this.windowSize = windowSize;
-        powerComputer = new PowerComputer(stream, windowSize); //à reverifier si il faut bien mettre windowSize
+        powerComputer = new PowerComputer(stream, BATCH_SIZE);
 
-        echantillonsIndPair = new int[windowSize/2]; //à reverifier si il faut bien mettre windowSize
-        echantillonsIndImpair = new int[windowSize/2]; //à reverifier si il faut bien mettre windowSize
+        echantillonsIndPair = new int[BATCH_SIZE];
+        echantillonsIndImpair = new int[BATCH_SIZE];
+
+        powerComputer.readBatch(echantillonsIndPair);   //remplit le premier tableau
     }
 
     /**
@@ -54,7 +70,7 @@ public final class PowerWindow {
      * @return la position actuelle de la fenêtre par rapport au début du flot de valeurs de puissance
      */
     public long position() {
-
+        return position;
     }
 
     /**
@@ -63,7 +79,7 @@ public final class PowerWindow {
      * @return vrai ssi la fenêtre est pleine
      */
     public boolean isFull() {
-
+        return !flotFini;
     }
 
     /**
@@ -73,8 +89,23 @@ public final class PowerWindow {
      * @throws IndexOutOfBoundsException si l'index n'est pas compris entre 0 (inclus) et la taille de la fenêtre (exclu)
      */
     public int get(int i){
-        Objects.checkIndex(0, windowSize);
-        return
+        Objects.checkIndex(i, windowSize);
+
+        int positionDansLot = (int) (position % BATCH_SIZE) + i;  //on peut caster en int car BATCH_SIZE est un int
+        if(positionDansLot >= BATCH_SIZE){  //si la fenêtre chevauche les 2 tableaux et que l'échantillon est dans le 2e tableau
+            positionDansLot -= BATCH_SIZE;
+            if(nbrLotsTraites % 2 == 0) {   //si le 1er tableau est le tableau des lots pair
+                return echantillonsIndImpair[positionDansLot];
+            }else { //si le 1er tableau est le tableau des lots impair
+                return echantillonsIndPair[positionDansLot];
+            }
+        }else { //si la fenêtre ne chevauche pas les 2 tableaux
+            if (nbrLotsTraites % 2 == 0) {   //si le 1er tableau est le tableau des lots pair
+                return echantillonsIndPair[positionDansLot];
+            } else { //si le 1er tableau est le tableau des lots impair
+                return echantillonsIndImpair[positionDansLot];
+            }
+        }
     }
 
     /**
@@ -82,7 +113,17 @@ public final class PowerWindow {
      * @throws IOException en cas d'erreur d'entrée/sortie
      */
     public void advance() throws IOException {
-        jekbcka
+        ++position;
+        if(position % BATCH_SIZE == 0){ //si on est au début d'un lot avec la fenêtre (permet de savoir si le premier tableau est celui des lots pair ou impair)
+            nbrLotsTraites++;
+        }
+        if(position % BATCH_SIZE + windowSize > BATCH_SIZE){   //si la fenêtre chevauche le prochain lot
+            if (nbrLotsTraites % 2 == 0) {   //si le 1er tableau est celui des lots d'indices pair
+                flotFini = powerComputer.readBatch(echantillonsIndImpair) < BATCH_SIZE;   //remplit le tableau des lots d'indices pair et vérifie que le flot remplit bien le tableau jusqu'à la fin
+            } else {  //si le 1er tableau est celui des lots d'indices impair
+                flotFini = powerComputer.readBatch(echantillonsIndPair) < BATCH_SIZE;   //remplit le tableau des lots d'indices impair et vérifie que le flot remplit bien le tableau jusqu'à la fin
+            }
+        }
     }
 
     /**
@@ -97,5 +138,4 @@ public final class PowerWindow {
             advance();
         }
     }
-
 }
