@@ -60,5 +60,4 @@ class PowerComputerTest {
         stream.close();
     }
 
-
 }
