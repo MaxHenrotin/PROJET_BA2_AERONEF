@@ -13,6 +13,10 @@ import static org.junit.jupiter.api.Assertions.*;
      * */
 class PowerWindowTest {
 
+    //advanceby(1196) est full et advanceby(1197) est plus full et elem 4 == 0 (window de taille 5)
+    //derniere valeur vaut 585
+    //Il y a 1200 valeurs et vaut 0 a partir de 1201
+
     @Test
     void powerWindowConstructCorrectly() throws IOException {
         InputStream stream = new FileInputStream("resources\\samples.bin");
@@ -32,6 +36,17 @@ class PowerWindowTest {
         PowerWindow window = new PowerWindow(stream, 5);
         System.out.println(window.get(3));
         assertEquals(745,window.get(3));
+    }
+
+    @Test
+    void getWorksWhenNotFull() throws  IOException{
+        InputStream stream = new FileInputStream("resources\\samples.bin");
+        PowerWindow window = new PowerWindow(stream, 5);
+        window.advanceBy(1196);
+        assertEquals(585,window.get(4));
+        window.advance();
+        assertEquals(0,window.get(4));
+
     }
 
     @Test
@@ -71,14 +86,14 @@ class PowerWindowTest {
         void isFullWorks() throws IOException{
             InputStream stream = new FileInputStream("resources\\samples.bin");
             PowerWindow window = new PowerWindow(stream, 5);
+            //sans advance
             assertTrue(window.isFull());
-            window.advance();
+            //avec advance
+            window.advanceBy(1196);
             assertTrue(window.isFull());
-            window.advanceBy(50);
-            assertTrue(window.isFull());
-            window.advanceBy(10000);
+            //limite pour une window de taille 5
+            window.advanceBy(1197);
             assertFalse(window.isFull());
         }
-
 
 }

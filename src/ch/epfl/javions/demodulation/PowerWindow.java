@@ -42,6 +42,8 @@ public final class PowerWindow {
      */
     private long position = 0;
 
+    private long finalIndex=-1;
+
     /**
      * Permet de garder une information sur quel tableau est le "premier" tableau
      * si nbrLotsTraites est pair, alors echantillonsIndPair est le premier tableau
@@ -68,7 +70,13 @@ public final class PowerWindow {
         echantillonsIndPair = new int[BATCH_SIZE];
         echantillonsIndImpair = new int[BATCH_SIZE];
 
-        flotFini = powerComputer.readBatch(echantillonsIndPair) < BATCH_SIZE; //remplit le 1er tableau
+
+        //flotFini = powerComputer.readBatch(echantillonsIndPair) < BATCH_SIZE; //remplit le 1er tableau
+        int j = powerComputer.readBatch(echantillonsIndPair);
+        if(j < BATCH_SIZE){
+            finalIndex=j;
+            flotFini=true;
+        }
         PremierTableauAIndexPair = true;
     }
 
@@ -93,7 +101,11 @@ public final class PowerWindow {
      * @return vrai ssi la fenêtre est pleine
      */
     public boolean isFull() {
-        return !flotFini;
+       if(flotFini){
+           return position + windowSize <= finalIndex; //si le flot est fini, on vérifie si la window depasse le dernier élément disponible
+       }else{
+           return true;
+       }
     }
 
     /**
@@ -128,14 +140,23 @@ public final class PowerWindow {
      */
     public void advance() throws IOException {
         ++position;
+        int j;
         if(position % BATCH_SIZE == 0){ //si on est au début d'un lot avec la fenêtre (permet de savoir si le premier tableau est celui des lots pair ou impair)
             PremierTableauAIndexPair = !PremierTableauAIndexPair;
         }
         if(position % BATCH_SIZE + windowSize > BATCH_SIZE){   //si la fenêtre chevauche le prochain lot
             if (PremierTableauAIndexPair) {   //si le 1er tableau est celui des lots d'indices pair
-                flotFini = powerComputer.readBatch(echantillonsIndImpair) < BATCH_SIZE;   //remplit le tableau des lots d'indices pair et vérifie que le flot remplit bien le tableau jusqu'à la fin
+                //flotFini = powerComputer.readBatch(echantillonsIndImpair) < BATCH_SIZE;   //remplit le tableau des lots d'indices pair et vérifie que le flot remplit bien le tableau jusqu'à la fin
+                if((j= powerComputer.readBatch(echantillonsIndImpair)) < BATCH_SIZE){
+                   finalIndex=j;
+                   flotFini=true;
+                }
             } else {  //si le 1er tableau est celui des lots d'indices impair
-                flotFini = powerComputer.readBatch(echantillonsIndPair) < BATCH_SIZE;   //remplit le tableau des lots d'indices impair et vérifie que le flot remplit bien le tableau jusqu'à la fin
+                //flotFini = powerComputer.readBatch(echantillonsIndPair) < BATCH_SIZE;   //remplit le tableau des lots d'indices impair et vérifie que le flot remplit bien le tableau jusqu'à la fin
+                if((j= powerComputer.readBatch(echantillonsIndImpair)) < BATCH_SIZE){
+                    finalIndex=j;
+                    flotFini=true;
+                }
             }
         }
     }
