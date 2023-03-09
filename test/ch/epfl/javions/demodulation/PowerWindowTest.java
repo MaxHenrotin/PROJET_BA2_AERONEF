@@ -31,12 +31,25 @@ class PowerWindowTest {
     }
 
     @Test
-    void getWorks() throws IOException{
+    void getWorksWhenWindowNotAdvanced() throws IOException{
         InputStream stream = new FileInputStream("resources\\samples.bin");
         PowerWindow window = new PowerWindow(stream, 5);
         System.out.println(window.get(3));
         assertEquals(745,window.get(3));
     }
+
+    @Test
+    void getWorksWhenAdvance() throws IOException{
+        InputStream stream = new FileInputStream("resources\\samples.bin");
+        PowerWindow window = new PowerWindow(stream, 5);
+
+        int[] test ={4226, 12244, 25722, 36818, 23825};
+        window.advanceBy(5);
+        for (int i = 0; i < test.length; i++) {
+            assertEquals(test[i],window.get(i));
+        }
+    }
+
 
     @Test
     void getWorksWhenNotFull() throws  IOException{
