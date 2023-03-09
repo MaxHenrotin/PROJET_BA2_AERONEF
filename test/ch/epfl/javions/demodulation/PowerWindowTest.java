@@ -27,23 +27,6 @@ class PowerWindowTest {
     }
 
     @Test
-    void isFullWorks() throws IOException{
-        InputStream stream = new FileInputStream("resources\\samples.bin");
-        PowerWindow window = new PowerWindow(stream, 30);
-        assertTrue(window.isFull());
-        window.advance();
-        assertTrue(window.isFull());
-        window.advanceBy(50);
-        assertTrue(window.isFull());
-        int etape = 51;
-        do {
-            ++etape;
-            window.advance();
-        } while (!window.isFull());
-        System.out.println("etape : " + etape);
-    }
-
-    @Test
     void getWorks() throws IOException{
         InputStream stream = new FileInputStream("resources\\samples.bin");
         PowerWindow window = new PowerWindow(stream, 5);
@@ -74,4 +57,28 @@ class PowerWindowTest {
         window.advanceBy(25);
         assertEquals(26,window.position());
     }
+
+    @Test
+    void test() throws IOException{
+        InputStream stream = new FileInputStream("resources\\samples.bin");
+        PowerWindow window = new PowerWindow(stream, 5);
+        for(int i=0;i<10000;i++){
+            window.advance();
+            System.out.println(window.get(0));
+        }
+    }
+        @Test
+        void isFullWorks() throws IOException{
+            InputStream stream = new FileInputStream("resources\\samples.bin");
+            PowerWindow window = new PowerWindow(stream, 5);
+            assertTrue(window.isFull());
+            window.advance();
+            assertTrue(window.isFull());
+            window.advanceBy(50);
+            assertTrue(window.isFull());
+            window.advanceBy(10000);
+            assertFalse(window.isFull());
+        }
+
+
 }
