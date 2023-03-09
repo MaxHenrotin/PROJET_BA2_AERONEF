@@ -8,9 +8,6 @@ import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-    /**
-     * ATTENTION POUR TESTER CETTE CLASSE IL FAUT CHANGER LA CONSTANTE BATCH_SIZE A 8 (2^3) dans PowerWindow
-     * */
 class PowerWindowTest {
 
     //advanceby(1196) est full et advanceby(1197) est plus full et elem 4 == 0 (window de taille 5)
