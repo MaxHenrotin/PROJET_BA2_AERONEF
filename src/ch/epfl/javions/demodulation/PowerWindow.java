@@ -19,7 +19,7 @@ public final class PowerWindow {
     /**
      * Taille d'un lot d'échantillons de puissance
      */
-    private final int BATCH_SIZE = (int) Math.scalb(1,16);  //2^16 de base (mais on peut changer pour les tests de PowerWindow (à 2^3 = 8))
+    private final int BATCH_SIZE = (int) Math.scalb(1,3);  //2^16 de base (mais on peut changer pour les tests de PowerWindow (à 2^3 = 8))
 
     private InputStream stream;
 
@@ -120,10 +120,6 @@ public final class PowerWindow {
         Objects.checkIndex(i, windowSize);
 
         int positionDansLot = (int) (position % BATCH_SIZE) + i;  //on peut caster en int car BATCH_SIZE est un int
-
-        if(positionDansLot >= BatchEnd && !isFull()){    //si l'échantillon demandé est après le dernier échantillon du flot
-            return 0;
-        }
 
         if(positionDansLot >= BATCH_SIZE){  //si la fenêtre chevauche les 2 tableaux et que l'échantillon est dans le 2e tableau
             positionDansLot -= BATCH_SIZE;

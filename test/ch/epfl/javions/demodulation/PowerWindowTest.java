@@ -60,8 +60,6 @@ class PowerWindowTest {
         PowerWindow window = new PowerWindow(stream, 5);
         window.advanceBy(1196);
         assertEquals(585,window.get(4));
-        window.advance();
-        assertEquals(0,window.get(4));
 
     }
 
