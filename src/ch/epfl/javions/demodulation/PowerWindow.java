@@ -5,7 +5,6 @@ import ch.epfl.javions.Preconditions;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -54,7 +53,6 @@ public final class PowerWindow {
      */
     private boolean PremierTableauAIndexPair;
 
-
     private boolean flotFini = false; //indique si le flot a été entièrement lu // à changer on pourait simplement verifier si batchend est negatif
 
     /**
@@ -73,7 +71,6 @@ public final class PowerWindow {
 
         echantillonsIndPair = new int[BATCH_SIZE];
         echantillonsIndImpair = new int[BATCH_SIZE];
-
 
         int nbrElemMisDansLeBatch = powerComputer.readBatch(echantillonsIndPair);   //remplit le 1er tableau
         if(nbrElemMisDansLeBatch < BATCH_SIZE){
@@ -164,7 +161,6 @@ public final class PowerWindow {
             }
         }
     }
-
 
     /**
      * avance la fenêtre du nombre d'échantillons donné

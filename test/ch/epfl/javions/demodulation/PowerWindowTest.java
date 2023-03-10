@@ -51,15 +51,16 @@ class PowerWindowTest {
         for (int i = 0; i < test.length; i++) {
             assertEquals(test[i],window.get(i));
         }
-    }
 
-
-    @Test
-    void getWorksWhenNotFull() throws  IOException{
-        InputStream stream = new FileInputStream("resources\\samples.bin");
-        PowerWindow window = new PowerWindow(stream, 5);
-        window.advanceBy(1200);
-        assertEquals(585,window.get(0));
+        InputStream stream2 = new FileInputStream("resources\\samples.bin");
+        PowerWindow window2 = new PowerWindow(stream2, 5);
+        window2.advanceBy(196);
+        assertEquals(6893,window2.get(0));
+        assertEquals(2306,window2.get(1));
+        window2.advanceBy(1000);
+        assertEquals(585,window2.get(4));
+        window2.advanceBy(4);
+        assertEquals(585,window2.get(0));
     }
 
     @Test
@@ -98,11 +99,12 @@ class PowerWindowTest {
         window.advance();
         assertFalse(window.isFull());
     }
+
+    /*
     @Test
     void testDAffichage() throws IOException {
         InputStream stream = new FileInputStream("resources\\samples.bin");
         PowerWindow window = new PowerWindow(stream, 5);
-
 
         for (int i = 0; i < 1300; i++) {
             System.out.print(i + " : ");
@@ -110,5 +112,6 @@ class PowerWindowTest {
             window.advance();
         }
     }
+     */
 
 }
