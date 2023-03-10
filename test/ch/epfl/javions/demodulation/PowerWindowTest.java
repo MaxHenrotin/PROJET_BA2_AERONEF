@@ -8,11 +8,18 @@ import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PowerWindowTest {
+/**
+ * ATTENTION : pour les tests qui suivent il peut etre interessant de changer BATCH_SIZE dans PowerWindow à 2^3 (=8)
+ * ceci est fait pour que les tests fassent des changements de batch sur le fichier samples.bin (qui contient que 1200 Elements)
+ */
 
-    //advanceby(1196) est full et advanceby(1197) est plus full et elem 4 == 0 (window de taille 5)
-    //derniere valeur vaut 585
-    //Il y a 1200 valeurs et vaut 0 a partir de 1201
+class PowerWindowTest {
+    /**
+     * Pour la classe PowerWindow, on a testé les méthodes sur le fichier samples.bin
+     * Dans lequel Il y a 1201 valeurs (vaut 0 à partir de l'index 1201)
+     * Donc pour unewindow de taille 5 advanceby(1196) est full et advanceby(1197) est plus full et elem 4 == 0
+     * (la derniere valeur vaut 585)
+     */
 
     @Test
     void powerWindowConstructCorrectly() throws IOException {
@@ -31,7 +38,6 @@ class PowerWindowTest {
     void getWorksWhenWindowNotAdvanced() throws IOException{
         InputStream stream = new FileInputStream("resources\\samples.bin");
         PowerWindow window = new PowerWindow(stream, 5);
-        System.out.println(window.get(3));
         assertEquals(745,window.get(3));
     }
 
@@ -82,28 +88,28 @@ class PowerWindowTest {
         window.advanceBy(25);
         assertEquals(26,window.position());
     }
-
     @Test
-    void test() throws IOException{
+    void isFullWorks() throws IOException{
         InputStream stream = new FileInputStream("resources\\samples.bin");
         PowerWindow window = new PowerWindow(stream, 5);
-        for(int i=0;i<10000;i++){
-            window.advance();
+        //sans advance
+        assertTrue(window.isFull());
+        //avec advance
+        window.advanceBy(1196);
+        assertTrue(window.isFull());
+        //limite pour une window de taille 5
+        window.advance();
+        assertFalse(window.isFull());
+    }
+    @Test
+    void testDAffichage() throws IOException {
+        InputStream stream = new FileInputStream("resources\\samples.bin");
+        PowerWindow window = new PowerWindow(stream, 5);
+        for (int i = 0; i < 1300; i++) {
+            System.out.print(i + " : ");
             System.out.println(window.get(0));
+            window.advance();
         }
     }
-        @Test
-        void isFullWorks() throws IOException{
-            InputStream stream = new FileInputStream("resources\\samples.bin");
-            PowerWindow window = new PowerWindow(stream, 5);
-            //sans advance
-            assertTrue(window.isFull());
-            //avec advance
-            window.advanceBy(1196);
-            assertTrue(window.isFull());
-            //limite pour une window de taille 5
-            window.advanceBy(1197);
-            assertFalse(window.isFull());
-        }
 
 }
