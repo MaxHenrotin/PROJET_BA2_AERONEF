@@ -58,8 +58,8 @@ class PowerWindowTest {
     void getWorksWhenNotFull() throws  IOException{
         InputStream stream = new FileInputStream("resources\\samples.bin");
         PowerWindow window = new PowerWindow(stream, 5);
-        window.advanceBy(1196);
-        assertEquals(585,window.get(4));
+        window.advanceBy(1200);
+        assertEquals(585,window.get(0));
     }
 
     @Test

@@ -105,7 +105,7 @@ public final class PowerWindow {
      */
     public boolean isFull() {
        if(flotFini){
-           return position % BATCH_SIZE + windowSize <= BatchEnd; //si le flot est fini, on vérifie si la window depasse le dernier élément disponible
+           return (position + windowSize) % BATCH_SIZE <= BatchEnd; //si le flot est fini, on vérifie si la window depasse le dernier élément disponible
        }else{
            return true;
        }
@@ -120,9 +120,7 @@ public final class PowerWindow {
     public int get(int i){
         Objects.checkIndex(i, windowSize);
 
-
         int positionDansLot = (int) (position % BATCH_SIZE) + i;  //on peut caster en int car BATCH_SIZE est un int
-
 
         if(positionDansLot >= BATCH_SIZE){  //si la fenêtre chevauche les 2 tableaux et que l'échantillon est dans le 2e tableau
             positionDansLot -= BATCH_SIZE;
@@ -147,11 +145,6 @@ public final class PowerWindow {
      * @throws IOException en cas d'erreur d'entrée/sortie
      */
     public void advance() throws IOException {
-
-        System.out.print("tableau pair : ");
-        System.out.println(Arrays.toString(echantillonsIndPair));
-        System.out.print("tableau impair : ");
-        System.out.println(Arrays.toString(echantillonsIndImpair));
         ++position;
         int nbrElemMisDansBatch;
         if(position % BATCH_SIZE == 0){ //si on est au début d'un lot avec la fenêtre (permet de savoir si le premier tableau est celui des lots pair ou impair)
