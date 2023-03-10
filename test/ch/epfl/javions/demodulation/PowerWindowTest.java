@@ -60,7 +60,6 @@ class PowerWindowTest {
         PowerWindow window = new PowerWindow(stream, 5);
         window.advanceBy(1196);
         assertEquals(585,window.get(4));
-
     }
 
     @Test
@@ -103,6 +102,8 @@ class PowerWindowTest {
     void testDAffichage() throws IOException {
         InputStream stream = new FileInputStream("resources\\samples.bin");
         PowerWindow window = new PowerWindow(stream, 5);
+
+
         for (int i = 0; i < 1300; i++) {
             System.out.print(i + " : ");
             System.out.println(window.get(0));

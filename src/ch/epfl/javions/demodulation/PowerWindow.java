@@ -5,6 +5,7 @@ import ch.epfl.javions.Preconditions;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -19,7 +20,7 @@ public final class PowerWindow {
     /**
      * Taille d'un lot d'échantillons de puissance
      */
-    private final int BATCH_SIZE = (int) Math.scalb(1,3);  //2^16 de base (mais on peut changer pour les tests de PowerWindow (à 2^3 = 8))
+    private final int BATCH_SIZE = (int) Math.scalb(1,16);  //2^16 de base (mais on peut changer pour les tests de PowerWindow (à 2^3 = 8))
 
     private InputStream stream;
 
@@ -119,16 +120,20 @@ public final class PowerWindow {
     public int get(int i){
         Objects.checkIndex(i, windowSize);
 
+
         int positionDansLot = (int) (position % BATCH_SIZE) + i;  //on peut caster en int car BATCH_SIZE est un int
+
 
         if(positionDansLot >= BATCH_SIZE){  //si la fenêtre chevauche les 2 tableaux et que l'échantillon est dans le 2e tableau
             positionDansLot -= BATCH_SIZE;
+            //System.out.print(" position dans lot " + positionDansLot + " valeur : ");
             if(PremierTableauAIndexPair) {   //si le 1er tableau est le tableau des lots pair
                 return echantillonsIndImpair[positionDansLot];
             }else { //si le 1er tableau est le tableau des lots impair
                 return echantillonsIndPair[positionDansLot];
             }
         }else { //si la fenêtre ne chevauche pas les 2 tableaux
+            //System.out.print("position dans lot " + positionDansLot + " valeur : ");
             if (PremierTableauAIndexPair) {   //si le 1er tableau est le tableau des lots pair
                 return echantillonsIndPair[positionDansLot];
             } else { //si le 1er tableau est le tableau des lots impair
@@ -142,12 +147,17 @@ public final class PowerWindow {
      * @throws IOException en cas d'erreur d'entrée/sortie
      */
     public void advance() throws IOException {
+
+        System.out.print("tableau pair : ");
+        System.out.println(Arrays.toString(echantillonsIndPair));
+        System.out.print("tableau impair : ");
+        System.out.println(Arrays.toString(echantillonsIndImpair));
         ++position;
         int nbrElemMisDansBatch;
         if(position % BATCH_SIZE == 0){ //si on est au début d'un lot avec la fenêtre (permet de savoir si le premier tableau est celui des lots pair ou impair)
             PremierTableauAIndexPair = !PremierTableauAIndexPair;
         }
-        if(position % BATCH_SIZE + windowSize - 1 == BATCH_SIZE + 1){   //moment où la fenêtre chevauche le prochain lot
+        if(position % BATCH_SIZE + windowSize == BATCH_SIZE ){   //moment où la fenêtre chevauche le prochain lot
             if (PremierTableauAIndexPair) {   //si le 1er tableau est celui des lots d'indices pair
                 if((nbrElemMisDansBatch = powerComputer.readBatch(echantillonsIndImpair)) < BATCH_SIZE){    //remplit le tableau des lots d'indices pair et verifie si c'est le dernier lot
                     BatchEnd = nbrElemMisDansBatch;
@@ -161,6 +171,7 @@ public final class PowerWindow {
             }
         }
     }
+
 
     /**
      * avance la fenêtre du nombre d'échantillons donné
