@@ -41,7 +41,7 @@ public final class AdsbDemodulator {
         byte[] bytes;
 
         while (window.isFull()){
-            System.out.println("les sommes : "+sommePorteuseEmise0+"  "+sommePorteuseEmise1+"  "+sommePorteuseEmise2+"  "+sommePorteuseNonEmise);
+            //System.out.println("les sommes : "+sommePorteuseEmise0+"  "+sommePorteuseEmise1+"  "+sommePorteuseEmise2+"  "+sommePorteuseNonEmise);
             if ((sommePorteuseEmise0 < sommePorteuseEmise1) && (sommePorteuseEmise1 > sommePorteuseEmise2) && (sommePorteuseEmise1 >= 2*sommePorteuseNonEmise)){
                 bytes = new byte[messageLength/Byte.SIZE];
 
@@ -49,7 +49,7 @@ public final class AdsbDemodulator {
                     bytes[0] = (byte) ((bytes[0]<<1) | calculByte(i));
                 }
 
-                System.out.println("first byte : "+bytes[0]);
+                //System.out.println("first byte : "+bytes[0]);
 
                 if(RawMessage.size(bytes[0]) == RawMessage.LENGTH){
                     for (int i = Byte.SIZE; i < messageLength; i++) {
