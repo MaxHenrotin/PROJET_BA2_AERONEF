@@ -66,8 +66,6 @@ public class PowerComputer {
 
             batch[i/2]=calculPuissanceEchantillon(tabCirculaire,currentIndex);
         }
-
-
         return nbrEchantillons/2;
     }
 
