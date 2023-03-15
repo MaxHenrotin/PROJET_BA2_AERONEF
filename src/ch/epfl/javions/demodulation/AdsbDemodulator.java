@@ -36,62 +36,59 @@ public final class AdsbDemodulator {
     }
 
     public RawMessage nextMessage() throws IOException{
-        calculsSommes();
-
         byte[] bytes;
 
         while (window.isFull()){
-            //System.out.println("les sommes : "+sommePorteuseEmise0+"  "+sommePorteuseEmise1+"  "+sommePorteuseEmise2+"  "+sommePorteuseNonEmise);
+
+            calculsSommes();
+
             if ((sommePorteuseEmise0 < sommePorteuseEmise1) && (sommePorteuseEmise1 > sommePorteuseEmise2) && (sommePorteuseEmise1 >= 2*sommePorteuseNonEmise)){
+                window.advance();
+
                 bytes = new byte[messageLength/Byte.SIZE];
 
+
+
                 for (int i = 0; i < Byte.SIZE; i++) {
-                    bytes[0] = (byte) ((bytes[0]<<1) | calculByte(i));
+                    bytes[0] = (byte) ((bytes[0]<<1) | calculBit(i));
                 }
 
-                //System.out.println("first byte : "+bytes[0]);
-
                 if(RawMessage.size(bytes[0]) == RawMessage.LENGTH){
+
                     for (int i = Byte.SIZE; i < messageLength; i++) {
-                        bytes[i/Byte.SIZE] = (byte) ((bytes[i/Byte.SIZE]<<1) | calculByte(i));
+                        bytes[i/Byte.SIZE] = (byte) ((bytes[i/Byte.SIZE]<<1) | calculBit(i));
                     }
-                    window.advanceBy(windowSize);
 
-                    return new RawMessage(window.position()*100,new ByteString(bytes));
-
-                    //rawMessage = RawMessage.of(window.position()+10,bytes);
-
-                    /*if (rawMessage != null) {
+                    rawMessage = RawMessage.of(window.position()*100,bytes);
+                    if (rawMessage != null) {
                         window.advanceBy(windowSize);
                         return rawMessage;
-                    }*/
-
+                    }
 
                 }
             }
             window.advance();
-            calculsSommes();
         }
         return null;
     }
 
-    private int calculSommePorteuseEmise(int index1, int index2, int index3,int index4){
-        return window.get(index1) + window.get(index2) + window.get(index3)+window.get(index4);
-    }
-
-    private int calculSommePorteuseNonEmise(int index1, int index2, int index3,int index4,int index5,int index6){
-        return window.get(index1) + window.get(index2) + window.get(index3) + window.get(index4) + window.get(index5) + window.get(index6);
+    private int calculSommePorteuse(int ... indexes){
+        int somme=0;
+        for (int i : indexes) {
+            somme+=window.get(i);
+        }
+        return somme;
     }
 
     private void calculsSommes(){
-        sommePorteuseEmise0 = calculSommePorteuseEmise(0,10,35,45);
-        sommePorteuseEmise1 = calculSommePorteuseEmise(10,20,45,55);
-        sommePorteuseEmise2 = calculSommePorteuseEmise(20,30,55,65);
+        sommePorteuseEmise0 = calculSommePorteuse(0,10,35,45);
+        sommePorteuseEmise1 = calculSommePorteuse(1,11,36,46);
+        sommePorteuseEmise2 = calculSommePorteuse(2,12,37,47);
 
-        sommePorteuseNonEmise = calculSommePorteuseNonEmise(5,15,20,25,30,40);
+        sommePorteuseNonEmise = calculSommePorteuse(6,16,21,26,31,41);
     }
 
-    private byte calculByte(int i){
+    private byte calculBit(int i){
         return (byte) ((window.get(80 + 10 * i) < window.get(85 + 10*i)) ? 0 : 1);
     }
 }

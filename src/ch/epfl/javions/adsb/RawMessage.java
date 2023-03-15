@@ -23,7 +23,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
     }
 
     public static int size(byte byte0){
-        if(Bits.extractUInt(byte0,3,5) == 17){
+        if(Bits.extractUInt(byte0,3,5) == DFValue){
             return LENGTH;
         }else {
             return 0;
