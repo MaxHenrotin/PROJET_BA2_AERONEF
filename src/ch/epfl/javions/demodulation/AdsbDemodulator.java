@@ -79,14 +79,6 @@ public final class AdsbDemodulator {
         }
         return null;
     }
-/*
-    private int calculSommePorteuse(int ... indexes){
-        int somme=0;
-        for (int i : indexes) {
-            somme+=window.get(i);
-        }
-        return somme;
-    }*/
 
     private int calculSommePorteuse(int i1,int i2,int i3,int i4){
         return window.get(i1)+ window.get(i2)+window.get(i3)+window.get(i4);
@@ -95,14 +87,6 @@ public final class AdsbDemodulator {
     private int calculSommeNonPorteuse(int i1,int i2,int i3,int i4,int i5,int i6){
         return window.get(i1)+ window.get(i2)+window.get(i3)+window.get(i4)+window.get(i5)+window.get(i6);
     }
-
-/*
-    private void calculsSommes(){
-        sommePorteuseEmise0 = calculSommePorteuse(0,10,35,45);
-        sommePorteuseEmise1 = calculSommePorteuse(1,11,36,46);
-        sommePorteuseEmise2 = calculSommePorteuse(2,12,37,47);
-        sommePorteuseNonEmise = calculSommePorteuse(6,16,21,26,31,41);
-    }*/
 
     private byte calculBit(int i){
         return (byte) ((window.get(80 + 10 * i) < window.get(85 + 10*i)) ? 0 : 1);

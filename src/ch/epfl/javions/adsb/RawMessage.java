@@ -9,9 +9,9 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
 
     public static final int LENGTH = 14;
 
-    private static final int DFValue = 17;
+    private static final int DF_VALUE = 17;
 
-    private static final int METypeLenght = 5;
+    private static final int ME_TYPE_LENGHT = 5;
 
     public RawMessage{
         Preconditions.checkArgument(timeStampNs>=0 && bytes.size()==LENGTH);
@@ -23,14 +23,14 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
     }
 
     public static int size(byte byte0){
-        if(Bits.extractUInt(byte0,3,5) == DFValue){
+        if(Bits.extractUInt(byte0,3,5) == DF_VALUE){
             return LENGTH;
         }else {
             return 0;
         }
     }
     public static int typeCode(long payload){
-        return  Bits.extractUInt(payload,Long.SIZE-METypeLenght,METypeLenght);
+        return  Bits.extractUInt(payload,51, ME_TYPE_LENGHT);
     }
 
     public int downLinkFormat(){
@@ -47,7 +47,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
     }
 
     public int typeCode(){
-        return Bits.extractUInt(bytes.byteAt(10),Byte.SIZE-METypeLenght,METypeLenght);
+        return typeCode(payload());
     }
 
 }
