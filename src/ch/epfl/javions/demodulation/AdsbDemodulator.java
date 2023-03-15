@@ -1,6 +1,10 @@
 package ch.epfl.javions.demodulation;
 
+import ch.epfl.javions.Bits;
+import ch.epfl.javions.ByteString;
+import ch.epfl.javions.Crc24;
 import ch.epfl.javions.adsb.RawMessage;
+import ch.epfl.javions.demodulation.PowerWindow;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,12 +41,16 @@ public final class AdsbDemodulator {
     public RawMessage nextMessage() throws IOException{
         byte[] bytes;
 
-        sommePorteuseEmise0 = calculSommePorteuse(0, 10, 35, 45);
-        sommePorteuseEmise1 = calculSommePorteuse(1, 11, 36, 46);
-        sommePorteuseEmise2 = calculSommePorteuse(2, 12, 37, 47);
-        sommePorteuseNonEmise = calculSommePorteuse(6, 16, 21, 26, 31, 41);
+        //le nom de la variable ne correspond pas mais il va etre reafecté juste apres
+        sommePorteuseEmise1 = calculSommePorteuse(0,10,35,45);  //tout premier calcul de somme porteuse
+        sommePorteuseEmise2 = calculSommePorteuse(1,11,36,46);  //2e calcul de somme porteuse
 
         while (window.isFull()){
+
+            sommePorteuseEmise0 = sommePorteuseEmise1;  //pour optimiser le temps et eviter de recalculer les sommes porteuses déjà calculées avant
+            sommePorteuseEmise1 = sommePorteuseEmise2;
+            sommePorteuseEmise2 = calculSommePorteuse(2,12,37,47);
+            sommePorteuseNonEmise = calculSommePorteuse(6,16,21,26,31,41);
 
             if ((sommePorteuseEmise0 < sommePorteuseEmise1) && (sommePorteuseEmise1 > sommePorteuseEmise2) && (sommePorteuseEmise1 >= 2*sommePorteuseNonEmise)){
                 window.advance();
@@ -68,10 +76,6 @@ public final class AdsbDemodulator {
                 }
             }
             window.advance();
-            sommePorteuseEmise1 = sommePorteuseEmise0;
-            sommePorteuseEmise2 = sommePorteuseEmise1;
-            sommePorteuseEmise0 = calculSommePorteuse(0, 10, 35, 45);
-            sommePorteuseNonEmise = calculSommePorteuse(6, 16, 21, 26, 31, 41);
         }
         return null;
     }
@@ -82,6 +86,13 @@ public final class AdsbDemodulator {
             somme+=window.get(i);
         }
         return somme;
+    }
+
+    private void calculsSommes(){
+        sommePorteuseEmise0 = calculSommePorteuse(0,10,35,45);
+        sommePorteuseEmise1 = calculSommePorteuse(1,11,36,46);
+        sommePorteuseEmise2 = calculSommePorteuse(2,12,37,47);
+        sommePorteuseNonEmise = calculSommePorteuse(6,16,21,26,31,41);
     }
 
     private byte calculBit(int i){
