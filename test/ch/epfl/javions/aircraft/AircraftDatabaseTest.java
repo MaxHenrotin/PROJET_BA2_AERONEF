@@ -48,7 +48,9 @@ class AircraftDatabaseTest {
                 icaoAddress += Integer.toHexString(randomNumber).toUpperCase();
             }
             final String icaoAddressFinal = icaoAddress;
+
             assertDoesNotThrow(() -> aircraftDatabase.get(new IcaoAddress(icaoAddressFinal)));
+
             //AircraftData aircraftData = aircraftDatabase.get(new IcaoAddress(icaoAddress));   //utile pour savoir les adresses qui posent problème (si il y en a)
             //System.out.println(aircraftData);   //possible car AircraftData est un enregistrement
             --repetitionNumber;

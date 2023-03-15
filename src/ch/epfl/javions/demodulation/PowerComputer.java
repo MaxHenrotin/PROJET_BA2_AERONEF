@@ -15,6 +15,8 @@ import java.util.Objects;
  * @author Max Henrotin (341463)
  */
 public class PowerComputer {
+
+    private final int NBR_ECHANTILLONS_MEMOIRE = 8;
     private InputStream stream;
 
     private final int batchSize; //taille des lots de puissance
@@ -34,7 +36,7 @@ public class PowerComputer {
      * @throws NullPointerException : si le flot est null
      */
     public PowerComputer(InputStream stream, int batchSize){
-        Preconditions.checkArgument(batchSize>0 && ((batchSize%8)==0));
+        Preconditions.checkArgument(batchSize>0 && ((batchSize % NBR_ECHANTILLONS_MEMOIRE)==0));
         Objects.requireNonNull(stream);
 
         this.stream=stream;
@@ -59,7 +61,7 @@ public class PowerComputer {
         int currentIndex;
 
         for (int i=0;i < nbrEchantillons;i+=2){
-            currentIndex = i%8;
+            currentIndex = i % NBR_ECHANTILLONS_MEMOIRE;
 
             tabCirculaire[currentIndex] = echantillons[i];
             tabCirculaire[currentIndex+1] = echantillons[i+1];
@@ -76,8 +78,8 @@ public class PowerComputer {
         int lastIndex0=lastIndex;
         int lastIndex1=lastIndex+1;
 
-        int p1 = tab[(lastIndex1+2)%8] - tab[(lastIndex1+4)%8] + tab[(lastIndex1+6)%8] - tab[lastIndex1];
-        int p2 = tab[(lastIndex0+2)%8] - tab[(lastIndex0+4)%8] + tab[(lastIndex0+6)%8] - tab[lastIndex0];
+        int p1 = tab[(lastIndex1+2)%NBR_ECHANTILLONS_MEMOIRE] - tab[(lastIndex1+4)%NBR_ECHANTILLONS_MEMOIRE] + tab[(lastIndex1+6)%NBR_ECHANTILLONS_MEMOIRE] - tab[lastIndex1];
+        int p2 = tab[(lastIndex0+2)%NBR_ECHANTILLONS_MEMOIRE] - tab[(lastIndex0+4)%NBR_ECHANTILLONS_MEMOIRE] + tab[(lastIndex0+6)%NBR_ECHANTILLONS_MEMOIRE] - tab[lastIndex0];
 
         return p1*p1 + p2*p2;
     }
