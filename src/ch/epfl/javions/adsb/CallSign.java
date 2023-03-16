@@ -5,6 +5,7 @@ import ch.epfl.javions.Preconditions;
 import java.util.regex.Pattern;
 /**
  * Représente ce que l'on nomme l'indicatif (call sign) d'un aéronef
+ *
  * @param string : indicatif de l'aéronef
  *
  * @author Julien Erbland (346893)

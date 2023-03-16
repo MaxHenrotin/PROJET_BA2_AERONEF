@@ -6,6 +6,12 @@ import ch.epfl.javions.adsb.RawMessage;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Classe représentant un démodulateur de messages ADS-B
+ *
+ * @author Julien Erbland (346893)
+ * @author Max Henrotin (341463)
+ */
 public final class AdsbDemodulator {
 
     private PowerWindow window;
@@ -14,12 +20,22 @@ public final class AdsbDemodulator {
 
     private final static int IMPULSION_TIME = 5; //en unité de temps de 0.1µs (=unité de temps de l'échantillonnage)
 
+    /**
+     * Constructeur de la classe retournant un démodulateur obtenant les octets contenant les échantillons du flot passé en argument
+     * Concrètement on construit un objet de type PowerWindow représentant la fenêtre de 1200 échantillons de puissance, utilisée pour rechercher les messages,
+     * celle-ci est liée au flot d'échantillons reçu de la radio
+     * @param samplesStream : flot contenant les informations reçues de la radio
+     * @throws IOException si une erreur d'entrée/sortie se produit lors de la création de la PowerWindow
+     */
     public AdsbDemodulator(InputStream samplesStream) throws IOException {
         window = new PowerWindow(samplesStream, WINDOW_SIZE);
     }
 
     /**
-     * ATTENTION CHANGER LES INDEXES PLUS TARD POUR Y METRE DES CONSTANTES
+     * Retourne le prochain message ADS-B du flot d'échantillons passé au constructeur, ou null s'il n'y en a plus (c.-à-d. que la fin du flot d'échantillons a été atteinte)
+     * L'horodatage des messages retournés par nextMessage utilise l'instant correspondant au tout premier échantillon de puissance comme origine du temps.
+     * @return le prochain message ADS-B du flot d'échantillons passé au constructeur, ou null s'il n'y en a plus
+     * @throws IOException en cas d'erreur d'entrée/sortie
      */
     public RawMessage nextMessage() throws IOException{
         RawMessage rawMessage;
@@ -30,15 +46,15 @@ public final class AdsbDemodulator {
         int sommePorteuseEmise2;
         int sommePorteuseNonEmise;
 
-        //le nom de la variable ne correspond pas mais il va etre reafecté juste apres
-        sommePorteuseEmise1 = calculSommePorteuse(0,2*IMPULSION_TIME,7*IMPULSION_TIME,9*IMPULSION_TIME);  //tout premier calcul de somme porteuse
-        sommePorteuseEmise2 = calculSommePorteuse(1, 1 + 2*IMPULSION_TIME, 1 + 7*IMPULSION_TIME, 1 + 9*IMPULSION_TIME);  //2e calcul de somme porteuse
+        //ici le nom de la variable ne correspond pas mais il va etre reafecté juste apres pour ajuster celà
+        sommePorteuseEmise1 = calculSommePorteuse(0);  //tout premier calcul de somme porteuse
+        sommePorteuseEmise2 = calculSommePorteuse(1);  //2e calcul de somme porteuse
 
         while (window.isFull()){
 
             sommePorteuseEmise0 = sommePorteuseEmise1;  //pour optimiser le temps et eviter de recalculer les sommes porteuses déjà calculées avant
             sommePorteuseEmise1 = sommePorteuseEmise2;
-            sommePorteuseEmise2 = calculSommePorteuse(2, 2 + 2*IMPULSION_TIME, 2 + 7*IMPULSION_TIME, 2 + 9*IMPULSION_TIME);
+            sommePorteuseEmise2 = calculSommePorteuse(2);
             sommePorteuseNonEmise = calculSommeNonPorteuse();
 
             if ((sommePorteuseEmise0 < sommePorteuseEmise1) && (sommePorteuseEmise1 > sommePorteuseEmise2) && (sommePorteuseEmise1 >= 2*sommePorteuseNonEmise)){
@@ -69,14 +85,28 @@ public final class AdsbDemodulator {
         return null;
     }
 
-    private int calculSommePorteuse(int i1,int i2,int i3,int i4){
-        return window.get(i1)+ window.get(i2)+window.get(i3)+window.get(i4);
+    /**
+     * Calcule selon la formule donnée dans le sujet la ième somme des puissances des impulsions porteuses
+     * @param i : index de la somme porteuse à calculer
+     * @return : la somme des puissances porteuses voulue
+     */
+    private int calculSommePorteuse(int i){
+        return window.get(i)+ window.get(i + 2*IMPULSION_TIME)+window.get(i + 7*IMPULSION_TIME)+window.get(i + 9*IMPULSION_TIME);
     }
 
+    /**
+     * Calcule selon la formule donnée dans le sujet la somme des puissances des impulsions non porteuses
+     * @return la somme des puisances non porteuses
+     */
     private int calculSommeNonPorteuse(){
         return window.get(1 + IMPULSION_TIME)+ window.get(1 + 3*IMPULSION_TIME)+window.get(1 + 4*IMPULSION_TIME)+window.get(1 + 5*IMPULSION_TIME)+window.get(1 + 7*IMPULSION_TIME)+window.get(1 + 8*IMPULSION_TIME);
     }
 
+    /**
+     * Détermine le bit à l'index i dans le message
+     * @param i : index du bit à calculer dans le message
+     * @return le bit calculé
+     */
     private byte calculBit(int i){
         return (byte) ((window.get(16*IMPULSION_TIME + 2*IMPULSION_TIME * i) < window.get(17*IMPULSION_TIME + 2*IMPULSION_TIME * i)) ? 0 : 1);
     }
