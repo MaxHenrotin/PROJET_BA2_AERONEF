@@ -99,7 +99,7 @@ public final class AdsbDemodulator {
      * @return la somme des puisances non porteuses
      */
     private int calculSommeNonPorteuse(){
-        return window.get(1 + IMPULSION_TIME)+ window.get(1 + 3*IMPULSION_TIME)+window.get(1 + 4*IMPULSION_TIME)+window.get(1 + 5*IMPULSION_TIME)+window.get(1 + 7*IMPULSION_TIME)+window.get(1 + 8*IMPULSION_TIME);
+        return window.get(1 + IMPULSION_TIME)+ window.get(1 + 3*IMPULSION_TIME)+window.get(1 + 4*IMPULSION_TIME)+window.get(1 + 5*IMPULSION_TIME)+window.get(1 + 6*IMPULSION_TIME)+window.get(1 + 8*IMPULSION_TIME);
     }
 
     /**
