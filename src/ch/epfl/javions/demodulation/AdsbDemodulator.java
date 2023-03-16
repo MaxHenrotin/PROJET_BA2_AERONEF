@@ -103,7 +103,7 @@ public final class AdsbDemodulator {
     }
 
     /**
-     * Détermine le bit à l'index i dans le message
+     * Détermine le bit à l'index i dans le message selon la formule donnée dans le sujet
      * @param i : index du bit à calculer dans le message
      * @return le bit calculé
      */

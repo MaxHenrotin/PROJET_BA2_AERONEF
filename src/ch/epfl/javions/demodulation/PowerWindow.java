@@ -19,7 +19,7 @@ public final class PowerWindow {
     /**
      * Taille d'un lot d'échantillons de puissance
      */
-    private final int BATCH_SIZE = 1 << 16; //2^16 de base (mais on peut changer pour les tests de PowerWindow (à 2^3 = 8))
+    private final int BATCH_SIZE = 1<<16; // equivalent à Math.scalb(1,16); (= 2^16) (mais on peut changer pour les tests de PowerWindow (à 2^3 = 8))
 
     private InputStream stream;
 
