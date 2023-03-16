@@ -53,7 +53,7 @@ public final class SamplesDecoder {
         bytes = stream.readNBytes(batchSize*2);
 
         for (int i=0; i < bytes.length ; i += 2){
-            batch[i/2]= (short) (calculEchantillon((short) (bytes[i+1]&0xFF), (short) (bytes[i]&0xFF)) - Math.scalb(1,ECHANTILLON_SIZE-1));
+            batch[i/2]= (short) (calculEchantillon((short) (bytes[i+1]&0xFF), (short) (bytes[i]&0xFF)) - (1<<ECHANTILLON_SIZE-1));  //(1<<ECHANTILLON_SIZE) est equivalent à Math.scalb(1,ECHANTILLON_SIZE-1)
         }
         return bytes.length/2;
     }
