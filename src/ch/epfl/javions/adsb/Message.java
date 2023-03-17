@@ -14,7 +14,7 @@ public interface Message {
      * Retourne l'horodatage du message, en nanosecondes
      * @return l'horodatage du message, en nanosecondes
      */
-    public long timeStampNs();
+    long timeStampNs();
 
     /**
      * Retourne l'adresse OACI de l'expéditeur du message.
