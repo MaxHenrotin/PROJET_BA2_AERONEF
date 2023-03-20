@@ -69,16 +69,17 @@ public final class ByteString {
      */
     public long bytesInRange(int fromIndex, int toIndex){
         Objects.checkFromToIndex(fromIndex,toIndex,tab.length);
-        Preconditions.checkArgument(toIndex-fromIndex<(Long.SIZE/Byte.SIZE));
+        Preconditions.checkArgument(toIndex-fromIndex<(Byte.SIZE));
 
         byte[] output = java.util.Arrays.copyOfRange(tab,fromIndex,toIndex);
 
-        long number = output[0];
+        long number = Byte.toUnsignedInt(output[0]);
 
-        for(int i = 1; i<output.length; ++i){
+        for(int i = 1; i < output.length; ++i){
             number = number << Byte.SIZE;
             number = number | Byte.toUnsignedInt(output[i]); //évite les problèmes de signes
         }
+
         return number;
     }
 
