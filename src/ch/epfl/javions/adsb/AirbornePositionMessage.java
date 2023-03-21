@@ -1,7 +1,9 @@
 package ch.epfl.javions.adsb;
 
 import ch.epfl.javions.Bits;
+import ch.epfl.javions.ByteString;
 import ch.epfl.javions.Preconditions;
+import ch.epfl.javions.Units;
 import ch.epfl.javions.aircraft.IcaoAddress;
 
 import java.util.Objects;
@@ -19,11 +21,21 @@ import java.util.Objects;
 
 public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,double altitude, int parity, double x, double y) implements Message{
 
+    private static final int Q0_BASE_ALTITUDE = -1000;
+
+    private static final int Q1_BASE_ALTITUDE = -1300;
     private static final int Q_INDEX = 4;
 
     private static final int Q_MASK = 1<<Q_INDEX;
 
     private static final int MASK_4 = 0b1111;
+
+    //mask de {D1, D2, D4, A1, A2, A4, B1, B2, B4, C1, C2, C4}
+    private static final int[] MASK_DEMELAGE = {Q_MASK, 1<<2, 1, 1<<10, 1<<8, 1<<6, 1<<5, 1<<3, 1<<1, 1<<11, 1<<9, 1<<7};
+
+    private static final int MASK_GROUPE_FAIBLE = 0b111;
+
+    private static final int MASK_GROUPE_FORT = ~MASK_GROUPE_FAIBLE;
 
     /**
      * Constructeur compact
@@ -57,8 +69,9 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         int alt = Bits.extractUInt(attributME, 36, 12);
 
         int altitude = calculAltitude(alt);
+
         if(altitude != -1){
-            return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), altitude, format, Math.scalb(lon_cpr,-17), Math.scalb(lat_cpr,-17));
+            return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), Units.convertFrom(altitude,Units.Length.FOOT), format, Math.scalb(lon_cpr,-17), Math.scalb(lat_cpr,-17));
         }else {
             return null;
         }
@@ -73,15 +86,46 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
     private static int calculAltitude(int alt){
         if((alt & Q_MASK) == Q_MASK){ //Q = 1
             int temp = MASK_4 & alt;
-            alt = alt>>5;
-            alt = alt<<4;
-            alt |= temp;
-            return alt;
+            alt = alt >> 5;
+            alt = (alt << 4) | temp;
+
+            return Q0_BASE_ALTITUDE + alt * 25;
         }else{ //Q = 0
+            int demele = demeleIndex(alt);
+            int groupeFort = decodeGray( demele & MASK_GROUPE_FORT, 9);
+            int groupeFaible =transformationGroupeFaible(decodeGray( demele & MASK_GROUPE_FAIBLE, 3), (groupeFort%2)==1);
 
+            return (groupeFaible != -1) ? Q1_BASE_ALTITUDE + groupeFaible * 100 + groupeFort * 500 : -1;
         }
+    }
 
-        return -1;
+    private static int demeleIndex(int input){
+        int output = 0;
+
+        for (int i = 0; i < MASK_DEMELAGE.length; i++) {
+            output = (output<<1) | (input & MASK_DEMELAGE[i]);
+        }
+        return output;
+    }
+
+    private static int decodeGray(int input, int size){
+        int output = input;
+        for (int i = 1; i < size; i++) {
+            output ^= (input >> i);
+        }
+        return output;
+    }
+
+    private static int transformationGroupeFaible(int groupeFaible, boolean groupeFortImpair){
+        if(groupeFaible==0 || groupeFaible==5 || groupeFaible==6){
+            return -1;
+        } else if (groupeFaible == 7) {
+            return 5;
+        }else if(groupeFortImpair){
+            return 6-groupeFaible;
+        }else {
+            return groupeFaible;
+        }
     }
 
 }
