@@ -58,7 +58,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
 
         //traitement de la catégorie
         int CA = extractCallSignCharacter(attributME, 0);
-        int typeCode = rawMessage.typeCode();   //faut il ici vérifier que typeCode est bien dans {1,2,3,4} ?
+        int typeCode = rawMessage.typeCode();   //ce type devrait appartenir à {1,2,3,4} ?
         int aeronefCategory = ((CATEGORY_MSB_CONSTANT - typeCode) << CA_TAKEN_SPACE_IN_CATEGORY | CA);  //voir point 2.1 de l'Etape 5 du projet
 
 
