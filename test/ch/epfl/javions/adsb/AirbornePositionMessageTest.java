@@ -1,5 +1,6 @@
 package ch.epfl.javions.adsb;
 
+import ch.epfl.javions.ByteString;
 import ch.epfl.javions.demodulation.AdsbDemodulator;
 import org.junit.jupiter.api.Test;
 
@@ -50,6 +51,13 @@ class AirbornePositionMessageTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    void testAltitudeQ0(){
+        String[] rawQ0String = {"8D39203559B225F07550ADBE328F","8DAE02C85864A5F5DD4975A1A3F5"};
+
+
     }
 
 }
