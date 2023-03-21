@@ -23,7 +23,7 @@ class AircraftIdentificationMessageTest {
                     ++counter;
                 }
             }
-            System.out.println(counter);
+            System.out.println("On en veut 14 avec les conditions sur typeCode et 29 sans ! Et il y en a ici : " + counter);
         } catch (IOException e) {
             e.printStackTrace();
         }
