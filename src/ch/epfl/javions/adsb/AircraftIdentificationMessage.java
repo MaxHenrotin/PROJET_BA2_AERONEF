@@ -42,8 +42,8 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
      * @throws IllegalArgumentException si timeStampNs est strictement inférieure à 0
      */
     public AircraftIdentificationMessage{
-        Objects.requireNonNull(icaoAddress());
-        Objects.requireNonNull(callSign());
+        Objects.requireNonNull(icaoAddress);
+        Objects.requireNonNull(callSign);
         Preconditions.checkArgument(timeStampNs >=0);
     }
 
@@ -59,7 +59,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
         //traitement de la catégorie
         int CA = extractCallSignCharacter(attributME, 0);
         int typeCode = rawMessage.typeCode();   //faut il ici vérifier que typeCode est bien dans {1,2,3,4} ?
-        byte aeronefCategory = (byte) ((CATEGORY_MSB_CONSTANT - typeCode) << CA_TAKEN_SPACE_IN_CATEGORY | CA);  //voir point 2.1 de l'Etape 5 du projet
+        int aeronefCategory = ((CATEGORY_MSB_CONSTANT - typeCode) << CA_TAKEN_SPACE_IN_CATEGORY | CA);  //voir point 2.1 de l'Etape 5 du projet
 
 
         //traitement de l'indicatif
@@ -75,7 +75,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
                 callSign += Cchar;
             }
         }
-        return new AircraftIdentificationMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), aeronefCategory , new CallSign(callSign));
+        return new AircraftIdentificationMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), Byte.toUnsignedInt((byte)aeronefCategory) , new CallSign(callSign));
     }
 
     /**
@@ -111,7 +111,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
      */
     private static char intToCallSignCharacter(int C){
         if(C > 0 && C <= ALPHABET_SIZE){
-            return (char) ((C-1) + A_VALUE); //On fait C-1 car on veut l'indice de la lettre dans l'alphabet
+            return (char) ((C-1) + A_VALUE); //On fait C-1 car on veut un indice (et en informatique on commence à 0 et non à 1)
         }else if(C >= ZERO_VALUE && C <= NINE_VALUE){
             return (char) (C);
         }else if(C == SPACE_VALUE) {

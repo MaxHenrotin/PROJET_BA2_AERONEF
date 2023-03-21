@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,6 +20,7 @@ class AdsbDemodulatorTest {
             RawMessage m;
             while ((m = d.nextMessage()) != null){
                 System.out.println(m);
+                System.out.println(m.icaoAddress());
             }
         } catch (IOException e) {
             e.printStackTrace();
