@@ -89,7 +89,7 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
             alt = alt >> 5;
             alt = (alt << 4) | temp;
 
-            return Q0_BASE_ALTITUDE + alt*25;
+            return Q0_BASE_ALTITUDE + alt * 25;
         }else{ //Q = 0
             int demele = demeleIndex(alt);
             int groupeFort = decodeGray( demele & MASK_GROUPE_FORT, 9);
@@ -110,7 +110,6 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
 
     private static int decodeGray(int input, int size){
         int output = input;
-
         for (int i = 1; i < size; i++) {
             output ^= (input >> i);
         }
