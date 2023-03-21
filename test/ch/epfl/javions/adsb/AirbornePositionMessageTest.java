@@ -55,15 +55,18 @@ class AirbornePositionMessageTest {
 
     @Test
     void testAltitudeQ0(){
+
+        double delta = 1e-8; //marge d'erreur parce que l'on manipule des double
+
         String rawMessage1String = "8D39203559B225F07550ADBE328F";  // altitude : environ 3474.72 m
         ByteString rawMessage1ByteString = ByteString.ofHexadecimalString(rawMessage1String);
         RawMessage rawMessage1 = new RawMessage(0, rawMessage1ByteString);
-        assertEquals(3474.72, AirbornePositionMessage.of(rawMessage1).altitude());
+        assertEquals(3474.72, AirbornePositionMessage.of(rawMessage1).altitude(),delta);
 
         String rawMessage2String = "8DAE02C85864A5F5DD4975A1A3F5";  // altitude : environ 7315.20 m
         ByteString rawMessage2ByteString = ByteString.ofHexadecimalString(rawMessage2String);
         RawMessage rawMessage2 = new RawMessage(1, rawMessage2ByteString);
-        assertEquals(7315.20, AirbornePositionMessage.of(rawMessage2).altitude());
+        assertEquals(7315.20, AirbornePositionMessage.of(rawMessage2).altitude(),delta);
     }
 
 }

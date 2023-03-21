@@ -26,7 +26,7 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
     private static final int Q1_BASE_ALTITUDE = -1300;
     private static final int Q_INDEX = 4;
 
-    private static final int Q_MASK = 1<<Q_INDEX;
+    private static final int Q_MASK = 1 << Q_INDEX;
 
     private static final int MASK_4 = 0b1111;
 
@@ -90,12 +90,13 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
             alt = (alt << 4) | temp;
 
             return Q0_BASE_ALTITUDE + alt * 25;
+
         }else{ //Q = 0
             int demele = demeleIndex(alt);
-            int groupeFort = decodeGray( demele & MASK_GROUPE_FORT, 9);
+            int groupeFort = decodeGray( (demele & MASK_GROUPE_FORT)>>3, 9);
             int groupeFaible =transformationGroupeFaible(decodeGray( demele & MASK_GROUPE_FAIBLE, 3), (groupeFort%2)==1);
 
-            return (groupeFaible != -1) ? Q1_BASE_ALTITUDE + groupeFaible * 100 + groupeFort * 500 : -1;
+            return (groupeFaible != -1) ? (Q1_BASE_ALTITUDE + groupeFaible * 100 + groupeFort * 500) : -1;
         }
     }
 
@@ -103,26 +104,27 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         int output = 0;
 
         for (int i = 0; i < MASK_DEMELAGE.length; i++) {
-            output = (output<<1) | (input & MASK_DEMELAGE[i]);
+            int bit = ((input & MASK_DEMELAGE[i]) == MASK_DEMELAGE[i]) ? 1:0;
+            output = (output<<1) | bit;
         }
         return output;
     }
 
     private static int decodeGray(int input, int size){
-        int output = input;
-        for (int i = 1; i < size; i++) {
+        int output = 0;
+        for (int i = 0; i < size; i++) {
             output ^= (input >> i);
         }
         return output;
     }
 
     private static int transformationGroupeFaible(int groupeFaible, boolean groupeFortImpair){
-        if(groupeFaible==0 || groupeFaible==5 || groupeFaible==6){
+        if(groupeFaible == 0 || groupeFaible == 5 || groupeFaible == 6){
             return -1;
         } else if (groupeFaible == 7) {
             return 5;
         }else if(groupeFortImpair){
-            return 6-groupeFaible;
+            return 6 - groupeFaible;
         }else {
             return groupeFaible;
         }
