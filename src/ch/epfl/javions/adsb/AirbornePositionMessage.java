@@ -1,5 +1,6 @@
 package ch.epfl.javions.adsb;
 
+import ch.epfl.javions.Bits;
 import ch.epfl.javions.Preconditions;
 import ch.epfl.javions.aircraft.IcaoAddress;
 
@@ -33,7 +34,6 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
     public AirbornePositionMessage{
         Objects.requireNonNull(icaoAddress);
         Preconditions.checkArgument(timeStampNs>=0 && (parity==0 || parity==1) && (x>=0 && x<1) && (y>=0 && y<1));
-
     }
 
     /**
@@ -42,9 +42,16 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
      * @return le message de positionnement en vol correspondant au message brut donné, ou null si l'altitude qu'il contient est invalide
      */
     public static AirbornePositionMessage of(RawMessage rawMessage){
+        long attributME = rawMessage.payload();
 
-        if(validAltitude){
-            return AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), altitude, parity, x, y);
+        double lon_cpr = Bits.extractUInt(attributME, 0, 17);
+        double lat_cpr = Bits.extractUInt(attributME, 17, 17);
+        int format = Bits.extractUInt(attributME, 34, 1); // 0 = paire, 1 = impaire
+        int alt = Bits.extractUInt(attributME, 36, 12);
+
+        int altitude;
+        if(altitude = calculAltitude(alt)){
+            return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), altitude, format, Math.scalb(lon_cpr,-17), Math.scalb(lat_cpr,-17));
         }else {
             return null;
         }
