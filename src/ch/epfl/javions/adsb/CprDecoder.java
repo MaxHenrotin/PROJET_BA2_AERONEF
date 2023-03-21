@@ -16,9 +16,9 @@ public class CprDecoder {
 
     private static double[] DELTA_LONGITUDES = new double[2];
 
-    private static double[] nombreLongitude = new double[2];
+    private final static double[] nombreLongitude = new double[2];
 
-    private static double[] latitudes = new double[2]; //exprimées en Turn puis return en T32
+    private final static double[] latitudes = new double[2]; //exprimées en Turn puis return en T32
 
     private static double[] longitudes = new double[2]; //exprimées en Turn puis return en T32
 
@@ -39,7 +39,7 @@ public class CprDecoder {
                 calculLongitudes(xLatitudes); //détermine les longitudes
 
             }else {
-                longitudes = xLatitudes.clone();//cas limite où l'on est en zone polaire
+                longitudes = xLatitudes;//cas limite où l'on est en zone polaire
             }
 
             for (int i = 0; i < latitudes.length; i++) { //recentre les valeurs autour de 0 et les convertie en T32
@@ -47,7 +47,7 @@ public class CprDecoder {
                 longitudes[i] = conversionTurn(longitudes[i]);
             }
 
-            return new GeoPos((int) longitudes[mostRecent], (int) latitudes[mostRecent]); //retourne les coordonnées les plus récentes
+            return new GeoPos((int) rint(longitudes[mostRecent]), (int) rint(latitudes[mostRecent])); //retourne les coordonnées les plus récentes
         }else {
             return null; //les coordonnées sont erronées car l'avion a chaangé de bande latitude
         }
@@ -80,6 +80,7 @@ public class CprDecoder {
     }
 
     private static boolean calculNombresLongitude(double latitude){
+
         double latitudeDegree = Units.convert(latitude, Units.Angle.TURN, Units.Angle.DEGREE); //la formule ci-dessous s'utilise avec des degrées
         double A = acos(1 - ((1 - cos(2 * PI * DELTA_LATITUDES[0])) / (cos(latitudeDegree)*cos(latitudeDegree))));
 

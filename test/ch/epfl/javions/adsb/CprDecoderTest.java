@@ -5,14 +5,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CprDecoderTest {
-
-    private double norme = Math.scalb(1,-17);
     @Test
     void testValeursProf(){
-        double valueLongitudeExpected = 7.476062;
-        double valueLatitudeExpected = 46.323349;
+        double valueLongitudeExpected = 7.476062346249819;
+        double valueLatitudeExpected = 46.323349038138986;
         System.out.println("expected : "+valueLongitudeExpected+", "+valueLatitudeExpected);
-        System.out.print("actual : "+CprDecoder.decodePosition(111600 * norme, 94445 * norme, 108865*norme, 77558*norme, 0));
+        System.out.print("actual : "+CprDecoder.decodePosition(Math.scalb(111600d, -17), Math.scalb(94445d, -17), Math.scalb(108865d, -17), Math.scalb(77558d, -17), 0));
     }
 
 }
