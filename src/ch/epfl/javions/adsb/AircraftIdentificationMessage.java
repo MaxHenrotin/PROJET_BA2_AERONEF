@@ -63,7 +63,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
 
 
         //traitement de l'indicatif
-        String callSign = "";
+        StringBuilder callSign = new StringBuilder();
         int Cint;
         char Cchar;
         for(int i = 1; i<=CALL_SIGN_LENGTH;++i) {
@@ -72,10 +72,10 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
             if(Cchar == INVALID_CHAR) { //si il y a un caractère invalide
                 return null;
             }else if(Cchar != ' '){
-                callSign += Cchar;
+                callSign.append(Cchar);
             }
         }
-        return new AircraftIdentificationMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), Byte.toUnsignedInt((byte)aeronefCategory) , new CallSign(callSign));
+        return new AircraftIdentificationMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), Byte.toUnsignedInt((byte)aeronefCategory) , new CallSign(callSign.toString()));
     }
 
     /**
