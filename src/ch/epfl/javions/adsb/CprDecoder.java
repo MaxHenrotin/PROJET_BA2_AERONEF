@@ -6,6 +6,12 @@ import ch.epfl.javions.Units;
 
 import static java.lang.Math.*;
 
+/**
+ * Classe permettant de décoder la latitude et la longitude d'une aéronef
+ *
+ * @author Julien Erbland (346893)
+ * @author Max Henrotin (341463)
+ */
 public class CprDecoder {
 
     private CprDecoder(){} //classe non instanciable
@@ -23,6 +29,16 @@ public class CprDecoder {
     private static double[] longitudes = new double[2]; //exprimées en Turn puis return en T32
 
 
+    /**
+     * Retourne la positon géographique correspondant aux positions locales normalisées données
+     * @param x0 : longitude locale normalisée d'un message pair
+     * @param y0 : latitude locale normalisée d'un message pair
+     * @param x1 : longitude locale normalisée d'un message impair
+     * @param y1 : latitude locale normalisée d'un message impair
+     * @param mostRecent  : indique si le message reçu le plus récent est pair ou impair
+     * @return la position de l'aéronef ou null si la latitude de la position décodée n'est pas valide
+     * @throws IllegalArgumentException : si mostRecent ne vaut pas 0 ou 1
+     */
     public static GeoPos decodePosition(double x0, double y0, double x1, double y1, int mostRecent){
         Preconditions.checkArgument(mostRecent==0 || mostRecent==1);
 
@@ -47,9 +63,11 @@ public class CprDecoder {
                 longitudes[i] = conversionTurn(longitudes[i]);
             }
 
-            return new GeoPos((int) rint(longitudes[mostRecent]), (int) rint(latitudes[mostRecent])); //retourne les coordonnées les plus récentes
+            //retourne les coordonnées les plus récentes
+            return new GeoPos((int) rint(longitudes[mostRecent]), (int) rint(latitudes[mostRecent]));
+
         }else {
-            return null; //les coordonnées sont erronées car l'avion a chaangé de bande latitude
+            return null; //les coordonnées sont erronées car l'avion a changé de bande latitude
         }
     }
 
