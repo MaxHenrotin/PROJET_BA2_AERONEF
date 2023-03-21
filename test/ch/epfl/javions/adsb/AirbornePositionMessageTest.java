@@ -7,18 +7,20 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-class AircraftIdentificationMessageTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+class AirbornePositionMessageTest {
 
     @Test
-    void aircraftIdentificationMessageWorksOnSample() {
+    void AirbornPositionMessageWorksOnSample() {
         int counter = 0;
         String f = "resources\\samples_20230304_1442.bin";
         try (InputStream s = new FileInputStream(f)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
             RawMessage m;
             while ((m = d.nextMessage()) != null){
-                AircraftIdentificationMessage a = AircraftIdentificationMessage.of(m);
-                if(a != null && (m.typeCode() ==1 || m.typeCode()==2 || m.typeCode()==3 ||m.typeCode()==4)) {
+                AirbornePositionMessage a = AirbornePositionMessage.of(m);
+                if(a != null && ((m.typeCode() >=9 && m.typeCode() <=18) || (m.typeCode() >= 20 && m.typeCode() <= 22))) {
                     System.out.println(a);
                     ++counter;
                 }
