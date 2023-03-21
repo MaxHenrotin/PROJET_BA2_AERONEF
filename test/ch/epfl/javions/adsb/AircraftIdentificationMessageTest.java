@@ -7,10 +7,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class AircraftIdentificationMessageTest {
 
     @Test
-    void aircraftIdentificationMessageWorksOnSample() {
+    void aircraftIdentificationMessageWorksOnSampleWithValidTypeCode() {
         int counter = 0;
         String f = "resources\\samples_20230304_1442.bin";
         try (InputStream s = new FileInputStream(f)) {
@@ -23,7 +25,27 @@ class AircraftIdentificationMessageTest {
                     ++counter;
                 }
             }
-            System.out.println("On en veut 14 avec les conditions sur typeCode et 29 sans ! Et il y en a ici : " + counter);
+            assertEquals(14, counter);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void aircraftIdentificationMessageWorksOnSampleWithoutValidTypeCode() {
+        int counter = 0;
+        String f = "resources\\samples_20230304_1442.bin";
+        try (InputStream s = new FileInputStream(f)) {
+            AdsbDemodulator d = new AdsbDemodulator(s);
+            RawMessage m;
+            while ((m = d.nextMessage()) != null){
+                AircraftIdentificationMessage a = AircraftIdentificationMessage.of(m);
+                if(a != null) {
+                    System.out.println(a);
+                    ++counter;
+                }
+            }
+            assertEquals(29, counter);
         } catch (IOException e) {
             e.printStackTrace();
         }

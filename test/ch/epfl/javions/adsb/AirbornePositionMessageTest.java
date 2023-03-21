@@ -6,13 +6,14 @@ import org.junit.jupiter.api.Test;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class AirbornePositionMessageTest {
 
     @Test
-    void AirbornPositionMessageWorksOnSample() {
+    void AirbornPositionMessageWorksOnSampleWithValidTypeCode() {
         int counter = 0;
         String f = "resources\\samples_20230304_1442.bin";
         try (InputStream s = new FileInputStream(f)) {
@@ -25,7 +26,27 @@ class AirbornePositionMessageTest {
                     ++counter;
                 }
             }
-            System.out.println("On en veut 137 avec les conditions sur typeCode et 311 sans ! Et il y en a ici : " + counter);
+            assertEquals(137, counter);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void AirbornPositionMessageWorksOnSampleWithoutValidTypeCode() {
+        int counter = 0;
+        String f = "resources\\samples_20230304_1442.bin";
+        try (InputStream s = new FileInputStream(f)) {
+            AdsbDemodulator d = new AdsbDemodulator(s);
+            RawMessage m;
+            while ((m = d.nextMessage()) != null){
+                AirbornePositionMessage a = AirbornePositionMessage.of(m);
+                if(a != null) {
+                    System.out.println(a);
+                    ++counter;
+                }
+            }
+            assertEquals(311, counter);
         } catch (IOException e) {
             e.printStackTrace();
         }
