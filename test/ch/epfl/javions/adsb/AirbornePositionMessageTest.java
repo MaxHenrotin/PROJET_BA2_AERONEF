@@ -25,7 +25,7 @@ class AirbornePositionMessageTest {
                     ++counter;
                 }
             }
-            System.out.println(counter);
+            System.out.println("On en veut 137 avec les conditions sur typeCode et 311 sans ! Et il y en a ici : " + counter);
         } catch (IOException e) {
             e.printStackTrace();
         }
