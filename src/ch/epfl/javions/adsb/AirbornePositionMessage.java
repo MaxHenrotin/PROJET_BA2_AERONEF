@@ -1,7 +1,6 @@
 package ch.epfl.javions.adsb;
 
 import ch.epfl.javions.Bits;
-import ch.epfl.javions.ByteString;
 import ch.epfl.javions.Preconditions;
 import ch.epfl.javions.Units;
 import ch.epfl.javions.aircraft.IcaoAddress;
@@ -100,16 +99,27 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         }
     }
 
+    /**
+     * Réalise le démêlage des bits comme ceci : C1 A1 C2 A2 C4 A4 B1 D1 B2 D2 B4 D4 -> D1 D2 D4 A1 A2 A4 B1 B2 B4 C1 C2 C4
+     * MASK_DEMELAGE permet d'avoir le mask pour récupérer la valeur du bit D1 de l'input puis D2 puis D4 et ainsi de suite
+     * @param input : ensemble des bits à démêler
+     * @return les bits démêlés
+     */
     private static int demeleIndex(int input){
         int output = 0;
 
-        for (int i = 0; i < MASK_DEMELAGE.length; i++) {
-            int bit = ((input & MASK_DEMELAGE[i]) == MASK_DEMELAGE[i]) ? 1:0;
-            output = (output<<1) | bit;
+        for (int mask : MASK_DEMELAGE) {
+            int bit = ((input & mask) == mask) ? 1 : 0;
+            output = (output << 1) | bit;
         }
         return output;
     }
 
+    /**Permet de décoder un code de Graay en interprétation binaire
+     * @param input : code de Gray
+     * @param size : nombre de bits du code
+     * @return l'interprétation binaire du code de Gray
+     */
     private static int decodeGray(int input, int size){
         int output = 0;
         for (int i = 0; i < size; i++) {
@@ -118,6 +128,12 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         return output;
     }
 
+    /**
+     * Réalise les transformations nécessaires sur le groupe faible dans le décodage de l'altitude
+     * @param groupeFaible : la valeur du groupe faible
+     * @param groupeFortImpair : permet de connaitre la parité du groupe fort
+     * @return la valeur trnasformée du groupe faible
+     */
     private static int transformationGroupeFaible(int groupeFaible, boolean groupeFortImpair){
         if(groupeFaible == 0 || groupeFaible == 5 || groupeFaible == 6){
             return -1;
