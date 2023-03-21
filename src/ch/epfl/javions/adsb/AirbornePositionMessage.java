@@ -23,6 +23,8 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
 
     private static final int Q_MASK = 1<<Q_INDEX;
 
+    private static final int MASK_4 = 0b1111;
+
     /**
      * Constructeur compact
      * @param timeStampNs : l'horodatage du message, en nanosecondes
@@ -54,8 +56,8 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         int format = Bits.extractUInt(attributME, 34, 1); // 0 = paire, 1 = impaire
         int alt = Bits.extractUInt(attributME, 36, 12);
 
-        int altitude;
-        if(altitude = calculAltitude(alt)){
+
+        if(calculAltitude(alt)){
             return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), altitude, format, Math.scalb(lon_cpr,-17), Math.scalb(lat_cpr,-17));
         }else {
             return null;
@@ -63,10 +65,13 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
     }
 
 
-    private static boolean calculAltitude(int alt){
-
+    private static int calculAltitude(int alt){
         if((alt & Q_MASK) == Q_MASK){ //Q = 1
-
+            int temp = MASK_4 & alt;
+            alt = alt>>5;
+            alt = alt<<4;
+            alt |= temp;
+            return alt;
         }else{ //Q = 0
 
         }
