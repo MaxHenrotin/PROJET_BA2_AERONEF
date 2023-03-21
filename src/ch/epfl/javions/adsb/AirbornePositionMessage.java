@@ -54,16 +54,21 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         int format = Bits.extractUInt(attributME, 34, 1); // 0 = paire, 1 = impaire
         int alt = Bits.extractUInt(attributME, 36, 12);
 
-        int altitude;
-        if(altitude = calculAltitude(alt)){
+        int altitude = calculAltitude(alt);
+        if(altitude != -1){
             return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), altitude, format, Math.scalb(lon_cpr,-17), Math.scalb(lat_cpr,-17));
         }else {
             return null;
         }
     }
 
+    /**
+     * Calcule l'altitude en fonction de l'attribut alt issus de l'attribut ME du message brut
+     * @param alt : la chaîne de bits contenant l'altitude dans l'attribut ME
+     * @return l'altitude à laquelle se trouvait l'aéronef au moment de l'envoi du message, en mètresou -1 si l'altitude est invalide
+     */
 
-    private static boolean calculAltitude(int alt){
+    private static int calculAltitude(int alt){
 
         if((alt & Q_MASK) == Q_MASK){ //Q = 1
 
@@ -71,6 +76,7 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
 
         }
 
+        return -1;
     }
 
 }
