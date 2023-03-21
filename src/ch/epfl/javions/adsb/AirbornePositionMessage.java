@@ -18,6 +18,10 @@ import java.util.Objects;
 
 public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,double altitude, int parity, double x, double y) implements Message{
 
+    private static final int Q_INDEX = 4;
+
+    private static final int Q_MASK = 1<<Q_INDEX;
+
     /**
      * Constructeur compact
      * @param timeStampNs : l'horodatage du message, en nanosecondes
@@ -43,10 +47,23 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
      */
     public static AirbornePositionMessage of(RawMessage rawMessage){
 
+
         if(validAltitude){
             return AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), altitude, parity, x, y);
         }else {
             return null;
         }
     }
+
+
+    private static boolean calculAltitude(int alt){
+
+        if((alt & Q_MASK) == Q_MASK){ //Q = 1
+            
+        }else{ //Q = 0
+
+        }
+
+    }
+
 }

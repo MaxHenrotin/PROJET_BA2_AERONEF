@@ -98,7 +98,7 @@ public class CprDecoder {
 
     private static double conversionTurn(double angle) {
         if(angle >= 0.5){
-            return Units.convert(angle - Units.Angle.TURN,Units.Angle.TURN,Units.Angle.T32);
+            return Units.convert(angle - 1,Units.Angle.TURN,Units.Angle.T32);
         }else {
             return Units.convert(angle, Units.Angle.TURN, Units.Angle.T32);
         }
