@@ -4,6 +4,8 @@ import ch.epfl.javions.GeoPos;
 import ch.epfl.javions.Preconditions;
 import ch.epfl.javions.Units;
 
+import java.util.Arrays;
+
 import static java.lang.Math.*;
 
 /**
@@ -13,7 +15,6 @@ import static java.lang.Math.*;
  * @author Max Henrotin (341463)
  */
 public class CprDecoder {
-
     private CprDecoder(){} //classe non instanciable
 
     private final static double EPSILON = 1e-3;
@@ -63,6 +64,8 @@ public class CprDecoder {
                 longitudes[i] = conversionTurn(longitudes[i]);
             }
 
+
+
             //retourne les coordonnées les plus récentes
             return new GeoPos((int) rint(longitudes[mostRecent]), (int) rint(latitudes[mostRecent]));
 
@@ -86,15 +89,15 @@ public class CprDecoder {
     }
 
     private static void calculLongitudes(double[] xLatitudes){
-            double[] indexLongitudes = new double[2];
+        double[] indexLongitudes = new double[2];
 
-            double z_longitude = rint(xLatitudes[0] * nombreLongitude[1] - xLatitudes[1] * nombreLongitude[0]);
+        double z_longitude = rint(xLatitudes[0] * nombreLongitude[1] - xLatitudes[1] * nombreLongitude[0]);
 
-            for (int i = 0; i < indexLongitudes.length; i++) {
-                indexLongitudes[i] = (z_longitude < 0) ? (z_longitude + nombreLongitude[i]) : z_longitude;
+        for (int i = 0; i < indexLongitudes.length; i++) {
+            indexLongitudes[i] = (z_longitude < 0) ? (z_longitude + nombreLongitude[i]) : z_longitude;
 
-                longitudes[i] = DELTA_LONGITUDES[i] * (indexLongitudes[i] + xLatitudes[i]);
-            }
+            longitudes[i] = DELTA_LONGITUDES[i] * (indexLongitudes[i] + xLatitudes[i]);
+        }
     }
 
     private static boolean calculNombresLongitude(double latitude){
@@ -102,7 +105,7 @@ public class CprDecoder {
         double latitudeDegree = Units.convert(latitude, Units.Angle.TURN, Units.Angle.DEGREE); //la formule ci-dessous s'utilise avec des degrées
         double A = acos(1 - ((1 - cos(2 * PI * DELTA_LATITUDES[0])) / (cos(latitudeDegree)*cos(latitudeDegree))));
 
-        if(Double.isNaN(A)){
+        if(Double.isNaN(A)){  //en zone polaire
             nombreLongitude[0] = 1;
             nombreLongitude[1] = 0;
             return false;
