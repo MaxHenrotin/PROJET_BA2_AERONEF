@@ -2,6 +2,7 @@ package ch.epfl.javions.adsb;
 
 import ch.epfl.javions.Bits;
 import ch.epfl.javions.Preconditions;
+import ch.epfl.javions.Units;
 import ch.epfl.javions.aircraft.IcaoAddress;
 
 import java.util.Objects;
@@ -55,14 +56,51 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
                 return null;
             }
 
+            //vitesse
+            double speed = Math.hypot(vns, vew);    //norme des deux composantes de vitesse
+            if(sousType == 2){ speed = speed*4; }
+            speed = Units.convertFrom(speed, Units.Speed.KNOT);   //conversion de noeuds en m/s
 
-            return new AirborneVelocityMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), speed, direction);
+            //direction
+            //pour faire coincider la direction est avec l'axe x
+            if(dew == 0){
+                dew = 1;
+            }else{
+                dew = -1;
+            }
+            //pour faire coincider la direction nord avec l'axe y
+            if(dns == 0) {
+                dns = 1;
+            }else{
+                dns = -1;
+            }
+            double speedX = dew*vew;
+            double speedY = dns*vns;
+            double angle = Math.atan2(speedX, speedY);  //angle en radian autours de l'axe y ]-pi,pi]
+            if(angle < 0){
+                angle = angle + 2*Math.PI;   //angle en radian autours de l'axe y [0,2pi]
+            }
+
+            return new AirborneVelocityMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), speed, angle);
+
         }else if(sousType == 3 || sousType == 4){
             double statusHeading = Bits.extractUInt((long) content, 21, 1); //SH
             double heading = Bits.extractUInt((long) content, 11, 10);      //HDG
             double airSpeed = Bits.extractUInt((long) content, 0, 10);      //AS
 
-            return new AirborneVelocityMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), speed, direction);
+            if(statusHeading == 1) {
+                //vitesse
+                if(sousType == 4){ airSpeed = airSpeed*4; }
+                airSpeed = Units.convertFrom(airSpeed, Units.Speed.KNOT);
+
+                //direction
+                double angle = ((int)heading)/Math.scalb(1,10); //angle en tours depuis l'axe y dans le sens horaire [0,1] (calcul selon la convention donnée au point 2.1.3 de l'étape 6)
+                angle = Units.convertFrom(angle, Units.Angle.TURN);   //conversion de tours en radian
+
+                return new AirborneVelocityMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), airSpeed, angle);
+            }else{
+                return null;
+            }
         }else{
             return null;
         }
