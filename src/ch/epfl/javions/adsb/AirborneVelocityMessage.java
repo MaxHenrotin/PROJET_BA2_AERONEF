@@ -57,7 +57,7 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
             }
 
             //vitesse
-            double speed = Math.hypot(vns, vew);    //norme des deux composantes de vitesse
+            double speed = Math.hypot(vns-1, vew-1);    //norme des deux composantes de vitesse (-1 car par convention ils sont stockés avec un décalage de 1, voir la doc etape 6 pt. 2.1.2)
             if(sousType == 2){ speed = speed*4; }
             speed = Units.convertFrom(speed, Units.Speed.KNOT);   //conversion de noeuds en m/s
 
@@ -74,8 +74,8 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
             }else{
                 dns = -1;
             }
-            double speedX = dew*vew;
-            double speedY = dns*vns;
+            double speedX = dew*(vew-1);    //(-1 car par convention ils sont stockés avec un décalage de 1, voir la doc etape 6 pt. 2.1.2)
+            double speedY = dns*(vns-1);    //(-1 car par convention ils sont stockés avec un décalage de 1, voir la doc etape 6 pt. 2.1.2)
             double angle = Math.atan2(speedX, speedY);  //angle en radian autours de l'axe y ]-pi,pi]
             if(angle < 0){
                 angle = angle + 2*Math.PI;   //angle en radian autours de l'axe y [0,2pi]

@@ -25,8 +25,7 @@ class AirborneVelocityMessageTest {
                     ++counter;
                 }
             }
-            System.out.println(counter);
-            //assertEquals( ??? , counter);
+            assertEquals(147 , counter);
         } catch (IOException e) {
             e.printStackTrace();
         }
