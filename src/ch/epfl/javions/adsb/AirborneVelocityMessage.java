@@ -19,7 +19,7 @@ import java.util.Objects;
  * @author Max Henrotin (341463)
  */
 
-public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress, double speed, double trackOrHeading) {
+public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress, double speed, double trackOrHeading) implements Message {
 
     /**
      * Constructeur compact

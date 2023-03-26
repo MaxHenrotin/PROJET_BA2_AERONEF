@@ -15,9 +15,16 @@ public final class MessageParser {
      * @return l'instance de AircraftIdentificationMessage, de AirbornePositionMessage ou de AirborneVelocityMessage correspondant au message brut donné
      *         ou bien null si : le code de type de ce dernier ne correspond à aucun de ces trois types de messages ou si il est invalide.
      */
-    public static Message parse(RawMessage rawMessage){
-
-        return null;
+    public static Message parse(RawMessage rawMessage) {
+        if (rawMessage.typeCode() == 1 || rawMessage.typeCode() == 2 || rawMessage.typeCode() == 3 || rawMessage.typeCode() == 4) {
+            return AircraftIdentificationMessage.of(rawMessage);
+        }else if((rawMessage.typeCode() >= 9 && rawMessage.typeCode() <= 18) || (rawMessage.typeCode() >= 20 && rawMessage.typeCode() <= 22)) {
+            return AirbornePositionMessage.of(rawMessage);
+        }else if(rawMessage.typeCode() == 19){
+            return AirborneVelocityMessage.of(rawMessage);
+        }else {
+            return null;
+        }
     }
 
 }
