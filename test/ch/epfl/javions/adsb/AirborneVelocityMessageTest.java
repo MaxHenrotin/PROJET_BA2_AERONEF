@@ -32,7 +32,7 @@ class AirborneVelocityMessageTest {
     }
 
     /*
-    RESULTATS ATTENDUS (Trouvés sur ED discussion avec les 5 premiers validés par le prof):
+    RESULTATS ATTENDUS (Trouvés sur ED discussion):
 
     AirborneVelocityMessage[timeStampNs=100775400, icaoAddress=IcaoAddress[string=39D300], speed=217.1759987875795, trackOrHeading=5.707008696317668]
     AirborneVelocityMessage[timeStampNs=146689300, icaoAddress=IcaoAddress[string=440237], speed=227.75426436901594, trackOrHeading=4.1068443167797195]
