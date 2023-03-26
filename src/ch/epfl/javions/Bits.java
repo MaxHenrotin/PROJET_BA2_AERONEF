@@ -9,7 +9,7 @@ import java.util.Objects;
  * @author Julien Erbland (346893)
  */
 public class Bits {
-    private Bits(){}    //constructeur privé pour que la classe soit non instanciable
+    private Bits(){}    //constructeur privé pour rendre la classe non instanciable
 
     /**
      * qui extrait du vecteur de 64 bits value la plage de size bits commençant au bit d'index start, qu'elle interprète comme une valeur non signée
