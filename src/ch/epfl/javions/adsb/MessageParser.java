@@ -3,6 +3,9 @@ package ch.epfl.javions.adsb;
 
 /**
  * Classe non instanciable ayant pour but de transformer les messages ADS-B bruts en messages d'un des trois types suivants : identification, position en vol, vitesse en vol
+ *
+ * @author Julien Erbland (346893)
+ * @author Max Henrotin (341463)
  */
 public final class MessageParser {
 

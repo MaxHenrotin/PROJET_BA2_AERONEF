@@ -20,7 +20,7 @@ class AirborneVelocityMessageTest {
             RawMessage m;
             while ((m = d.nextMessage()) != null){
                 AirborneVelocityMessage a = AirborneVelocityMessage.of(m);
-                if(a != null) {
+                if(a != null && m.typeCode() == 19) {
                     System.out.println(a);
                     ++counter;
                 }
@@ -33,7 +33,7 @@ class AirborneVelocityMessageTest {
     }
 
     /*
-    RESULTATS ATTENDUS :
+    RESULTATS ATTENDUS (Trouvés sur ED discussion avec les 5 premiers validés par le prof):
 
     AirborneVelocityMessage[timeStampNs=100775400, icaoAddress=IcaoAddress[string=39D300], speed=217.1759987875795, trackOrHeading=5.707008696317668]
     AirborneVelocityMessage[timeStampNs=146689300, icaoAddress=IcaoAddress[string=440237], speed=227.75426436901594, trackOrHeading=4.1068443167797195]
