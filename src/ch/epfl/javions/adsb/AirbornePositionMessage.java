@@ -16,6 +16,9 @@ import java.util.Objects;
  * @param parity : la parité du message (0 s'il est pair, 1 s'il est impair)
  * @param x : la longitude locale et normalisée (donc comprise entre 0 et 1) à laquelle se trouvait l'aéronef au moment de l'envoi du message
  * @param y : la latitude locale et normalisée (donc comprise entre 0 et 1) à laquelle se trouvait l'aéronef au moment de l'envoi du message
+ *
+ * @author Julien Erbland (346893)
+ * @author Max Henrotin (341463)
  */
 
 public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,double altitude, int parity, double x, double y) implements Message{
