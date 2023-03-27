@@ -25,9 +25,12 @@ public class CprDecoder {
 
     private final static double[] nombreLongitude = new double[2];
 
+
     private final static double[] latitudes = new double[2]; //exprimées en Turn puis return en T32
 
     private static double[] longitudes = new double[2]; //exprimées en Turn puis return en T32
+
+    private static boolean inPolarZone;
 
 
     /**
@@ -47,24 +50,26 @@ public class CprDecoder {
 
         //détermine les latitudes et retourne un boolean si les latitudes sont cohérentes
         if(calculLatitudes(yLatitudes)) {
-            double[] xLatitudes = {x0, x1};
+            double[] xLongitudes = {x0, x1};
 
             //utilise la latitude la plus récente pour calculer le nombre de zones de longitudes
             // et vérifie si on est pas en zone polaire
-            if (calculNombresLongitude(latitudes[mostRecent])) {
+            if (calculNombresLongitude()){
 
-                calculLongitudes(xLatitudes); //détermine les longitudes
+                calculLongitudes(xLongitudes); //détermine les longitudes
 
             }else {
-                longitudes = xLatitudes;//cas limite où l'on est en zone polaire
+                if (inPolarZone){
+                    longitudes = xLongitudes;//cas limite où l'on est en zone polaire
+                }else {
+                    return null;
+                }
             }
 
             for (int i = 0; i < latitudes.length; i++) { //recentre les valeurs autour de 0 et les convertie en T32
                 latitudes[i] = conversionTurn(latitudes[i]);
                 longitudes[i] = conversionTurn(longitudes[i]);
             }
-
-
 
             //retourne les coordonnées les plus récentes
             return new GeoPos((int) rint(longitudes[mostRecent]), (int) rint(latitudes[mostRecent]));
@@ -83,9 +88,13 @@ public class CprDecoder {
             indexLatitudes[i] = (z_latitude<0) ? (z_latitude + NOMBRE_LATITUDES[i]) : z_latitude;
 
             latitudes[i] = DELTA_LATITUDES[i] * (indexLatitudes[i] + yLatitudes[i]);
-        }
 
-        return  (abs(latitudes[0]-latitudes[1]) < EPSILON);
+            if (latitudes[i] < 0d || latitudes[i] > 1d){
+                return false;
+            }
+        }
+        return true;
+
     }
 
     private static void calculLongitudes(double[] xLatitudes){
@@ -100,20 +109,35 @@ public class CprDecoder {
         }
     }
 
-    private static boolean calculNombresLongitude(double latitude){
+    private static boolean calculNombresLongitude(){
 
-        double latitudeDegree = Units.convert(latitude, Units.Angle.TURN, Units.Angle.DEGREE); //la formule ci-dessous s'utilise avec des degrées
-        double A = acos(1 - ((1 - cos(2 * PI * DELTA_LATITUDES[0])) / (cos(latitudeDegree)*cos(latitudeDegree))));
+        double latitudeRadianEven = Units.convert(latitudes[0], Units.Angle.TURN, Units.Angle.RADIAN); //la formule ci-dessous s'utilise avec des radians
+        double latitudeRadianOdd = Units.convert(latitudes[1], Units.Angle.TURN, Units.Angle.RADIAN);
+        double AEven = acos(1 - ((1 - cos(2 * PI * DELTA_LATITUDES[0])) / (cos(latitudeRadianEven)*cos(latitudeRadianEven))));
+        double AOdd = acos(1 - ((1 - cos(2 * PI * DELTA_LATITUDES[0])) / (cos(latitudeRadianOdd)*cos(latitudeRadianOdd))));
 
-        if(Double.isNaN(A)){  //en zone polaire
+        if(Double.isNaN(AEven)&& Double.isNaN(AOdd)){  //en zone polaire
             nombreLongitude[0] = 1;
             nombreLongitude[1] = 0;
+            inPolarZone = true;
             return false;
         }else {
-            nombreLongitude[0] = floor((2 * PI)/A);
-            nombreLongitude[1] = nombreLongitude[0] - 1;
-            DELTA_LONGITUDES = new double[]{1 / nombreLongitude[0], 1 / nombreLongitude[1]};
-            return true;
+            double nombreLongitudesEven;
+            inPolarZone = false;
+
+            //cas limite où l'avion a changé de bande de latitude et est passé d'une zone polaire à une zone non polare
+            if (Double.isNaN(AEven) || Double.isNaN(AOdd)){
+                return false;
+            }
+
+            if((nombreLongitudesEven = floor((2. * PI)/AEven)) == floor((2.*PI)/AOdd)) {
+                nombreLongitude[0] = nombreLongitudesEven;
+                nombreLongitude[1] = nombreLongitude[0] - 1;
+                DELTA_LONGITUDES = new double[]{1 / nombreLongitude[0], 1 / nombreLongitude[1]};
+                return true;
+            }else {
+                return false;
+            }
         }
     }
 
