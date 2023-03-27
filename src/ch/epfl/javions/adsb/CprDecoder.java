@@ -47,39 +47,40 @@ public class CprDecoder {
         Preconditions.checkArgument(mostRecent==0 || mostRecent==1);
 
         double[] yLatitudes = {y0, y1};
+        double[] xLongitudes = {x0, x1};
 
         //détermine les latitudes et retourne un boolean si les latitudes sont cohérentes
-        if(calculLatitudes(yLatitudes)) {
-            double[] xLongitudes = {x0, x1};
+        calculLatitudes(yLatitudes);
 
-            //utilise la latitude la plus récente pour calculer le nombre de zones de longitudes
-            // et vérifie si on est pas en zone polaire
-            if (calculNombresLongitude()){
 
-                calculLongitudes(xLongitudes); //détermine les longitudes
+        //utilise la latitude la plus récente pour calculer le nombre de zones de longitudes
+        // et vérifie si on est pas en zone polaire
+        if (calculNombresLongitude()){
 
-            }else {
-                if (inPolarZone){
-                    longitudes = xLongitudes;//cas limite où l'on est en zone polaire
-                }else {
-                    return null;
-                }
-            }
-
-            for (int i = 0; i < latitudes.length; i++) { //recentre les valeurs autour de 0 et les convertie en T32
-                latitudes[i] = conversionTurn(latitudes[i]);
-                longitudes[i] = conversionTurn(longitudes[i]);
-            }
-
-            //retourne les coordonnées les plus récentes
-            return new GeoPos((int) rint(longitudes[mostRecent]), (int) rint(latitudes[mostRecent]));
-
+            calculLongitudes(xLongitudes); //détermine les longitudes
         }else {
-            return null; //les coordonnées sont erronées car l'avion a changé de bande latitude
+            if (inPolarZone){
+                longitudes = xLongitudes;//cas limite où l'on est en zone polaire
+            }else {
+                return null;
+            }
         }
+
+        if(latitudes[mostRecent] > 0.25d && latitudes[mostRecent] < 0.75d){ //test si lattitude calculéee est valide
+            return null;
+        }
+
+        for (int i = 0; i < latitudes.length; i++) { //recentre les valeurs autour de 0 et les convertie en T32
+            latitudes[i] = conversionTurn(latitudes[i]);
+            longitudes[i] = conversionTurn(longitudes[i]);
+        }
+
+        //retourne les coordonnées les plus récentes
+        return new GeoPos((int) rint(longitudes[mostRecent]), (int) rint(latitudes[mostRecent]));
+
     }
 
-    private static boolean calculLatitudes(double [] yLatitudes){
+    private static void calculLatitudes(double [] yLatitudes){
         double[] indexLatitudes = new double[2];
 
         double z_latitude = rint(yLatitudes[0] * NOMBRE_LATITUDES[1] - yLatitudes[1] * NOMBRE_LATITUDES[0]);
@@ -89,12 +90,7 @@ public class CprDecoder {
 
             latitudes[i] = DELTA_LATITUDES[i] * (indexLatitudes[i] + yLatitudes[i]);
 
-            if (latitudes[i] < 0d || latitudes[i] > 1d){
-                return false;
-            }
         }
-        return true;
-
     }
 
     private static void calculLongitudes(double[] xLatitudes){
