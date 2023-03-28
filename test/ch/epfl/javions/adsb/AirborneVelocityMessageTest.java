@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HexFormat;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,6 +30,21 @@ class AirborneVelocityMessageTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * trouvé sur le forum ED 853
+     * il faut 192.91666666666669 comme vitesse et 4.25833066717054 comme trackOrHeading
+     */
+    @Test
+    void AirbornVelocityMessageWorksOnBookMessage() {
+        RawMessage messageA = RawMessage.of(100, HexFormat.of().parseHex("8D485020994409940838175B284F"));
+        RawMessage messageB = RawMessage.of(200,HexFormat.of().parseHex("8DA05F219B06B6AF189400CBC33F"));
+        String f = "resources\\samples_20230304_1442.bin";
+        AirborneVelocityMessage a = AirborneVelocityMessage.of(messageA);
+        AirborneVelocityMessage b = AirborneVelocityMessage.of(messageB);
+        System.out.println("A :" + a);
+        System.out.println("B :" + b);
     }
 
     /*
