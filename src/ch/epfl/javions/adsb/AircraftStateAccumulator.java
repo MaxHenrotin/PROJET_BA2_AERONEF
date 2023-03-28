@@ -19,9 +19,7 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extend
 
     private final T stateSetter;
 
-    private Message dernierMessagePair;
-
-    private Message dernierMessageImpair;
+   private Message[] messagesPositions = new Message[2];
 
     /**
      * Constructeur retournant un accumulateur d'état d'aéronef associé à l'état modifiable donné
@@ -44,6 +42,20 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extend
      */
     public void update(Message message){
 
+        switch (message){
+            case AircraftIdentificationMessage messageIdectification :
+                stateSetter.setCategory(messageIdectification.category());
+                stateSetter.setCallSign(messageIdectification.callSign());
+                break;
+            case AirborneVelocityMessage messageVelocity :
+                stateSetter.setVelocity(messageVelocity.speed());
+                stateSetter.setTrackOrHeading(messageVelocity.trackOrHeading());
+                break;
+            case AirbornePositionMessage messagePosition :
+
+
+
+        }
 
         //A CODER
 
