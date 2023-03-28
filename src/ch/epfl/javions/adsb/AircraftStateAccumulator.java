@@ -48,6 +48,7 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extend
      */
     public void update(Message message){
 
+
         switch (message){
             case AircraftIdentificationMessage messageIdectification :
                 stateSetter.setCategory(messageIdectification.category());
@@ -76,6 +77,7 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extend
             default:
                 throw new IllegalArgumentException("Aucun message de type conforme reçu");
         }
+
 
     }
 
