@@ -17,27 +17,27 @@ public class AircraftState implements AircraftStateSetter {
 
     @Override
     public void setCategory(int category) {
-        //System.out.println("catégorie : " + category);
+        System.out.println("catégorie : " + category);
     }
 
     @Override
     public void setLastMessageTimeStampNs(long timeStampNs) {
-        //System.out.println("horodatage : " + timeStampNs);
+        System.out.println("horodatage : " + timeStampNs);
     }
 
     @Override
     public void setAltitude(double altitude) {
-        //System.out.println("altitude : " + altitude);
+        System.out.println("altitude : " + altitude);
     }
 
     @Override
     public void setVelocity(double velocity) {
-        //System.out.println("vitesse : " + velocity);
+        System.out.println("vitesse : " + velocity);
     }
 
     @Override
     public void setTrackOrHeading(double trackOrHeading) {
-        //System.out.println("direction : " + trackOrHeading);
+        System.out.println("direction : " + trackOrHeading);
     }
 
 }
