@@ -25,7 +25,7 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extend
 
    private int messagePositionParity;
 
-   private final static double TIME_LIMIT_POSITION = 10000; //il faut 10 secondes d'écart max mais le timeStamps est exprimé en microsecondes
+   private final static double TIME_LIMIT_POSITION = 10e9; //il faut 10 secondes d'écart max mais le timeStamps est exprimé en microsecondes
 
     /**
      * Constructeur retournant un accumulateur d'état d'aéronef associé à l'état modifiable donné
@@ -73,10 +73,10 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extend
                     stateSetter.setPosition(newPosition);
                 }
                 break;
+
             default:
                 throw new IllegalArgumentException("Aucun message de type conforme reçu");
         }
-
     }
 
     private boolean checkValidPosition(){
