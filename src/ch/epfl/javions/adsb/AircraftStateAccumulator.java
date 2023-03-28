@@ -1,6 +1,8 @@
 package ch.epfl.javions.adsb;
 //  Author:    Max Henrotin
 
+import ch.epfl.javions.GeoPos;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -19,7 +21,11 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extend
 
     private final T stateSetter;
 
-   private Message[] messagesPositions = new Message[2];
+   private AirbornePositionMessage[] messagesPositions = new AirbornePositionMessage[2];
+
+   private int messagePositionParity;
+
+   private final static double TIME_LIMIT_POSITION = 10000; //il faut 10 secondes d'écart max mais le timeStamps est exprimé en microsecondes
 
     /**
      * Constructeur retournant un accumulateur d'état d'aéronef associé à l'état modifiable donné
@@ -52,13 +58,33 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extend
                 stateSetter.setTrackOrHeading(messageVelocity.trackOrHeading());
                 break;
             case AirbornePositionMessage messagePosition :
+                messagePositionParity = messagePosition.parity();
+                messagesPositions[messagePositionParity] = messagePosition;
 
+                stateSetter.setAltitude(messagePosition.altitude());
 
+                if(checkValidPosition()){
+                    double x0 = messagesPositions[0].x();
+                    double y0 = messagesPositions[0].y();
+                    double x1 = messagesPositions[1].x();
+                    double y1 = messagesPositions[1].y();
 
+                    GeoPos newPosition = CprDecoder.decodePosition(x0, y0, x1, y1, messagePositionParity);
+                    stateSetter.setPosition(newPosition);
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Aucun message de type conforme reçu");
         }
 
-        //A CODER
+    }
 
+    private boolean checkValidPosition(){
+        if(messagesPositions[0] != null && messagesPositions[1] != null){
+            return Math.abs(messagesPositions[0].timeStampNs() - messagesPositions[1].timeStampNs()) < TIME_LIMIT_POSITION;
+        }else {
+            return false;
+        }
     }
 
 }
