@@ -37,14 +37,11 @@ class AirborneVelocityMessageTest {
      * il faut 192.91666666666669 comme vitesse et 4.25833066717054 comme trackOrHeading
      */
     @Test
-    void AirbornVelocityMessageWorksOnBookMessage() {
-        RawMessage messageA = RawMessage.of(100, HexFormat.of().parseHex("8D485020994409940838175B284F"));
+    void AirbornVelocityMessageWorksSubType3Message() {
         RawMessage messageB = RawMessage.of(200,HexFormat.of().parseHex("8DA05F219B06B6AF189400CBC33F"));
-        String f = "resources\\samples_20230304_1442.bin";
-        AirborneVelocityMessage a = AirborneVelocityMessage.of(messageA);
         AirborneVelocityMessage b = AirborneVelocityMessage.of(messageB);
-        System.out.println("A :" + a);
-        System.out.println("B :" + b);
+        assertEquals(192.91666666666669, b.speed());
+        assertEquals(4.25833066717054, b.trackOrHeading());
     }
 
     /*
