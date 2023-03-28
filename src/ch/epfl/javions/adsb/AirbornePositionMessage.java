@@ -37,7 +37,7 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
 
     private static final int MASK_GROUPE_FAIBLE = 0b111;
 
-    private static final int MASK_GROUPE_FORT = 0b111_111_111_000;//~MASK_GROUPE_FAIBLE;
+    private static final int MASK_GROUPE_FORT = ~MASK_GROUPE_FAIBLE;
 
     /**
      * Constructeur compact

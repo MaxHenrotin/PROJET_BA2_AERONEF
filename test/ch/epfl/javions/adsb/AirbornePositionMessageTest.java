@@ -65,17 +65,17 @@ class AirbornePositionMessageTest {
         record MessageAndAltitude(String message, double altitude) {
         }
         var testValues = List.of(
-                /*new MessageAndAltitude("8D4B1BB5598486491F4BDBF44FC6", 1584.96),
+                new MessageAndAltitude("8D4B1BB5598486491F4BDBF44FC6", 1584.96),
                 new MessageAndAltitude("8D4B1BB5592C22D2A155F49835EF", 1798.32),
                 new MessageAndAltitude("8D4B1BB5592422D2BB55FD991FA4", 1828.80),
                 new MessageAndAltitude("8D4B1BB559A4264FDB4DDDC058EA", 1859.28),
-                new MessageAndAltitude("8D4B1BB5598426509F4E1F032D5D", 1889.76),*/
-                new MessageAndAltitude("8D4B1BB5598406514D4E5FEC1AC3", 1920.24));
-                /*new MessageAndAltitude("8D4B1BB559A40653594F35F9A08F", 1950.72),
+                new MessageAndAltitude("8D4B1BB5598426509F4E1F032D5D", 1889.76),
+                new MessageAndAltitude("8D4B1BB5598406514D4E5FEC1AC3", 1920.24),
+                new MessageAndAltitude("8D4B1BB559A40653594F35F9A08F", 1950.72),
                 new MessageAndAltitude("8D4B1BB55924065661506DA3728A", 1981.20),
                 new MessageAndAltitude("8D4B1BB5592C02EE175E9AF78185", 2011.68),
                 new MessageAndAltitude("8D4B1BB5590C02FAED63A05783E1", 2042.16),
-                new MessageAndAltitude("8DADA2FD593682D9D99C2643E7DA", 2743.20));*/
+                new MessageAndAltitude("8DADA2FD593682D9D99C2643E7DA", 2743.20));
         for (var testValue : testValues) {
             var message = RawMessage.of(100, HexFormat.of().parseHex(testValue.message));
             assertNotNull(message);
