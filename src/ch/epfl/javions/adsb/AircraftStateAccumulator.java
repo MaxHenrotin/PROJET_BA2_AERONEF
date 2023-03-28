@@ -1,6 +1,7 @@
 package ch.epfl.javions.adsb;
 //  Author:    Max Henrotin
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -42,6 +43,7 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extend
      * @param message : message contenant les informations sur l'aéronef pour les mises à jour
      */
     public void update(Message message){
+
 
         //A CODER
 
