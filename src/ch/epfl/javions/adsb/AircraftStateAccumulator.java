@@ -1,6 +1,7 @@
 package ch.epfl.javions.adsb;
 //  Author:    Max Henrotin
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -18,8 +19,9 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extend
 
     private final T stateSetter;
 
-    private Message[] messages = new Message[2];
+    private Message dernierMessagePair;
 
+    private Message dernierMessageImpair;
 
     /**
      * Constructeur retournant un accumulateur d'état d'aéronef associé à l'état modifiable donné
@@ -42,24 +44,7 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extend
      */
     public void update(Message message){
 
-        switch (message){
-            case AircraftIdentificationMessage messageIdentification :
-                stateSetter.setCallSign(messageIdentification.callSign());
-                stateSetter.setCategory(messageIdentification.category());
-                break;
 
-            case AirborneVelocityMessage messageVelocity :
-                stateSetter.setVelocity(messageVelocity.speed());
-                stateSetter.setTrackOrHeading(messageVelocity.trackOrHeading());
-                break;
-
-            case AirbornePositionMessage messagePosition :
-                messages[messagePosition.parity()] = messagePosition;
-
-                stateSetter.setAltitude(messagePosition.altitude());
-                //stateSetter.setPosition(messagePosition.);
-
-        }
         //A CODER
 
     }
