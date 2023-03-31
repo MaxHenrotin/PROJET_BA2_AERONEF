@@ -88,7 +88,12 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
             int heading = Bits.extractUInt((long) content, 11, 10);      //HDG
             double airSpeed = Bits.extractUInt((long) content, 0, 10) - 1;      //AS    //-1 car c'est la convention d'encodage
 
-            if(statusHeading == 1) {
+            if(statusHeading == 0 || airSpeed == 0){
+
+                return null;
+
+            }else {
+            //statusHeading == 1
                 //vitesse
                 if(sousType == 4){ airSpeed = airSpeed * 4d; }
                 airSpeed = Units.convertFrom(airSpeed,Units.Speed.KNOT);
@@ -98,8 +103,6 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
                 angle = Units.convertFrom(angle, Units.Angle.TURN);   //conversion de tours en radian
 
                 return new AirborneVelocityMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), airSpeed, angle);
-            }else{
-                return null;
             }
         }else{
             return null;

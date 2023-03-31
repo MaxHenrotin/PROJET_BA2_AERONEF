@@ -86,7 +86,7 @@ class AircraftStateAccumulatorTest {
         */
 
         String f = "resources\\samples_20230304_1442.bin";
-        IcaoAddress expectedAddress = icaoAdresses[0];
+        IcaoAddress expectedAddress = icaoAdresses[4];
         try (InputStream s = new FileInputStream(f)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
             RawMessage m;

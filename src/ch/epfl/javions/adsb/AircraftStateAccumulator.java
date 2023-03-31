@@ -75,7 +75,7 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extend
                 break;
 
             default:
-                throw new IllegalArgumentException("Aucun message de type conforme reçu");
+                throw new Error("Un type de message inconnu a été intercepté");
         }
     }
 
