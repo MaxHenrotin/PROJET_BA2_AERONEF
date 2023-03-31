@@ -84,17 +84,17 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
             return new AirborneVelocityMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), speed, angle);
 
         }else if(sousType == 3 || sousType == 4){
-            double statusHeading = Bits.extractUInt((long) content, 21, 1); //SH
-            double heading = Bits.extractUInt((long) content, 11, 10);      //HDG
-            double airSpeed = Bits.extractUInt((long) content, 0, 10);      //AS
+            int statusHeading = Bits.extractUInt((long) content, 21, 1); //SH
+            int heading = Bits.extractUInt((long) content, 11, 10);      //HDG
+            double airSpeed = Bits.extractUInt((long) content, 0, 10) - 1;      //AS    //-1 car c'est la convention d'encodage
 
             if(statusHeading == 1) {
                 //vitesse
-                if(sousType == 4){ airSpeed = airSpeed*4; }
-                airSpeed = Units.convertFrom(airSpeed, Units.Speed.KNOT);
+                if(sousType == 4){ airSpeed = airSpeed * 4d; }
+                airSpeed = Units.convertFrom(airSpeed,Units.Speed.KNOT);
 
                 //direction
-                double angle = ((int)heading)/Math.scalb(1,10); //angle en tours depuis l'axe y dans le sens horaire [0,1] (calcul selon la convention donnée au point 2.1.3 de l'étape 6)
+                double angle = Math.scalb(heading,-10); //angle en tours depuis l'axe y dans le sens horaire [0,1] (calcul selon la convention donnée au point 2.1.3 de l'étape 6)
                 angle = Units.convertFrom(angle, Units.Angle.TURN);   //conversion de tours en radian
 
                 return new AirborneVelocityMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), airSpeed, angle);
