@@ -63,19 +63,13 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
 
             //direction
             //pour faire coincider la direction est avec l'axe x
-            if(dew == 0){
-                dew = 1;
-            }else{
-                dew = -1;
-            }
+            dew = (dew ==0) ? 1 : -1;
+
             //pour faire coincider la direction nord avec l'axe y
-            if(dns == 0) {
-                dns = 1;
-            }else{
-                dns = -1;
-            }
-            double speedX = dew*(vew-1);    //(-1 car par convention ils sont stockés avec un décalage de 1, voir la doc etape 6 pt. 2.1.2)
-            double speedY = dns*(vns-1);    //(-1 car par convention ils sont stockés avec un décalage de 1, voir la doc etape 6 pt. 2.1.2)
+            dns = (dns == 0) ? 1 : -1;
+
+            double speedX = dew  * (vew - 1);    //(-1 car par convention ils sont stockés avec un décalage de 1, voir la doc etape 6 pt. 2.1.2)
+            double speedY = dns * (vns - 1);    //(-1 car par convention ils sont stockés avec un décalage de 1, voir la doc etape 6 pt. 2.1.2)
             double angle = Math.atan2(speedX, speedY);  //angle en radian autours de l'axe y ]-pi,pi]
             if(angle < 0){
                 angle = angle + 2*Math.PI;   //angle en radian autours de l'axe y [0,2pi]
