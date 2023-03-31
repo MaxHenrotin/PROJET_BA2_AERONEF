@@ -39,6 +39,19 @@ class AircraftStateAccumulatorTest {
             icaoAdresses[i] = new IcaoAddress(icaoAdressesString[i]);
         }
 
+        String f = "resources\\samples_20230304_1442.bin";
+        IcaoAddress expectedAddress = icaoAdresses[4];
+        try (InputStream s = new FileInputStream(f)) {
+            AdsbDemodulator d = new AdsbDemodulator(s);
+            RawMessage m;
+            AircraftStateAccumulator<AircraftState> a = new AircraftStateAccumulator<>(new AircraftState());
+            while ((m = d.nextMessage()) != null) {
+                if (!m.icaoAddress().equals(expectedAddress)) continue;
+
+                Message pm = MessageParser.parse(m);
+                if (pm != null) a.update(pm);
+            }
+        }
 /*
         1) IcaoAddress[string=4B17E5]
 
@@ -85,19 +98,7 @@ class AircraftStateAccumulatorTest {
         position : (6.098216017708182°, 46.09822084195912°)
         */
 
-        String f = "resources\\samples_20230304_1442.bin";
-        IcaoAddress expectedAddress = icaoAdresses[4];
-        try (InputStream s = new FileInputStream(f)) {
-            AdsbDemodulator d = new AdsbDemodulator(s);
-            RawMessage m;
-            AircraftStateAccumulator<AircraftState> a = new AircraftStateAccumulator<>(new AircraftState());
-            while ((m = d.nextMessage()) != null) {
-                if (!m.icaoAddress().equals(expectedAddress)) continue;
 
-                Message pm = MessageParser.parse(m);
-                if (pm != null) a.update(pm);
-            }
-        }
     }
 
 }
