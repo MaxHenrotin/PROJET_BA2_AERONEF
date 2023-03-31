@@ -52,6 +52,7 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
             double vew = Bits.extractUInt((long) content, 11, 10);
             double dns = Bits.extractUInt((long) content, 10, 1);
             double vns = Bits.extractUInt((long) content, 0, 10);
+
             if(vns == 0 || vew == 0){
                 return null;
             }
@@ -80,15 +81,15 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
         }else if(sousType == 3 || sousType == 4){
             int statusHeading = Bits.extractUInt((long) content, 21, 1); //SH
             int heading = Bits.extractUInt((long) content, 11, 10);      //HDG
-            double airSpeed = Bits.extractUInt((long) content, 0, 10) - 1;      //AS    //-1 car c'est la convention d'encodage
+            double airSpeed = Bits.extractUInt((long) content, 0, 10);      //AS
 
             if(statusHeading == 0 || airSpeed == 0){
-
                 return null;
-
             }else {
             //statusHeading == 1
                 //vitesse
+                airSpeed -= 1;//-1 car c'est la convention d'encodage
+
                 if(sousType == 4){ airSpeed = airSpeed * 4d; }
                 airSpeed = Units.convertFrom(airSpeed,Units.Speed.KNOT);
 
