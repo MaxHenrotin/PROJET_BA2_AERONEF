@@ -11,9 +11,12 @@ public final class Units {
     private Units(){}
 
     /**
-     * Préfixes utiles pour calculer les unités en fonction de l'unité de base
+     * Préfixe centi utile aux calculs d'unités
      */
     public static final double CENTI = 1e-2;
+    /**
+     * Préfixe kilo utile aux calculs d'unités
+     */
     public static final double KILO = 1e3;
 
 
@@ -57,12 +60,31 @@ public final class Units {
     public static class Length{
 
         private Length(){}
+
+        /**
+         * Unité de base de longueur
+         */
         public static final double METER = 1;
-        public static final double CENTIMETER = CENTI*METER;
-        public static final double KILOMETER = KILO*METER;
-        public static final double INCH = 2.54*CENTIMETER;
-        public static final double FOOT = 12.*INCH;
-        public static final double NAUTICAL_MILE = 1852.*METER;
+        /**
+         * Unité de centimètre
+         */
+        public static final double CENTIMETER = CENTI * METER;
+        /**
+         * Unité de killomètre
+         */
+        public static final double KILOMETER = KILO * METER;
+        /**
+         * Unité de pouce
+         */
+        public static final double INCH = 2.54 * CENTIMETER;
+        /**
+         * Unité de pied
+         */
+        public static final double FOOT = 12d * INCH;
+        /**
+         * Unité de mile nautique
+         */
+        public static final double NAUTICAL_MILE = 1852d * METER;
 
     }
 
@@ -72,8 +94,17 @@ public final class Units {
     public static class Time{
         private Time(){}
 
+        /**
+         * Unité de base de temps
+         */
         public static final double SECOND = 1;
+        /**
+         * Unité de minute
+         */
         public static final double MINUTE = 60*SECOND;
+        /**
+         * Unité de l'heure
+         */
         public static final double HOUR = 60*MINUTE;
 
     }
@@ -84,9 +115,22 @@ public final class Units {
 
     public static class Angle{
         private Angle(){}
+
+        /**
+         * Unité de base de longueur
+         */
         public static final double RADIAN = 1;
+        /**
+         * Unité de tour
+         */
         public static final double TURN = 2.*Math.PI*RADIAN;
+        /**
+         * Unité de degrée
+         */
         public static final double DEGREE = TURN/360.;
+        /**
+         * Unité de T32
+         */
         public static final double T32 = TURN/Math.scalb(1.,32);
 
     }
@@ -97,7 +141,13 @@ public final class Units {
 
     public static class Speed{
         private Speed(){}
+        /**
+         * Unité de noeud
+         */
         public static final double KNOT = Length.NAUTICAL_MILE/Time.HOUR;
+        /**
+         * Unité de kilomètre par heure
+         */
 
         public static final double KILOMETER_PER_HOUR = Length.KILOMETER/Time.HOUR;
 
