@@ -23,9 +23,9 @@ public final class Crc24 {
 
     private final int generator;
 
-    private final static int mask24= 1 << CRC24LENGTH;
+    private final static int mask24 = 1 << CRC24LENGTH;
 
-    private final static int mask23bits=mask24-1;
+    private final static int mask23bits = mask24 - 1;
     private final int[] table;
 
     /**
@@ -33,8 +33,8 @@ public final class Crc24 {
      * @param generator : gémérateur utilisé pour calculer le crc24
      */
     public Crc24(int generator){
-        this.generator=generator;
-        table= buildTable();
+        this.generator = generator;
+        table = buildTable();
     }
 
     /**
@@ -46,7 +46,7 @@ public final class Crc24 {
 
         int crc = 0;
 
-        ByteString byteString=new ByteString(bytes);
+        ByteString byteString = new ByteString(bytes);
 
         int index;
 
@@ -58,9 +58,9 @@ public final class Crc24 {
 
         }
 
-        for (int k=0; k< (CRC24LENGTH/Byte.SIZE);++k){
+        for (int k=0; k< (CRC24LENGTH / Byte.SIZE);++k){
 
-            index = Bits.extractUInt(crc,CRC24LENGTH-Byte.SIZE,Byte.SIZE);
+            index = Bits.extractUInt(crc,CRC24LENGTH - Byte.SIZE, Byte.SIZE);
 
             crc=(crc << Byte.SIZE) ^ table[index];
 
@@ -83,15 +83,15 @@ public final class Crc24 {
 
         int index;
 
-        int newGenerator=(generator &  mask23bits);
+        int newGenerator = (generator &  mask23bits);
 
-        int[] table = {0,newGenerator};
+        int[] table = {0, newGenerator};
 
         for (byte elem : bytes){
-            for (int j=0 ; j<Byte.SIZE ; ++j){
+            for (int j=0 ; j < Byte.SIZE ; ++j){
                 b = Bits.extractUInt(elem,Byte.SIZE - j - 1,1);
 
-                index=(crc24 & mask23bits)>>>(CRC24LENGTH-1);
+                index=(crc24 & mask23bits) >>> (CRC24LENGTH - 1);
 
                 crc24 = ((crc24 << 1) | b) ^ table[index];
 
@@ -101,7 +101,7 @@ public final class Crc24 {
 
         for (int k=0; k<CRC24LENGTH ;++k){
 
-            index=(crc24 & mask23bits)>>>(CRC24LENGTH-1);
+            index=(crc24 & mask23bits) >>> (CRC24LENGTH - 1);
 
             crc24 = (crc24 << 1) ^ table[index];
 

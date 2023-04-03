@@ -27,7 +27,8 @@ public record GeoPos(int longitudeT32, int latitudeT32) {
      * @return vrai si la longitude est dans l'intervalle [-2^30,2^30]
      */
     public static boolean isValidLatitudeT32(int latitudeT32){
-        return latitudeT32>= (int)Math.scalb(-1,30) && latitudeT32<= (int)Math.scalb(1,30);     //casté en int pour pas crée des problèmes talle de bit aux limites
+        //casté en int pour pas crée des problèmes talle de bit aux limites
+        return (latitudeT32 >= (int)Math.scalb(-1,30)) && (latitudeT32 <= (int)Math.scalb(1,30));
     }
 
     /**

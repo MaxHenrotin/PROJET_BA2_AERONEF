@@ -101,11 +101,11 @@ public final class Units {
         /**
          * Unité de minute
          */
-        public static final double MINUTE = 60*SECOND;
+        public static final double MINUTE = 60 * SECOND;
         /**
          * Unité de l'heure
          */
-        public static final double HOUR = 60*MINUTE;
+        public static final double HOUR = 60 * MINUTE;
 
     }
 
@@ -123,15 +123,15 @@ public final class Units {
         /**
          * Unité de tour
          */
-        public static final double TURN = 2.*Math.PI*RADIAN;
+        public static final double TURN = 2. * Math.PI * RADIAN;
         /**
          * Unité de degrée
          */
-        public static final double DEGREE = TURN/360.;
+        public static final double DEGREE = TURN / 360.;
         /**
          * Unité de T32
          */
-        public static final double T32 = TURN/Math.scalb(1.,32);
+        public static final double T32 = TURN / Math.scalb(1.,32);
 
     }
 
@@ -144,12 +144,12 @@ public final class Units {
         /**
          * Unité de noeud
          */
-        public static final double KNOT = Length.NAUTICAL_MILE/Time.HOUR;
+        public static final double KNOT = Length.NAUTICAL_MILE / Time.HOUR;
         /**
          * Unité de kilomètre par heure
          */
 
-        public static final double KILOMETER_PER_HOUR = Length.KILOMETER/Time.HOUR;
+        public static final double KILOMETER_PER_HOUR = Length.KILOMETER / Time.HOUR;
 
     }
 
