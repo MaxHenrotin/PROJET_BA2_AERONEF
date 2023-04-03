@@ -49,19 +49,22 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extend
     public void update(Message message){
 
         switch (message){
-            case AircraftIdentificationMessage messageIdectification :
-                stateSetter.setCategory(messageIdectification.category());
-                stateSetter.setCallSign(messageIdectification.callSign());
+            case AircraftIdentificationMessage messageIdentification :
+                stateSetter.setCategory(messageIdentification.category());
+                stateSetter.setCallSign(messageIdentification.callSign());
+                stateSetter.setLastMessageTimeStampNs(messageIdentification.timeStampNs());
                 break;
             case AirborneVelocityMessage messageVelocity :
                 stateSetter.setVelocity(messageVelocity.speed());
                 stateSetter.setTrackOrHeading(messageVelocity.trackOrHeading());
+                stateSetter.setLastMessageTimeStampNs(messageVelocity.timeStampNs());
                 break;
             case AirbornePositionMessage messagePosition :
                 messagePositionParity = messagePosition.parity();
                 messagesPositions[messagePositionParity] = messagePosition;
 
                 stateSetter.setAltitude(messagePosition.altitude());
+                stateSetter.setLastMessageTimeStampNs(messagePosition.timeStampNs());
 
                 if(checkValidPosition()){
                     double x0 = messagesPositions[0].x();
@@ -70,7 +73,11 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extend
                     double y1 = messagesPositions[1].y();
 
                     GeoPos newPosition = CprDecoder.decodePosition(x0, y0, x1, y1, messagePositionParity);
-                    stateSetter.setPosition(newPosition);
+
+                    if(newPosition != null){
+                        stateSetter.setPosition(newPosition);
+                    }
+
                 }
                 break;
 

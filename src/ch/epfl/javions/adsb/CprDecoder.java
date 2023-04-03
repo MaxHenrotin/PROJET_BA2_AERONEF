@@ -58,6 +58,7 @@ public class CprDecoder {
         if (calculNombresLongitude()){
 
             calculLongitudes(xLongitudes); //détermine les longitudes
+
         }else {
             if (inPolarZone){
                 longitudes = xLongitudes;//cas limite où l'on est en zone polaire
@@ -112,7 +113,7 @@ public class CprDecoder {
         double AEven = acos(1 - ((1 - cos(2 * PI * DELTA_LATITUDES[0])) / (cos(latitudeRadianEven)*cos(latitudeRadianEven))));
         double AOdd = acos(1 - ((1 - cos(2 * PI * DELTA_LATITUDES[0])) / (cos(latitudeRadianOdd)*cos(latitudeRadianOdd))));
 
-        if(Double.isNaN(AEven)&& Double.isNaN(AOdd)){  //en zone polaire
+        if(Double.isNaN(AEven) && Double.isNaN(AOdd)){  //en zone polaire
             nombreLongitude[0] = 1;
             nombreLongitude[1] = 0;
             inPolarZone = true;
@@ -121,7 +122,7 @@ public class CprDecoder {
             double nombreLongitudesEven;
             inPolarZone = false;
 
-            //cas limite où l'avion a changé de bande de latitude et est passé d'une zone polaire à une zone non polare
+            //cas limite où l'avion a changé de bande de latitude et est passé d'une zone polaire à une zone non polaire
             if (Double.isNaN(AEven) || Double.isNaN(AOdd)){
                 return false;
             }
