@@ -17,7 +17,7 @@ public record AircraftTypeDesignator(String string) {
 
     /**
      * Constructeur compact
-     * @param string
+     * @param string : indicateur de type de l'aéronef
      * @throws IllegalArgumentException : si l'indicateur de type de ne respecte pas la syntaxe établie
      */
     public AircraftTypeDesignator {

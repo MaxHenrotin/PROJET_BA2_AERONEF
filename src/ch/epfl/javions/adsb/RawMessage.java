@@ -16,29 +16,31 @@ import java.util.HexFormat;
  */
 public record RawMessage(long timeStampNs, ByteString bytes) {
 
+    //---------- Attributs publiques ----------
     /**
      * attribut public, statique et final de la classe représentant la longueur EN OCTET des messages ADS-B.
      */
     public static final int LENGTH = 14;
 
+    //---------- Attributs privées ----------
+
     /**
      * les constantes suivantes sont utilisées pour extraire les différents champs du message selon la procédure décrite dans l'énoncé du projet
      */
     private static final int DF_VALUE = 17;
-
     private static final int DF_FORMAT_LENGHT = 5;
     private static final int DF_BIT_POSITION_INDEX = 3;
-
+    private static final int FORMAT_BIT_INDEX = 0;
     private static final int ICAO_BYTE_POSITION_INDEX = 1;
-
     private static final int ICAO_HEX_SIZE = 6;
-
     private static final int ME_BYTE_POSITION_INDEX = 4;
-
     private static final int CRC_BYTE_POSITION_INDEX = 11;
-
     private static final int ME_LENGHT = 56;
-    private static final int ME_TYPE_LENGHT = 5;
+    private static final int TYPECODE_LENGTH = 5;
+    private static final int TYPECODE_INDEX = ME_LENGHT - TYPECODE_LENGTH;
+
+
+    //---------- Constructeur ----------
 
     /**
      * Constructeur compact de la classe RawMessage
@@ -49,6 +51,8 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
     public RawMessage{
         Preconditions.checkArgument(timeStampNs>=0 && bytes.size()==LENGTH);
     }
+
+    //---------- Méthodes publiques ----------
 
     /**
      * Méthode statique retournant le message ADS-B brut avec l'horodatage et les octets donnés, ou null si le CRC24 des octets ne vaut pas 0
@@ -80,7 +84,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return le code de type de l'attribut ME passé en argument
      */
     public static int typeCode(long payload){
-        return  Bits.extractUInt(payload, ME_LENGHT - ME_TYPE_LENGHT , ME_TYPE_LENGHT);
+        return  Bits.extractUInt(payload, TYPECODE_INDEX , TYPECODE_LENGTH);
     }
 
     /**
@@ -88,7 +92,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return l'attribut DF stocké dans le premier octet du message ADS-B
      */
     public int downLinkFormat(){
-        return Bits.extractUInt(bytes.byteAt(0), DF_BIT_POSITION_INDEX, DF_FORMAT_LENGHT);
+        return Bits.extractUInt(bytes.byteAt(FORMAT_BIT_INDEX), DF_BIT_POSITION_INDEX, DF_FORMAT_LENGHT);
     }
 
     /**
@@ -97,7 +101,8 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      */
     public IcaoAddress icaoAddress(){
         HexFormat hexFormat = HexFormat.of().withUpperCase();
-        return new IcaoAddress( hexFormat.toHexDigits(bytes.bytesInRange(ICAO_BYTE_POSITION_INDEX,ME_BYTE_POSITION_INDEX), ICAO_HEX_SIZE));
+        return new IcaoAddress( hexFormat.toHexDigits(bytes.bytesInRange(ICAO_BYTE_POSITION_INDEX, ME_BYTE_POSITION_INDEX),
+                                ICAO_HEX_SIZE));
     }
 
     /**
@@ -105,7 +110,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return l'attribut ME du message ADS-B
      */
     public long payload(){
-        return bytes.bytesInRange(ME_BYTE_POSITION_INDEX,CRC_BYTE_POSITION_INDEX);
+        return bytes.bytesInRange(ME_BYTE_POSITION_INDEX, CRC_BYTE_POSITION_INDEX);
     }
 
     /**

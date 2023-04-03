@@ -17,7 +17,7 @@ public record AircraftRegistration(String string) {
 
     /**
      * Constructeur compact
-     * @param string
+     * @param string : immatriculation de l'aéronef
      * @throws IllegalArgumentException : si l'immatriculation est vide
      * @throws IllegalArgumentException : si le numéro d'immatriculation ne respecte pas la syntaxe
      */

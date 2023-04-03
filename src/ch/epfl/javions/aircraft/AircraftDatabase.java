@@ -16,7 +16,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author Max Henrotin (341463)
  */
 public final class AircraftDatabase {
-    private String fileName;
+    private final String fileName;
 
     /**
      * Constructeur qui retourne un objet représentant la base de données mictronics, stockée dans le fichier de nom filename

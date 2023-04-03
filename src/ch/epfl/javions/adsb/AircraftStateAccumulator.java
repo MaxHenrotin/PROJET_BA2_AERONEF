@@ -1,9 +1,6 @@
 package ch.epfl.javions.adsb;
-//  Author:    Max Henrotin
 
 import ch.epfl.javions.GeoPos;
-
-import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -19,13 +16,25 @@ import java.util.Objects;
 
 public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extends impose que T soit une sous-classe de AircraftStateSetter (T est borné par AircraftStateSetter)
 
+
+    //---------- Attributs privées ----------
+    private final static double TIME_LIMIT_POSITION = 10e9; //il faut 10 secondes d'écart max mais le timeStamps est exprimé en microsecondes
+    private final static int ODD_INDEX = 1;
+    private final static int EVEN_INDEX = 0;
     private final T stateSetter;
+    private final AirbornePositionMessage[] messagesPositions = new AirbornePositionMessage[2];
 
-   private AirbornePositionMessage[] messagesPositions = new AirbornePositionMessage[2];
+    //---------- Méthodes privées ----------
 
-   private int messagePositionParity;
+    private boolean checkValidPosition(){
+        if(messagesPositions[EVEN_INDEX] != null && messagesPositions[ODD_INDEX] != null){
+            return Math.abs(messagesPositions[EVEN_INDEX].timeStampNs() - messagesPositions[ODD_INDEX].timeStampNs()) < TIME_LIMIT_POSITION;
+        }else {
+            return false;
+        }
+    }
 
-   private final static double TIME_LIMIT_POSITION = 10e9; //il faut 10 secondes d'écart max mais le timeStamps est exprimé en microsecondes
+    //---------- Constructeur ----------
 
     /**
      * Constructeur retournant un accumulateur d'état d'aéronef associé à l'état modifiable donné
@@ -35,6 +44,8 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extend
         Objects.requireNonNull(stateSetter);
         this.stateSetter = stateSetter;
     }
+
+    //---------- Méthodes publiques ----------
 
     /**
      * Getter de l'état modifiable de l'aéronef passé à son constructeur
@@ -48,50 +59,50 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {  //extend
      */
     public void update(Message message){
 
-        switch (message){
-            case AircraftIdentificationMessage messageIdentification :
+        switch (message) {
+            //vérifie le type du message et en crée une instance
+            case AircraftIdentificationMessage messageIdentification -> { //message d'identification
+
+                //met à jour la catégorie et le call sign
                 stateSetter.setCategory(messageIdentification.category());
                 stateSetter.setCallSign(messageIdentification.callSign());
+
+                //met à jour le timestamps
                 stateSetter.setLastMessageTimeStampNs(messageIdentification.timeStampNs());
-                break;
-            case AirborneVelocityMessage messageVelocity :
+            }
+            case AirborneVelocityMessage messageVelocity -> { //message de vitesse et direction
+                //met à jour la vitesse et la direction
                 stateSetter.setVelocity(messageVelocity.speed());
                 stateSetter.setTrackOrHeading(messageVelocity.trackOrHeading());
+
+                //met à jour le timestamps
                 stateSetter.setLastMessageTimeStampNs(messageVelocity.timeStampNs());
-                break;
-            case AirbornePositionMessage messagePosition :
-                messagePositionParity = messagePosition.parity();
+            }
+            case AirbornePositionMessage messagePosition -> { //message de position
+
+                //actualise les deux derniers messages reçu avec celui reçu en paramètre
+                int messagePositionParity = messagePosition.parity();
                 messagesPositions[messagePositionParity] = messagePosition;
 
+                //met à jour l'altitude et le time stamps
                 stateSetter.setAltitude(messagePosition.altitude());
                 stateSetter.setLastMessageTimeStampNs(messagePosition.timeStampNs());
 
-                if(checkValidPosition()){
-                    double x0 = messagesPositions[0].x();
-                    double y0 = messagesPositions[0].y();
-                    double x1 = messagesPositions[1].x();
-                    double y1 = messagesPositions[1].y();
+                if (checkValidPosition()) { //met à jour la position si elle est valide
+                    double xEven = messagesPositions[EVEN_INDEX].x();
+                    double yEven = messagesPositions[EVEN_INDEX].y();
+                    double xOdd = messagesPositions[ODD_INDEX].x();
+                    double yOdd = messagesPositions[ODD_INDEX].y();
 
-                    GeoPos newPosition = CprDecoder.decodePosition(x0, y0, x1, y1, messagePositionParity);
+                    GeoPos newPosition = CprDecoder.decodePosition(xEven, yEven, xOdd, yOdd, messagePositionParity);
 
-                    if(newPosition != null){
+                    //la nouvelle position peut être null en cas de changement de bande de latitude
+                    if (newPosition != null) {
                         stateSetter.setPosition(newPosition);
                     }
-
                 }
-                break;
-
-            default:
-                throw new Error("Un type de message inconnu a été intercepté");
+            }
+            default -> throw new Error("Un type de message inconnu a été intercepté");
         }
     }
-
-    private boolean checkValidPosition(){
-        if(messagesPositions[0] != null && messagesPositions[1] != null){
-            return Math.abs(messagesPositions[0].timeStampNs() - messagesPositions[1].timeStampNs()) < TIME_LIMIT_POSITION;
-        }else {
-            return false;
-        }
-    }
-
 }

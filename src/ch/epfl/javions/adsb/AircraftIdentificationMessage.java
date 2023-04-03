@@ -30,7 +30,17 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
     private static final int ME_CONTENT_LENGTH = 51;
     private static final int CATEGORY_MSB_CONSTANT = 14;    //voir point 2.1 de l'Etape 5 du projet (il n'y a aucune explication sur cette valeur)
     private static final int CA_TAKEN_SPACE_IN_CATEGORY = 4;
+    /**
+     * Les constantes qui suivent sont simplement utilisées pour la conversion d'entiers en caractères.
+     */
+    private static final int A_VALUE = 65;
+    private static final int ZERO_VALUE = 48;
+    private static final int SPACE_VALUE = 32;
+    private static final int NINE_VALUE = 57;
+    private static final int ALPHABET_SIZE = 26;
 
+
+    //---------- Constructeur ----------
     /**
      * Constructeur compact
      * @param timeStampNs : l'horodatage du message, en nanosecondes
@@ -47,36 +57,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
         Preconditions.checkArgument(timeStampNs >=0);
     }
 
-
-    /**
-     * Classe publique statique retournant le message d'identification correspondant au message brut donné, ou null si au moins un des caractères de l'indicatif qu'il contient est invalide (voir point 2.1 de l'Etape 5 du projet).
-     * @param rawMessage : le message brut à analyser
-     * @return le message d'identification correspondant au message brut donné, ou null si au moins un des caractères de l'indicatif qu'il contient est invalide
-     */
-    public static AircraftIdentificationMessage of(RawMessage rawMessage){
-        long attributME = rawMessage.payload();
-
-        //traitement de la catégorie
-        int CA = extractCallSignCharacter(attributME, 0);
-        int typeCode = rawMessage.typeCode();   //ce type devrait appartenir à {1,2,3,4} ?
-        int aeronefCategory = ((CATEGORY_MSB_CONSTANT - typeCode) << CA_TAKEN_SPACE_IN_CATEGORY | CA);  //voir point 2.1 de l'Etape 5 du projet
-
-
-        //traitement de l'indicatif
-        StringBuilder callSign = new StringBuilder();
-        int Cint;
-        char Cchar;
-        for(int i = 1; i<=CALL_SIGN_LENGTH;++i) {
-            Cint = extractCallSignCharacter(attributME, i);
-            Cchar = intToCallSignCharacter(Cint);
-            if(Cchar == INVALID_CHAR) { //si il y a un caractère invalide
-                return null;
-            }else if(Cchar != ' '){
-                callSign.append(Cchar);
-            }
-        }
-        return new AircraftIdentificationMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), Byte.toUnsignedInt((byte)aeronefCategory) , new CallSign(callSign.toString()));
-    }
+    //---------- Méthodes privées ----------
 
     /**
      * Retourne le caractère d'indice CharIndex de l'indicatif
@@ -95,14 +76,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
         }
     }
 
-    /**
-     * Les constantes qui suivent sont simplement utilisées pour la conversion d'entiers en caractères.
-     */
-    private static final int A_VALUE = 65;
-    private static final int ZERO_VALUE = 48;
-    private static final int SPACE_VALUE = 32;
-    private static final int NINE_VALUE = 57;
-    private static final int ALPHABET_SIZE = 26;
+
 
     /**
      * Retourne le caractère correspondant à l'entier C dans la convention donnée au point 2.1 de l'Etape 5 du projet.
@@ -111,7 +85,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
      */
     private static char intToCallSignCharacter(int C){
         if(C > 0 && C <= ALPHABET_SIZE){
-            return (char) ((C-1) + A_VALUE); //On fait C-1 car on veut un indice (et en informatique on commence à 0 et non à 1)
+            return (char) ((C - 1) + A_VALUE); //On fait C-1 car on veut un indice (et en informatique on commence à 0 et non à 1)
         }else if(C >= ZERO_VALUE && C <= NINE_VALUE){
             return (char) (C);
         }else if(C == SPACE_VALUE) {
@@ -120,4 +94,38 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
             return INVALID_CHAR;
         }
     }
+
+    //---------- Méthodes publiques ----------
+    /**
+     * Classe publique statique retournant le message d'identification correspondant au message brut donné, ou null si au moins un des caractères de l'indicatif qu'il contient est invalide (voir point 2.1 de l'Etape 5 du projet).
+     * @param rawMessage : le message brut à analyser
+     * @return le message d'identification correspondant au message brut donné, ou null si au moins un des caractères de l'indicatif qu'il contient est invalide
+     */
+    public static AircraftIdentificationMessage of(RawMessage rawMessage){
+        long attributME = rawMessage.payload();
+
+        //traitement de la catégorie
+        int CA = extractCallSignCharacter(attributME, 0);
+        int typeCode = rawMessage.typeCode();   //ce type devrait appartenir à {1,2,3,4}
+        int aeronefCategory = ((CATEGORY_MSB_CONSTANT - typeCode) << CA_TAKEN_SPACE_IN_CATEGORY | CA);  //voir point 2.1 de l'Etape 5 du projet
+
+
+        //traitement de l'indicatif
+        StringBuilder callSign = new StringBuilder();
+        int Cint;
+        char Cchar;
+        for(int i = 1; i <= CALL_SIGN_LENGTH;++i) {
+            Cint = extractCallSignCharacter(attributME, i);
+            Cchar = intToCallSignCharacter(Cint);
+            if(Cchar == INVALID_CHAR) { //si il y a un caractère invalide
+                return null;
+            }else if(Cchar != ' '){
+                callSign.append(Cchar);
+            }
+        }
+        return new AircraftIdentificationMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(),
+                                                    Byte.toUnsignedInt((byte)aeronefCategory) , new CallSign(callSign.toString()));
+    }
+
+
 }

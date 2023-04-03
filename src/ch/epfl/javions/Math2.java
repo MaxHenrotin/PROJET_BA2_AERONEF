@@ -17,10 +17,10 @@ public final class Math2 {
      * @return min si v est inférieure à min, max si v est supérieure à max
      */
     public static int clamp(int min, int v, int max) {
-        Preconditions.checkArgument(min<=max);
-        if(v<min){
+        Preconditions.checkArgument(min <= max);
+        if(v < min){
             return min;
-        }else if(v>max){
+        }else if(v > max){
             return max;
         }
         return v;
@@ -32,6 +32,6 @@ public final class Math2 {
      * @return le sinus hyperbolique réciproque de son argument (x)
      */
     public static double asinh(double x){
-        return Math.log(x+Math.sqrt(1+x*x));
+        return Math.log(x + Math.sqrt(1 + x * x));
     }
 }

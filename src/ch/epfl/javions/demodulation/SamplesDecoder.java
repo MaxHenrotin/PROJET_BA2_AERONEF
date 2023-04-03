@@ -18,7 +18,7 @@ public final class SamplesDecoder {
     private final int ECHANTILLON_SIZE = 12; //en bit (ce que la AIRSPY nous donne)
     private final int batchSize; //stocke la taille des lots d'échantillons
 
-    private InputStream stream;
+    private final InputStream stream;
 
     private byte [] bytes; //stocke les bytes reçus par le flot
 
@@ -26,10 +26,10 @@ public final class SamplesDecoder {
      * "Construit" un décodeur d'échantillons utilisant le flot d'entrée donné pour obtenir les octets de la radio AirSpy et produisant les échantillons par lots de taille donnée
      * @param stream : flot de bytes nécessaires pour construire les échantillons
      * @param batchSize : taille des lots
-     * @throws IOException : si le flot est null
      * @throws IllegalArgumentException : si la taille des lots n'est pas supérieure à 0
+     * @throws NullPointerException : si le stream passé en argument est null
      */
-    public SamplesDecoder(InputStream stream, int batchSize) {
+    public SamplesDecoder(InputStream stream, int batchSize){
         Preconditions.checkArgument(batchSize>0);
         Objects.requireNonNull(stream);
 

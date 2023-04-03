@@ -58,7 +58,7 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
             }
 
             //vitesse
-            double speed = Math.hypot(vns-1, vew-1);    //norme des deux composantes de vitesse (-1 car par convention ils sont stockés avec un décalage de 1, voir la doc etape 6 pt. 2.1.2)
+            double speed = Math.hypot(vns - 1, vew - 1);    //norme des deux composantes de vitesse (-1 car par convention ils sont stockés avec un décalage de 1, voir la doc etape 6 pt. 2.1.2)
             if(sousType == 2){ speed = speed*4; }
             speed = Units.convertFrom(speed, Units.Speed.KNOT);   //conversion de noeuds en m/s
 

@@ -21,21 +21,19 @@ public final class PowerWindow {
      */
     private final int BATCH_SIZE = 1<<16; // equivalent à Math.scalb(1,16); (= 2^16) (mais on peut changer pour les tests de PowerWindow (à 2^3 = 8))
 
-    private InputStream stream;
-
-    private int windowSize;
-    private PowerComputer powerComputer;
+    private final int windowSize;
+    private final PowerComputer powerComputer;
 
     /**
      * Tableaux contenant les lots d'échantillons de puissance d'index pair
      * (Est le premier tableau à la construction de PowerWindow)
      */
-    private int[] echantillonsIndPair;
+    private final int[] echantillonsIndPair;
 
     /**
      * Tableaux contenant les lots d'échantillons de puissance d'index impair
      */
-    private int[] echantillonsIndImpair;
+    private final int[] echantillonsIndImpair;
 
     /**
      * Position actuelle de la fenêtre par rapport au début du flot
@@ -65,7 +63,6 @@ public final class PowerWindow {
     public PowerWindow(InputStream stream, int windowSize) throws IOException {
         Preconditions.checkArgument(windowSize > 0 && windowSize <= BATCH_SIZE);
 
-        this.stream = stream;
         this.windowSize = windowSize;
         powerComputer = new PowerComputer(stream, BATCH_SIZE);
 

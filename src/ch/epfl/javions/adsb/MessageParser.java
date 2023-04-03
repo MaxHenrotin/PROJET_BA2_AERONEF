@@ -9,7 +9,19 @@ package ch.epfl.javions.adsb;
  */
 public final class MessageParser {
 
+
+
     private MessageParser() {} //constructeur privé pour rendre la classe non instanciable
+
+    //---------- Attributs privées ----------
+
+    private static final int VELOCITY_MESSAGE_TYPECODE = 19;
+    private static final int[] POSITION_MESSAGE_LOWER_BOUND_TYPECODE = new int[] {9, 20};
+    private static final int[] POSITION_MESSAGE_UPPER_BOUND_TYPECODE = new int[] {18, 22};
+    private static final int[] IDENTIFICATION_MESSAGE_TYPECODES = new int[] {1, 2, 3, 4};
+
+
+    //---------- Méthodes publiques ----------
 
     /**
      * Extrait d'un message ADS-B brut un message d'un des trois types suivants : identification, position en vol, vitesse en vol
@@ -19,12 +31,26 @@ public final class MessageParser {
      *         ou bien null si : le code de type de ce dernier ne correspond à aucun de ces trois types de messages ou si il est invalide.
      */
     public static Message parse(RawMessage rawMessage) {
-        if (rawMessage.typeCode() == 1 || rawMessage.typeCode() == 2 || rawMessage.typeCode() == 3 || rawMessage.typeCode() == 4) {
+        if (rawMessage.typeCode() == IDENTIFICATION_MESSAGE_TYPECODES[0]
+                || rawMessage.typeCode() == IDENTIFICATION_MESSAGE_TYPECODES[1]
+                || rawMessage.typeCode() == IDENTIFICATION_MESSAGE_TYPECODES[2]
+                || rawMessage.typeCode() == IDENTIFICATION_MESSAGE_TYPECODES[3]) {
+
             return AircraftIdentificationMessage.of(rawMessage);
-        }else if((rawMessage.typeCode() >= 9 && rawMessage.typeCode() <= 18) || (rawMessage.typeCode() >= 20 && rawMessage.typeCode() <= 22)) {
+
+        }else
+            if((rawMessage.typeCode() >= POSITION_MESSAGE_LOWER_BOUND_TYPECODE[0]
+                    && rawMessage.typeCode() <= POSITION_MESSAGE_UPPER_BOUND_TYPECODE[0])
+
+                    || (rawMessage.typeCode() >= POSITION_MESSAGE_LOWER_BOUND_TYPECODE[1]
+                    && rawMessage.typeCode() <= POSITION_MESSAGE_UPPER_BOUND_TYPECODE[1])) {
+
             return AirbornePositionMessage.of(rawMessage);
-        }else if(rawMessage.typeCode() == 19){
+
+        }else if(rawMessage.typeCode() == VELOCITY_MESSAGE_TYPECODE){
+
             return AirborneVelocityMessage.of(rawMessage);
+
         }else {
             return null;
         }

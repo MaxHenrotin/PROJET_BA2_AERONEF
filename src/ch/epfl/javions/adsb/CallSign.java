@@ -13,9 +13,11 @@ import java.util.regex.Pattern;
  */
 public record CallSign(String string) {
 
+    //---------- Attributs privées ----------
 
-    //Pattern d'écriture d'un indicatif
-    private static final Pattern callSignExpression = Pattern.compile("[A-Z0-9 ]{0,8}");
+    private static final Pattern callSignExpression = Pattern.compile("[A-Z0-9 ]{0,8}");//Pattern d'écriture d'un indicatif
+
+    //---------- Constructeur ----------
 
     /**
      * Constructeur compact

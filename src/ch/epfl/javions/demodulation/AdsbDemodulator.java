@@ -14,7 +14,7 @@ import java.io.InputStream;
  */
 public final class AdsbDemodulator {
 
-    private PowerWindow window;
+    private final PowerWindow window;
 
     private final static int WINDOW_SIZE = 1200;    //en unité de temps de 0.1µs (=unité de temps de l'échantillonnage)
 

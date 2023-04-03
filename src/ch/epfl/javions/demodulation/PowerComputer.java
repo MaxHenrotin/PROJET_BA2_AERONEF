@@ -1,10 +1,8 @@
 package ch.epfl.javions.demodulation;
 
 import ch.epfl.javions.Preconditions;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -17,15 +15,13 @@ import java.util.Objects;
 public class PowerComputer {
 
     private final int NBR_ECHANTILLONS_MEMOIRE = 8;
-    private InputStream stream;
-
     private final int batchSize; //taille des lots de puissance
 
-    private SamplesDecoder sample; //décodeur d'échantillons
+    private final SamplesDecoder sample; //décodeur d'échantillons
 
-    private int[] tabCirculaire = new int[8]; //tableau stockant les 8 derniers échantillons utilisés pour calculer la puissance
+    private final int[] tabCirculaire = new int[8]; //tableau stockant les 8 derniers échantillons utilisés pour calculer la puissance
 
-    private short[] echantillons; //stocke les échantillons
+    private final short[] echantillons; //stocke les échantillons
 
     /**
      * Retourne un calculateur de puissance utilisant le flot d'entrée donné pour obtenir les octets de la radio AirSpy
@@ -39,7 +35,6 @@ public class PowerComputer {
         Preconditions.checkArgument(batchSize>0 && ((batchSize % NBR_ECHANTILLONS_MEMOIRE)==0));
         Objects.requireNonNull(stream);
 
-        this.stream=stream;
         this.batchSize=batchSize;
         sample = new SamplesDecoder(stream,batchSize*2);
         echantillons=new short[batchSize*2]; //besoin de 2 échantillons pour calculer une puissance

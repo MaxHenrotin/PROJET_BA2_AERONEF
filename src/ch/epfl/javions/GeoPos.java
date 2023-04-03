@@ -7,6 +7,8 @@ package ch.epfl.javions;
  * @author Julien Erbland (346893)
  */
 public record GeoPos(int longitudeT32, int latitudeT32) {
+
+    //---------- Constructeur ----------
     /**
      * constructeur compact de GeoPos
      * @param longitudeT32 longitude exprimée en T32
@@ -16,6 +18,8 @@ public record GeoPos(int longitudeT32, int latitudeT32) {
     public GeoPos{
         Preconditions.checkArgument(isValidLatitudeT32(latitudeT32));
     }
+
+    //---------- Méthodes publiques ----------
 
     /**
      * vérifie si la longitude est dans l'intervalle [-2^30,2^30]
@@ -48,6 +52,12 @@ public record GeoPos(int longitudeT32, int latitudeT32) {
      */
     @Override
     public String toString() {
-        return "(" + Units.convert(longitudeT32,Units.Angle.T32,Units.Angle.DEGREE)+ "°, " + Units.convert(latitudeT32,Units.Angle.T32,Units.Angle.DEGREE) + "°)";
+        StringBuilder geoPosToString = new StringBuilder()
+                                        .append("(")
+                                        .append(Units.convert(longitudeT32,Units.Angle.T32,Units.Angle.DEGREE))
+                                        .append("°, ")
+                                        .append(Units.convert(latitudeT32,Units.Angle.T32,Units.Angle.DEGREE))
+                                        .append("°)");
+        return geoPosToString.toString();
     }
 }
