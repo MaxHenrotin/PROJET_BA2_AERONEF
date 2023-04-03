@@ -157,7 +157,8 @@ class AircraftStateAccumulatorTest {
 
     @Test
     void aircraftStateAccumulatorCorrectlyHandlesLatitudeBandChange() {
-        record ParityXY(int p, int x, int y) { }
+        record ParityXY(int p, int x, int y) {
+        }
 
         var xys = new ParityXY[]{
                 new ParityXY(0, 98152, 106326),
@@ -192,7 +193,7 @@ class AircraftStateAccumulatorTest {
         }
     }
 
-    /*
+
     @Test
     void AircraftStateAccumulatorWorksOnSample() throws IOException {
         String f = "resources\\samples_20230304_1442.bin";
@@ -211,9 +212,9 @@ class AircraftStateAccumulatorTest {
     }
 
     @Test
-    void AircraftStateAccumulatorEdTest() throws IOException{
+    void AircraftStateAccumulatorEdTest() throws IOException {
 
-        String[] icaoAdressesString = {"4B17E5","495299","39D300","4241A9","4B1A00"};
+        String[] icaoAdressesString = {"4B17E5", "495299", "39D300", "4241A9", "4B1A00"};
         IcaoAddress[] icaoAdresses = new IcaoAddress[icaoAdressesString.length];
         for (int i = 0; i < icaoAdresses.length; i++) {
             icaoAdresses[i] = new IcaoAddress(icaoAdressesString[i]);
@@ -279,5 +280,6 @@ class AircraftStateAccumulatorTest {
         */
 
 
+    }
 }
 

@@ -23,60 +23,59 @@ import java.util.Objects;
 
 public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,double altitude, int parity, double x, double y) implements Message{
 
-    private static final int Q0_BASE_ALTITUDE = -1000;
 
-    private static final int Q1_BASE_ALTITUDE = -1300;
-    private static final int Q_INDEX = 4;
+    //---------- Attributs privées ----------
+    private static final int Q0_BASE_ALTITUDE = -1000; //altitude de base quand Q = 0
 
-    private static final int Q_MASK = 1 << Q_INDEX;
+    private static final int Q1_BASE_ALTITUDE = -1300; //altitude de base quand Q = 1
+    private static final int Q_INDEX = 4; //position du bit Q
 
-    private static final int MASK_4 = 0b1111;
+    private static final int Q_MASK = 1 << Q_INDEX; //mask permettant de récupérer le bit Q
+
+    private static final int MASK_4BITS = 0b1111; //mask qui récupère les 4 premiers bits
+
+    private static final int D2_INDEX = 2;
+    private static final int D4_INDEX = 1;
+    private static final int A1_INDEX = 10;
+    private static final int A2_INDEX = 8;
+    private static final int A4_INDEX = 6;
+    private static final int B1_INDEX = 5;
+    private static final int B2_INDEX = 3;
+
+    private static final int B4_INDEX = 1;
+    private static final int C1_INDEX = 11;
+    private static final int C2_INDEX = 9;
+    private static final int C4_INDEX = 7;
 
     //mask de {D1, D2, D4, A1, A2, A4, B1, B2, B4, C1, C2, C4}
-    private static final int[] MASK_DEMELAGE = {Q_MASK, 1<<2, 1, 1<<10, 1<<8, 1<<6, 1<<5, 1<<3, 1<<1, 1<<11, 1<<9, 1<<7};
+    //Ces masks permettent le démêlage dans le cas où le bit Q vaut 0
+    private static final int[] MASK_DEMELAGE = {Q_MASK, 1 << D2_INDEX, D4_INDEX, 1 << A1_INDEX,
+                                                1 << A2_INDEX, 1 << A4_INDEX, 1 << B1_INDEX, 1 << B2_INDEX,
+                                                1 <<B4_INDEX, 1 << C1_INDEX, 1 << C2_INDEX, 1 << C4_INDEX};
 
     private static final int MASK_GROUPE_FAIBLE = 0b111;
 
     private static final int MASK_GROUPE_FORT = ~MASK_GROUPE_FAIBLE;
+    private static final int INVALID_ALTITUDE_VALUE = -1;
+    private static final int Q0_ALTITUDE_FACTOR = 25;
+    private static final int GROUPE_FORT_SIZE = 9;
+    private static final int GROUPE_FAIBLE_SIZE = 3;
+    private static final int Q1_GROUPE_FAIBLE_FACTOR = 100;
+    private static final int Q1_GROUPE_FORT_FACTOR = 500;
 
-    /**
-     * Constructeur compact
-     * @param timeStampNs : l'horodatage du message, en nanosecondes
-     * @param icaoAddress : l'adresse OACI de l'expéditeur du message
-     * @param altitude : l'altitude à laquelle se trouvait l'aéronef au moment de l'envoi du message, en mètres
-     * @param parity : la parité du message (0 s'il est pair, 1 s'il est impair)
-     * @param x : la longitude locale et normalisée (donc comprise entre 0 et 1) à laquelle se trouvait l'aéronef au moment de l'envoi du message
-     * @param y : la latitude locale et normalisée (donc comprise entre 0 et 1) à laquelle se trouvait l'aéronef au moment de l'envoi du message
-     *
-     * @throws NullPointerException si icaoAddress est nul
-     * @throws IllegalArgumentException si timeStamp est strictement inférieure à 0, ou parity est différent de 0 ou 1, ou x ou y ne sont pas compris entre 0 (inclus) et 1 (exclu)
-     */
-    public AirbornePositionMessage{
-        Objects.requireNonNull(icaoAddress);
-        Preconditions.checkArgument(timeStampNs>=0 && (parity==0 || parity==1) && (x>=0 && x<1) && (y>=0 && y<1));
-    }
+    private static final int LONGITUDE_CPR_INDEX = 0;
+    private static final int LATITUDE_CPR_INDEX = 17;
+    private static final int LONGITUDE_CPR_LENGTH = 17;
+    private static final int LATITUDE_CPR_LENGTH = 17;
+    private static final int ALTITUDE_INDEX = 36;
+    private static final int ALTITUDE_LENGTH = 12;
 
-    /**
-     * Méthode publique statique retournant le message de positionnement en vol correspondant au message brut donné, ou null si l'altitude qu'il contient est invalide (voir point 2.2.5.2 de l'étape 5 du projet).
-     * @param rawMessage : le message brut dont on doit extraire les informations souhaitées
-     * @return le message de positionnement en vol correspondant au message brut donné, ou null si l'altitude qu'il contient est invalide
-     */
-    public static AirbornePositionMessage of(RawMessage rawMessage){
-        long attributME = rawMessage.payload();
+    public static final int FORMAT_INDEX = 34;
 
-        double lon_cpr = Bits.extractUInt(attributME, 0, 17);
-        double lat_cpr = Bits.extractUInt(attributME, 17, 17);
-        int format = Bits.extractUInt(attributME, 34, 1); // 0 = paire, 1 = impaire
-        int alt = Bits.extractUInt(attributME, 36, 12);
+    public static final int FORMAT_LENGTH = 1;
 
-        int altitude = calculAltitude(alt);
 
-        if(altitude != -1){
-            return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), Units.convertFrom(altitude,Units.Length.FOOT), format, Math.scalb(lon_cpr,-17), Math.scalb(lat_cpr,-17));
-        }else {
-            return null;
-        }
-    }
+    //---------- Méthodes privées ----------
 
     /**
      * Calcule l'altitude en fonction de l'attribut alt issus de l'attribut ME du message brut
@@ -86,18 +85,38 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
 
     private static int calculAltitude(int alt){
         if((alt & Q_MASK) == Q_MASK){ //Q = 1
-            int temp = MASK_4 & alt;
+            int temp = MASK_4BITS & alt;
             alt = alt >> 5;
             alt = (alt << 4) | temp;
 
-            return Q0_BASE_ALTITUDE + alt * 25;
+            return Q0_BASE_ALTITUDE + alt * Q0_ALTITUDE_FACTOR;
 
         }else{ //Q = 0
+            //remet les bits dans le bon ordre
             int demele = demeleIndex(alt);
-            int groupeFort = decodeGray( (demele & MASK_GROUPE_FORT)>>3, 9);
-            int groupeFaible =transformationGroupeFaible(decodeGray( demele & MASK_GROUPE_FAIBLE, 3), (groupeFort%2)==1);
 
-            return (groupeFaible != -1) ? (Q1_BASE_ALTITUDE + groupeFaible * 100 + groupeFort * 500) : -1;
+
+            //---Calcul du groupe fort---
+
+            //récupère les bits du groupe fort
+            int groupeFort = (demele & MASK_GROUPE_FORT) >> GROUPE_FAIBLE_SIZE;
+            //réalise le décodage  de Gray
+            groupeFort = decodeGray(groupeFort, GROUPE_FORT_SIZE);
+
+            //---Calcul du groupe faible---
+
+            //récupère les bits du groupe faible
+            int groupeFaible = demele & MASK_GROUPE_FAIBLE;
+            //réalise le décodage de Gray
+            groupeFaible = decodeGray( groupeFaible, GROUPE_FAIBLE_SIZE);
+            //réalise les dernières transformations sur le groupe faible
+            boolean groupeFortOdd = (groupeFort % 2) == 1;
+            groupeFaible =transformationGroupeFaible(groupeFaible, groupeFortOdd);
+
+            //retourne l'altitude calculée en vérifiant qu'elle soit bien valide
+            return (groupeFaible != INVALID_ALTITUDE_VALUE) ?
+                    (Q1_BASE_ALTITUDE + groupeFaible * Q1_GROUPE_FAIBLE_FACTOR + groupeFort * Q1_GROUPE_FORT_FACTOR)
+                    : INVALID_ALTITUDE_VALUE;
         }
     }
 
@@ -138,18 +157,67 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
      */
     private static int transformationGroupeFaible(int groupeFaible, boolean groupeFortImpair){
         if(groupeFaible == 0 || groupeFaible == 5 || groupeFaible == 6){
-            return -1;
+            return INVALID_ALTITUDE_VALUE;
         } else if (groupeFaible == 7) {
             if(groupeFortImpair){
+                //symétrique de 5
                 return 1;
             }else{
                 return 5;
             }
+
         }else if(groupeFortImpair){
+            //on retourne la veur symétrique centrale si le groupe fort est impaire
             return 6 - groupeFaible;
         }else {
             return groupeFaible;
         }
     }
+
+    //---------- Constructeur ----------
+
+    /**
+     * Constructeur compact
+     * @param timeStampNs : l'horodatage du message, en nanosecondes
+     * @param icaoAddress : l'adresse OACI de l'expéditeur du message
+     * @param altitude : l'altitude à laquelle se trouvait l'aéronef au moment de l'envoi du message, en mètres
+     * @param parity : la parité du message (0 s'il est pair, 1 s'il est impair)
+     * @param x : la longitude locale et normalisée (donc comprise entre 0 et 1) à laquelle se trouvait l'aéronef au moment de l'envoi du message
+     * @param y : la latitude locale et normalisée (donc comprise entre 0 et 1) à laquelle se trouvait l'aéronef au moment de l'envoi du message
+     *
+     * @throws NullPointerException si icaoAddress est nul
+     * @throws IllegalArgumentException si timeStamp est strictement inférieure à 0, ou parity est différent de 0 ou 1, ou x ou y ne sont pas compris entre 0 (inclus) et 1 (exclu)
+     */
+    public AirbornePositionMessage{
+        Objects.requireNonNull(icaoAddress);
+        Preconditions.checkArgument(timeStampNs>=0 && (parity==0 || parity==1) && (x>=0 && x<1) && (y>=0 && y<1));
+    }
+
+
+    //---------- Méthodes publiques ----------
+    /**
+     * Méthode publique statique retournant le message de positionnement en vol correspondant au message brut donné, ou null si l'altitude qu'il contient est invalide (voir point 2.2.5.2 de l'étape 5 du projet).
+     * @param rawMessage : le message brut dont on doit extraire les informations souhaitées
+     * @return le message de positionnement en vol correspondant au message brut donné, ou null si l'altitude qu'il contient est invalide
+     */
+    public static AirbornePositionMessage of(RawMessage rawMessage){
+        long attributME = rawMessage.payload();
+
+        double lon_cpr = Bits.extractUInt(attributME, LONGITUDE_CPR_INDEX, LONGITUDE_CPR_LENGTH);
+        double lat_cpr = Bits.extractUInt(attributME, LATITUDE_CPR_INDEX, LATITUDE_CPR_LENGTH);
+        int format = Bits.extractUInt(attributME, FORMAT_INDEX, FORMAT_LENGTH); // 0 = paire, 1 = impaire
+        int alt = Bits.extractUInt(attributME, ALTITUDE_INDEX, ALTITUDE_LENGTH);
+
+        int altitude = calculAltitude(alt);
+
+        if(altitude != INVALID_ALTITUDE_VALUE){
+            return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(),
+                                                Units.convertFrom(altitude,Units.Length.FOOT), format,
+                                                Math.scalb(lon_cpr,-17), Math.scalb(lat_cpr,-17));
+        }else {
+            return null;
+        }
+    }
+
 
 }
