@@ -32,19 +32,19 @@ public record AirbornePositionMessage
     //===================================== Méthodes privées statiques =================================================
     //===================================== Attributs privées ==========================================================
     //===================================== Méthodes privées ===========================================================
-    private static final int Q0_BASE_ALTITUDE = -1000; //altitude de base quand Q = 0
+    //===================================== Attributs publiques statiques ==============================================
+    //===================================== Méthodes publiques statiques ===============================================
+    //===================================== Attributs publiques ========================================================
+    //===================================== Méthodes publiques =========================================================
 
-    private static final int Q1_BASE_ALTITUDE = -1300; //altitude de base quand Q = 1
-
-    private static final int MASK_4BITS = 0b1111; //mask qui récupère les 4 premiers bits
-    private static final int MASK_GROUPE_FAIBLE = 0b111;
-    private static final int MASK_GROUPE_FORT = ~MASK_GROUPE_FAIBLE;
+    //valeur utilisé pour transmettre l'information que l'altitude calculée est invalide
     private static final int INVALID_ALTITUDE_VALUE = -1;
-    private static final int Q0_ALTITUDE_FACTOR = 25;
-    private static final int GROUPE_FORT_SIZE = 9;
-    private static final int GROUPE_FAIBLE_SIZE = 3;
-    private static final int Q1_GROUPE_FAIBLE_FACTOR = 100;
-    private static final int Q1_GROUPE_FORT_FACTOR = 500;
+
+    //exposant de 2 utilisé pour normaliser la latitude et la longitude
+    private static final int NORMALISATION_EXPOSANT = -17;
+
+
+    //---------- Constantes utiles à l'extraction des différentes valeurs du message ----------
     private static final int LONGITUDE_CPR_INDEX = 0;
     private static final int LATITUDE_CPR_INDEX = 17;
     private static final int LONGITUDE_CPR_LENGTH = 17;
@@ -53,8 +53,22 @@ public record AirbornePositionMessage
     private static final int ALTITUDE_LENGTH = 12;
     public static final int FORMAT_INDEX = 34;
     public static final int FORMAT_LENGTH = 1;
+
+
+    //---------- Constantes utiles à l'extraction du bit Q ----------
     private static final int Q_INDEX = 4; //position du bit Q
     private static final int Q_MASK = 1 << Q_INDEX; //mask permettant de récupérer le bit Q
+
+    //---------- Constantes utiles au décodage si Q = 0 ----------
+    private static final int Q0_BASE_ALTITUDE = -1000; //altitude de base quand Q = 0
+    private static final int MASK_GROUPE_FAIBLE = 0b111;
+    private static final int MASK_GROUPE_FORT = ~MASK_GROUPE_FAIBLE;
+    private static final int GROUPE_FORT_SIZE = 9;
+    private static final int GROUPE_FAIBLE_SIZE = 3;
+    private static final int Q0_GROUPE_FAIBLE_FACTOR = 100;
+    private static final int Q0_GROUPE_FORT_FACTOR = 500;
+
+    //Ensemble des index correspondant à la position des bits avant démêlage
     private static final int D2_INDEX = 2;
     private static final int D4_INDEX = 1;
     private static final int A1_INDEX = 10;
@@ -67,16 +81,19 @@ public record AirbornePositionMessage
     private static final int C2_INDEX = 9;
     private static final int C4_INDEX = 7;
 
-    private static final int NORMALISATION_EXPOSANT = -17;
-
     //mask de {D1, D2, D4, A1, A2, A4, B1, B2, B4, C1, C2, C4}
     //Ces masks permettent le démêlage dans le cas où le bit Q vaut 0
     private static final int[] MASK_DEMELAGE = {Q_MASK, 1 << D2_INDEX, D4_INDEX, 1 << A1_INDEX,
-            1 << A2_INDEX, 1 << A4_INDEX, 1 << B1_INDEX, 1 << B2_INDEX,
-            1 <<B4_INDEX, 1 << C1_INDEX, 1 << C2_INDEX, 1 << C4_INDEX};
+                                                1 << A2_INDEX, 1 << A4_INDEX, 1 << B1_INDEX, 1 << B2_INDEX,
+                                                1 <<B4_INDEX, 1 << C1_INDEX, 1 << C2_INDEX, 1 << C4_INDEX};
+
+    //---------- Constantes utiles au décodage si Q = 1 ----------
+    private static final int Q1_BASE_ALTITUDE = -1300; //altitude de base quand Q = 1
+    private static final int MASK_4BITS = 0b1111; //mask qui récupère les 4 premiers bits
+    private static final int Q1_ALTITUDE_FACTOR = 25;
 
 
-    //---------- Méthodes privées ----------
+    //===================================== Méthodes privées statiques =================================================
 
     /**
      * Calcule l'altitude en fonction de l'attribut alt issus de l'attribut ME du message brut
@@ -92,7 +109,7 @@ public record AirbornePositionMessage
             alt = alt >> 5;
             alt = (alt << 4) | temp;
 
-            return Q0_BASE_ALTITUDE + alt * Q0_ALTITUDE_FACTOR;
+            return Q0_BASE_ALTITUDE + alt*Q1_ALTITUDE_FACTOR;
 
         }else{ //Q = 0
             //remet les bits dans le bon ordre
@@ -118,7 +135,7 @@ public record AirbornePositionMessage
 
             //retourne l'altitude calculée en vérifiant qu'elle soit bien valide
             return (groupeFaible != INVALID_ALTITUDE_VALUE) ?
-                    (Q1_BASE_ALTITUDE + groupeFaible * Q1_GROUPE_FAIBLE_FACTOR + groupeFort * Q1_GROUPE_FORT_FACTOR)
+                    (Q1_BASE_ALTITUDE + groupeFaible*Q0_GROUPE_FAIBLE_FACTOR + groupeFort*Q0_GROUPE_FORT_FACTOR)
                     : INVALID_ALTITUDE_VALUE;
         }
     }
@@ -182,7 +199,8 @@ public record AirbornePositionMessage
         }
     }
 
-    //---------- Méthodes publiques ----------
+    //===================================== Méthodes publiques statiques ===============================================
+
     /**
      * Méthode publique statique retournant le message de positionnement en vol correspondant au message brut donné,
      * ou null si l'altitude qu'il contient est invalide (voir point 2.2.5.2 de l'étape 5 du projet).
@@ -211,22 +229,27 @@ public record AirbornePositionMessage
     }
 
 
-    //---------- Constructeur ----------
+    //===================================== Méthodes publiques =========================================================
 
     /**
      * Constructeur compact
+     *
      * @param timeStampNs : l'horodatage du message, en nanosecondes
      * @param icaoAddress : l'adresse OACI de l'expéditeur du message
      * @param altitude : l'altitude à laquelle se trouvait l'aéronef au moment de l'envoi du message, en mètres
      * @param parity : la parité du message (0 s'il est pair, 1 s'il est impair)
-     * @param x : la longitude locale et normalisée (donc comprise entre 0 et 1) à laquelle se trouvait l'aéronef au moment de l'envoi du message
-     * @param y : la latitude locale et normalisée (donc comprise entre 0 et 1) à laquelle se trouvait l'aéronef au moment de l'envoi du message
+     * @param x : la longitude locale et normalisée (donc comprise entre 0 et 1)
+     *          à laquelle se trouvait l'aéronef au moment de l'envoi du message
+     * @param y : la latitude locale et normalisée (donc comprise entre 0 et 1)
+     *          à laquelle se trouvait l'aéronef au moment de l'envoi du message
      *
      * @throws NullPointerException si icaoAddress est nul
-     * @throws IllegalArgumentException si timeStamp est strictement inférieure à 0, ou parity est différent de 0 ou 1, ou x ou y ne sont pas compris entre 0 (inclus) et 1 (exclu)
+     * @throws IllegalArgumentException si timeStamp est strictement inférieure à 0, ou parity est différent de 0 ou 1,
+     *                                                  ou x ou y ne sont pas compris entre 0 (inclus) et 1 (exclu)
      */
     public AirbornePositionMessage{
         Objects.requireNonNull(icaoAddress);
-        Preconditions.checkArgument(timeStampNs>=0 && (parity==0 || parity==1) && (x>=0 && x<1) && (y>=0 && y<1));
+        Preconditions.checkArgument(timeStampNs >= 0 && (parity == 0 || parity == 1)
+                                                    && (x >= 0 && x < 1) && (y >= 0 && y < 1));
     }
 }

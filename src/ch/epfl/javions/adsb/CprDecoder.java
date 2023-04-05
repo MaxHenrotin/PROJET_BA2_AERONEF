@@ -13,25 +13,26 @@ import static java.lang.Math.*;
  * @author Max Henrotin (341463)
  */
 public class CprDecoder {
-    private CprDecoder(){} //classe non instanciable
 
-    //---------- Attributs privées ----------
+
+    //===================================== Attributs privées statiques ================================================
 
     private static final int ODD_INDEX = 1;
     private static final int EVEN_INDEX = 0;
     private static final int ONE_TURN = 1;
     private static final double UPPER_BOUND_LATITUDE_LIMIT = 0.75d;
     private static final double LOWER_BOUND_LATITUDE_LIMIT = 0.25d;
-    private final static double[] NOMBRE_LATITUDES = {60d, 59d};
-    private final static double[] DELTA_LATITUDES = {1d / NOMBRE_LATITUDES[EVEN_INDEX], 1d / NOMBRE_LATITUDES[ODD_INDEX]};
-    private final static double[] nombreLongitude = new double[2];
-    private final static double[] latitudes = new double[2]; //exprimées en Turn puis return en T32
+    private static final  double[] NOMBRE_LATITUDES = {60d, 59d};
+    private static final  double[] DELTA_LATITUDES = {1d / NOMBRE_LATITUDES[EVEN_INDEX],
+                                                        1d / NOMBRE_LATITUDES[ODD_INDEX]};
+    private static final  double[] nombreLongitude = new double[2];
+    private static final  double[] latitudes = new double[2]; //exprimées en Turn puis return en T32
     private static double[] longitudes = new double[2]; //exprimées en Turn puis return en T32
     private static double[] DELTA_LONGITUDES = new double[2];
     private static boolean inPolarZone;
 
-    //---------- Méthodes privées ----------
 
+    //===================================== Méthodes privées statiques =================================================
     private static void calculLatitudes(double [] yLatitudes){
         double[] indexLatitudes = new double[2];
 
@@ -50,7 +51,7 @@ public class CprDecoder {
         double[] indexLongitudes = new double[2];
 
         double z_longitude = rint(xLatitudes[EVEN_INDEX] * nombreLongitude[ODD_INDEX]
-                                - xLatitudes[ODD_INDEX] * nombreLongitude[EVEN_INDEX]);
+                                    - xLatitudes[ODD_INDEX] * nombreLongitude[EVEN_INDEX]);
 
         for (int i = 0; i < indexLongitudes.length; i++) {
             indexLongitudes[i] = (z_longitude < 0) ? (z_longitude + nombreLongitude[i]) : z_longitude;
@@ -96,14 +97,16 @@ public class CprDecoder {
     }
 
     private static double conversionTurn(double angle) {
-        if(angle >= 0.5){   //demi tour
-            return Units.convert(angle - ONE_TURN,Units.Angle.TURN,Units.Angle.T32);
-        }else {
-            return Units.convert(angle, Units.Angle.TURN, Units.Angle.T32);
-        }
+       return (angle >= 0.5) ? Units.convert(angle - ONE_TURN,Units.Angle.TURN,Units.Angle.T32) :
+                                 Units.convert(angle, Units.Angle.TURN, Units.Angle.T32);
+
     }
 
-    //---------- Méthodes publiques ----------
+    //===================================== Méthodes privées ===========================================================
+
+    private CprDecoder(){} //classe non instanciable
+
+    //===================================== Méthodes publiques statiques ===============================================
 
     /**
      * Retourne la positon géographique correspondant aux positions locales normalisées données
@@ -134,14 +137,15 @@ public class CprDecoder {
             if (inPolarZone){
                 longitudes = messageLongitudes;//cas limite où l'on est en zone polaire
             }else {
-                return null;//cas limite où l'on a changé de bande de lattitude de zone polaire à non polaire ou inversement
+                //cas limite où l'on a changé de bande de lattitude de zone polaire à non polaire ou inversement
+                return null;
             }
         }
 
         //test si lattitude calculéee est valide
-        if(latitudes[mostRecent] > LOWER_BOUND_LATITUDE_LIMIT && latitudes[mostRecent] < UPPER_BOUND_LATITUDE_LIMIT){
+        if(latitudes[mostRecent] > LOWER_BOUND_LATITUDE_LIMIT && latitudes[mostRecent] < UPPER_BOUND_LATITUDE_LIMIT)
             return null;
-        }
+
 
         //recentre les valeurs autour de 0 et les convertie en T32
         for (int i = 0; i < latitudes.length; i++) {
