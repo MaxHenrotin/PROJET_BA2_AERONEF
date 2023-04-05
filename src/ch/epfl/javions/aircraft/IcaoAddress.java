@@ -25,6 +25,8 @@ public record IcaoAddress(String string) {
      */
     public IcaoAddress{
         Preconditions.checkArgument(!string.isEmpty());
-        Preconditions.checkArgument(icaoAddressExpression.matcher(string).matches());
+        Preconditions.checkArgument(icaoAddressExpression
+                                    .matcher(string)
+                                    .matches());
     }
 }

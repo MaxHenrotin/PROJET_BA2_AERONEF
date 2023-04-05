@@ -21,6 +21,8 @@ public record AircraftTypeDesignator(String string) {
      * @throws IllegalArgumentException : si l'indicateur de type de ne respecte pas la syntaxe établie
      */
     public AircraftTypeDesignator {
-        Preconditions.checkArgument(aircraftTypeDesignatorExpression.matcher(string).matches() || string.isEmpty());
+        Preconditions.checkArgument(aircraftTypeDesignatorExpression
+                                                .matcher(string)
+                                                .matches() || string.isEmpty());
     }
 }

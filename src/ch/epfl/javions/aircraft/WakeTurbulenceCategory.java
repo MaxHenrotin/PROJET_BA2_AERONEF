@@ -1,7 +1,8 @@
 package ch.epfl.javions.aircraft;
 
 /**
- * Représente la catégorie de turbulence de sillage d'un aéronef, il contient quatre valeurs : light, medium, heavy, unknown
+ * Représente la catégorie de turbulence de sillage d'un aéronef, il contient quatre valeurs :
+ * light, medium, heavy, unknown
  *
  * @author Julien Erbland (346893)
  * @author Max Henrotin (341463)
