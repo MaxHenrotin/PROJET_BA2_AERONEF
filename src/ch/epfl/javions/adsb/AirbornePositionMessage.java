@@ -29,6 +29,9 @@ public record AirbornePositionMessage
 
 
     //===================================== Attributs privées statiques ================================================
+    //===================================== Méthodes privées statiques =================================================
+    //===================================== Attributs privées ==========================================================
+    //===================================== Méthodes privées ===========================================================
     private static final int Q0_BASE_ALTITUDE = -1000; //altitude de base quand Q = 0
 
     private static final int Q1_BASE_ALTITUDE = -1300; //altitude de base quand Q = 1
