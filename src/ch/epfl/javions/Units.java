@@ -141,14 +141,15 @@ public final class Units {
 
     public static class Speed{
         private Speed(){}
+
         /**
          * Unité de noeud
          */
         public static final double KNOT = Length.NAUTICAL_MILE / Time.HOUR;
+
         /**
          * Unité de kilomètre par heure
          */
-
         public static final double KILOMETER_PER_HOUR = Length.KILOMETER / Time.HOUR;
 
     }
