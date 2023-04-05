@@ -14,16 +14,61 @@ import java.io.InputStream;
  */
 public final class AdsbDemodulator {
 
+    //===================================== Attributs privées statiques ================================================
+
+    private static final  int WINDOW_SIZE = 1200;    //en unité de temps de 0.1µs (=unité de temps de l'échantillonnage)
+
+    private static final  int IMPULSION_TIME = 5; //en unité de temps de 0.1µs (=unité de temps de l'échantillonnage)
+
+
+    //===================================== Attributs privées ==========================================================
+
     private final PowerWindow window;
 
-    private final static int WINDOW_SIZE = 1200;    //en unité de temps de 0.1µs (=unité de temps de l'échantillonnage)
 
-    private final static int IMPULSION_TIME = 5; //en unité de temps de 0.1µs (=unité de temps de l'échantillonnage)
+    //===================================== Méthodes privées ===========================================================
 
     /**
-     * Constructeur de la classe retournant un démodulateur obtenant les octets contenant les échantillons du flot passé en argument
-     * Concrètement on construit un objet de type PowerWindow représentant la fenêtre de 1200 échantillons de puissance, utilisée pour rechercher les messages,
-     * celle-ci est liée au flot d'échantillons reçu de la radio
+     * Calcule selon la formule donnée dans le sujet la ième somme des puissances des impulsions porteuses
+     *
+     * @param i : index de la somme porteuse à calculer
+     * @return : la somme des puissances porteuses voulue
+     */
+    private int calculSommePorteuse(int i){
+        return window.get(i) + window.get(i + 2*IMPULSION_TIME) + window.get(i + 7*IMPULSION_TIME)
+                + window.get(i + 9*IMPULSION_TIME);
+    }
+
+    /**
+     * Calcule selon la formule donnée dans le sujet la somme des puissances des impulsions non porteuses
+     *
+     * @return la somme des puisances non porteuses
+     */
+    private int calculSommeNonPorteuse(){
+        return window.get(1 + IMPULSION_TIME) + window.get(1 + 3*IMPULSION_TIME) + window.get(1 + 4*IMPULSION_TIME)
+               + window.get(1 + 5*IMPULSION_TIME) + window.get(1 + 6*IMPULSION_TIME) + window.get(1 + 8*IMPULSION_TIME);
+    }
+
+    /**
+     * Détermine le bit à l'index i dans le message selon la formule donnée dans le sujet
+     *
+     * @param i : index du bit à calculer dans le message
+     * @return le bit calculé
+     */
+    private byte calculBit(int i){
+        return (byte) ((window.get(16*IMPULSION_TIME + 2*IMPULSION_TIME * i) < window.get(17*IMPULSION_TIME
+                                                                                + 2*IMPULSION_TIME * i)) ? 0 : 1);
+    }
+
+
+    //===================================== Méthodes publiques =========================================================
+
+    /**
+     * Constructeur de la classe retournant un démodulateur obtenant les octets contenant
+     * les échantillons du flot passé en argument
+     * Concrètement on construit un objet de type PowerWindow représentant la fenêtre de 1200 échantillons de puissance,
+     * utilisé pour rechercher les messages, celui-ci est lié au flot d'échantillons reçu de la radio
+     *
      * @param samplesStream : flot contenant les informations reçues de la radio
      * @throws IOException si une erreur d'entrée/sortie se produit lors de la création de la PowerWindow
      */
@@ -32,8 +77,11 @@ public final class AdsbDemodulator {
     }
 
     /**
-     * Retourne le prochain message ADS-B du flot d'échantillons passé au constructeur, ou null s'il n'y en a plus (c.-à-d. que la fin du flot d'échantillons a été atteinte)
-     * L'horodatage des messages retournés par nextMessage utilise l'instant correspondant au tout premier échantillon de puissance comme origine du temps.
+     * Retourne le prochain message ADS-B du flot d'échantillons passé au constructeur, ou null s'il n'y en a plus
+     * (c.-à-d. que la fin du flot d'échantillons a été atteinte)
+     * L'horodatage des messages retournés par nextMessage utilise l'instant correspondant
+     * au tout premier échantillon de puissance comme origine du temps.
+     *
      * @return le prochain message ADS-B du flot d'échantillons passé au constructeur, ou null s'il n'y en a plus
      * @throws IOException en cas d'erreur d'entrée/sortie
      */
@@ -52,12 +100,15 @@ public final class AdsbDemodulator {
 
         while (window.isFull()){
 
-            sommePorteuseEmise0 = sommePorteuseEmise1;  //pour optimiser le temps et eviter de recalculer les sommes porteuses déjà calculées avant
+            sommePorteuseEmise0 = sommePorteuseEmise1;  //pour optimiser et eviter de recalculer les sommes porteuses
             sommePorteuseEmise1 = sommePorteuseEmise2;
             sommePorteuseEmise2 = calculSommePorteuse(2);
             sommePorteuseNonEmise = calculSommeNonPorteuse();
 
-            if ((sommePorteuseEmise0 < sommePorteuseEmise1) && (sommePorteuseEmise1 > sommePorteuseEmise2) && (sommePorteuseEmise1 >= 2*sommePorteuseNonEmise)){
+            if ((sommePorteuseEmise0 < sommePorteuseEmise1)
+                    && (sommePorteuseEmise1 > sommePorteuseEmise2)
+                    && (sommePorteuseEmise1 >= 2*sommePorteuseNonEmise)){
+
                 window.advance();
 
                 bytes = new byte[RawMessage.LENGTH];
@@ -72,7 +123,9 @@ public final class AdsbDemodulator {
                         bytes[i/Byte.SIZE] = (byte) ((bytes[i/Byte.SIZE]<<1) | calculBit(i));
                     }
 
-                    rawMessage = RawMessage.of((long) (window.position()*(0.1*Units.KILO)),bytes);   //Units.KILO/10 car on travaille en echantillonage de 0.1µs ce qui représente 100 nanosecondes
+                    //Units.KILO/10 car on travaille en echantillonage de 0.1µs ce qui représente 100 nanosecondes
+                    rawMessage = RawMessage.of((long) (window.position()*(0.1*Units.KILO)),bytes);
+
                     if (rawMessage != null) {
                         window.advanceBy(WINDOW_SIZE);
                         return rawMessage;
@@ -83,32 +136,6 @@ public final class AdsbDemodulator {
             window.advance();
         }
         return null;
-    }
-
-    /**
-     * Calcule selon la formule donnée dans le sujet la ième somme des puissances des impulsions porteuses
-     * @param i : index de la somme porteuse à calculer
-     * @return : la somme des puissances porteuses voulue
-     */
-    private int calculSommePorteuse(int i){
-        return window.get(i)+ window.get(i + 2*IMPULSION_TIME)+window.get(i + 7*IMPULSION_TIME)+window.get(i + 9*IMPULSION_TIME);
-    }
-
-    /**
-     * Calcule selon la formule donnée dans le sujet la somme des puissances des impulsions non porteuses
-     * @return la somme des puisances non porteuses
-     */
-    private int calculSommeNonPorteuse(){
-        return window.get(1 + IMPULSION_TIME)+ window.get(1 + 3*IMPULSION_TIME)+window.get(1 + 4*IMPULSION_TIME)+window.get(1 + 5*IMPULSION_TIME)+window.get(1 + 6*IMPULSION_TIME)+window.get(1 + 8*IMPULSION_TIME);
-    }
-
-    /**
-     * Détermine le bit à l'index i dans le message selon la formule donnée dans le sujet
-     * @param i : index du bit à calculer dans le message
-     * @return le bit calculé
-     */
-    private byte calculBit(int i){
-        return (byte) ((window.get(16*IMPULSION_TIME + 2*IMPULSION_TIME * i) < window.get(17*IMPULSION_TIME + 2*IMPULSION_TIME * i)) ? 0 : 1);
     }
 }
 
