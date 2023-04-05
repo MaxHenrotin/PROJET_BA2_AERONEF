@@ -124,7 +124,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
             }
         }
         return new AircraftIdentificationMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(),
-                                                    Byte.toUnsignedInt((byte)aeronefCategory) , new CallSign(callSign.toString()));
+                                        Byte.toUnsignedInt((byte)aeronefCategory) , new CallSign(callSign.toString()));
     }
 
 
