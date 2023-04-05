@@ -36,7 +36,6 @@ public final class Submit {
     // Jeton du second membre (identique au premier pour les personnes travaillant seules)
     private static final String TOKEN_2 = "ca7Quu4d";   //TOKEN JULIEN (etape 6)
     // -------------
-
     private static final String ZIP_ENTRY_NAME_PREFIX = "Javions/";
     private static final int TOKEN_LENGTH = 8;
     private static final int TIMEOUT_SECONDS = 5;
