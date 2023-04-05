@@ -21,8 +21,6 @@ import java.util.Objects;
 public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAddress, int category, CallSign callSign)
         implements Message{
 
-
-
     //===================================== Attributs privées statiques ================================================
 
 
@@ -47,7 +45,8 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
     private static final int NINE_VALUE = 57;
     private static final int ALPHABET_SIZE = 26;
 
-    //---------- Méthodes privées statiques ----------
+
+    //===================================== Méthodes privées statiques =================================================
 
     /*
      * Retourne le caractère d'indice CharIndex de l'indicatif
@@ -58,8 +57,11 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
      */
     private static int extractCallSignCharacter(long attributME, int CharIndex){
         if(CharIndex == 0) {
+
             return Bits.extractUInt(attributME, ME_CONTENT_LENGTH - CA_LENGTH, CA_LENGTH);
+
         }else if(CharIndex > 0 && CharIndex <= CALL_SIGN_LENGTH){
+
             return Bits.extractUInt(attributME,
                     ME_CONTENT_LENGTH - CA_LENGTH - CharIndex * CALL_SIGN_CHARACTER_LENGTH,
                     CALL_SIGN_CHARACTER_LENGTH);
@@ -76,7 +78,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
      */
     private static char intToCallSignCharacter(int C){
         if(C > 0 && C <= ALPHABET_SIZE){
-            return (char) ((C - 1) + A_VALUE); //On fait C-1 car on veut un indice (et en informatique on commence à 0 et non à 1)
+            return (char) ((C - 1) + A_VALUE); //On fait C-1 car on veut un indice
         }else if(C >= ZERO_VALUE && C <= NINE_VALUE){
             return (char) (C);
         }else if(C == SPACE_VALUE) {
@@ -86,27 +88,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
         }
     }
 
-
-    //---------- Constructeur ----------
-    /**
-     * Constructeur compact
-     * @param timeStampNs : l'horodatage du message, en nanosecondes
-     * @param icaoAddress : l'adresse OACI de l'expéditeur du message
-     * @param category : la catégorie d'aéronef de l'expéditeur
-     * @param callSign : l'indicatif de l'expéditeur
-     *
-     * @throws NullPointerException si icaoAddress ou callSign sont nuls
-     * @throws IllegalArgumentException si timeStampNs est strictement inférieure à 0
-     */
-    public AircraftIdentificationMessage{
-        Objects.requireNonNull(icaoAddress);
-        Objects.requireNonNull(callSign);
-        Preconditions.checkArgument(timeStampNs >=0);
-    }
-
-
-
-    //---------- Méthodes publiques statiques ----------
+    //===================================== Méthodes publiques statiques ===============================================
     /**
      * Classe publique statique retournant le message d'identification correspondant au message brut donné,
      * ou null si au moins un des caractères de l'indicatif qu'il contient est invalide
@@ -121,9 +103,9 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
 
         //traitement de la catégorie
         int CA = extractCallSignCharacter(attributME, 0);
-        int typeCode = rawMessage.typeCode();   //ce type devrait appartenir à {1,2,3,4}
+        int typeCode = rawMessage.typeCode();   //ce type devrait appartient à {1,2,3,4}
 
-        //voir point 2.1 de l'Etape 5 du projet
+        //extraction de la catégorie de l'aéronef (voir point 2.1 de l'Etape 5)
         int aeronefCategory = ((CATEGORY_MSB_CONSTANT - typeCode) << CA_TAKEN_SPACE_IN_CATEGORY | CA);
 
 
@@ -132,8 +114,13 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
         int Cint;
         char Cchar;
         for(int i = 1; i <= CALL_SIGN_LENGTH;++i) {
+
+            //retourne le caractère d'indice CharIndex de l'indicatif
             Cint = extractCallSignCharacter(attributME, i);
+
+            //retourne le caractère correspondant à l'entier C dans la convention donnée
             Cchar = intToCallSignCharacter(Cint);
+
             if(Cchar == INVALID_CHAR) { //si il y a un caractère invalide
                 return null;
             }else if(Cchar != ' '){
@@ -141,9 +128,31 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
             }
         }
         return new AircraftIdentificationMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(),
-                                                    Byte.toUnsignedInt((byte)aeronefCategory) ,
-                                                    new CallSign(callSign.toString()));
+                Byte.toUnsignedInt((byte)aeronefCategory) ,
+                new CallSign(callSign.toString()));
     }
+
+    //===================================== Méthodes publiques =========================================================
+    /**
+     * Constructeur compact
+     * @param timeStampNs : l'horodatage du message, en nanosecondes
+     * @param icaoAddress : l'adresse OACI de l'expéditeur du message
+     * @param category : la catégorie d'aéronef de l'expéditeur
+     * @param callSign : l'indicatif de l'expéditeur
+     *
+     * @throws NullPointerException si icaoAddress ou callSign sont nuls
+     * @throws IllegalArgumentException si timeStampNs est strictement inférieure à 0
+     */
+    public AircraftIdentificationMessage{
+        Objects.requireNonNull(icaoAddress);
+        Objects.requireNonNull(callSign);
+
+        Preconditions.checkArgument(timeStampNs >= 0);
+    }
+
+
+
+
 
 
 }

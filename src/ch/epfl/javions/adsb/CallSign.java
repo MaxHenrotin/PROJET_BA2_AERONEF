@@ -13,11 +13,12 @@ import java.util.regex.Pattern;
  */
 public record CallSign(String string) {
 
-    //---------- Attributs privées ----------
+    //===================================== Attributs privées statiques ================================================
 
-    private static final Pattern callSignExpression = Pattern.compile("[A-Z0-9 ]{0,8}");//Pattern d'écriture d'un indicatif
+    //Pattern d'écriture d'un indicatif
+    private static final Pattern callSignExpression = Pattern.compile("[A-Z0-9 ]{0,8}");
 
-    //---------- Constructeur ----------
+    //===================================== Méthodes publiques =========================================================
 
     /**
      * Constructeur compact
@@ -26,6 +27,8 @@ public record CallSign(String string) {
      * @throws IllegalArgumentException : si l'indicatif ne respecte pas la syntaxe
      */
     public CallSign {
-        Preconditions.checkArgument(callSignExpression.matcher(string).matches());
+        Preconditions.checkArgument(callSignExpression
+                                    .matcher(string)
+                                    .matches());
     }
 }
