@@ -8,7 +8,25 @@ package ch.epfl.javions;
  */
 public record GeoPos(int longitudeT32, int latitudeT32) {
 
-    //---------- Constructeur ----------
+    //===================================== Attributs privées statiques ================================================
+
+    //casté en int pour pas crée des problèmes taille de bit aux limites
+    private static final int LATITUDE_T32_LOWER_BOUND =  (int)Math.scalb(-1,30);
+    private static final int LATITUDE_T32_UPPER_BOUND =  (int)Math.scalb(1,30);
+
+    //===================================== Méthodes publiques statiques ===============================================
+
+    /**
+     * vérifie si la longitude est dans l'intervalle [-2^30,2^30]
+     * @param latitudeT32 longitude exprimée en T32 à vérifier
+     * @return vrai si la longitude est dans l'intervalle [-2^30,2^30]
+     */
+    public static boolean isValidLatitudeT32(int latitudeT32){
+        return (latitudeT32 >= LATITUDE_T32_LOWER_BOUND) && (latitudeT32 <= LATITUDE_T32_UPPER_BOUND);
+    }
+
+    //===================================== Méthodes publiques =========================================================
+
     /**
      * constructeur compact de GeoPos
      * @param longitudeT32 longitude exprimée en T32
@@ -18,19 +36,6 @@ public record GeoPos(int longitudeT32, int latitudeT32) {
     public GeoPos{
         Preconditions.checkArgument(isValidLatitudeT32(latitudeT32));
     }
-
-    //---------- Méthodes publiques ----------
-
-    /**
-     * vérifie si la longitude est dans l'intervalle [-2^30,2^30]
-     * @param latitudeT32 longitude exprimée en T32 à vérifier
-     * @return vrai si la longitude est dans l'intervalle [-2^30,2^30]
-     */
-    public static boolean isValidLatitudeT32(int latitudeT32){
-        //casté en int pour pas crée des problèmes talle de bit aux limites
-        return (latitudeT32 >= (int)Math.scalb(-1,30)) && (latitudeT32 <= (int)Math.scalb(1,30));
-    }
-
     /**
      * retourne la longitude (en radians)
      * @return la longitude (en radians)

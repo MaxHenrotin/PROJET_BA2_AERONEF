@@ -1,16 +1,19 @@
 package ch.epfl.javions;
 
 /**
- * Offre des méthodes statiques permettant d'effectuer certains calculs mathématiques (Similaire à la classe Math de la bibliothèque standard Java)
+ * Offre des méthodes statiques permettant d'effectuer certains calculs mathématiques
+ * (Similaire à la classe Math de la bibliothèque standard Java)
  *
  * @author Max Henrotin (341463)
  * @author Julien Erbland (346893)
  */
 public final class Math2 {
-    private Math2(){}   //constructeur privé pour rendre la classe non instanciable
+
+    //===================================== Méthodes publiques statiques ===============================================
 
     /**
-     * Limite la valeur v à l'intervalle allant de min à max, en retournant min si v est inférieure à min, max si v est supérieure à max, et v sinon
+     * Limite la valeur v à l'intervalle allant de min à max, en retournant min si v est inférieure à min,
+     * max si v est supérieure à max, et v sinon
      * @param min borne minimale de l'intervalle à contrôler
      * @param v valeur dont il faut vérifier son appartenance à l'intervalle min-max
      * @param max borne maximale de l'intervalle à contrôler
@@ -18,12 +21,9 @@ public final class Math2 {
      */
     public static int clamp(int min, int v, int max) {
         Preconditions.checkArgument(min <= max);
-        if(v < min){
-            return min;
-        }else if(v > max){
-            return max;
-        }
-        return v;
+
+        if(v < min) return min;
+        else return Math.min(v, max);
     }
 
     /**
@@ -32,6 +32,10 @@ public final class Math2 {
      * @return le sinus hyperbolique réciproque de son argument (x)
      */
     public static double asinh(double x){
-        return Math.log(x + Math.sqrt(1 + x * x));
+        return Math.log(x + Math.sqrt(1 + x*x));
     }
+
+    //===================================== Méthodes privées ===========================================================
+
+    private Math2(){}   //constructeur privé pour rendre la classe non instanciable
 }

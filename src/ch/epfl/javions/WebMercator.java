@@ -7,7 +7,8 @@ package ch.epfl.javions;
  * @author Julien Erbland (346893)
  */
 public class WebMercator {
-    private WebMercator(){} //constructeur privé pour rendre la classe non instantiable
+
+    //===================================== Méthodes publiques statiques ===============================================
 
     /**
      * retourne la coordonnée x correspondant à la longitude donnée (en radians) au niveau de zoom donné sur WebMercator
@@ -30,4 +31,9 @@ public class WebMercator {
         //formule donnée en 2.5 (voir 3.8 pour + d'infos)
         return Math.scalb( - Units.convertTo(Math2.asinh(Math.tan(latitude)),Units.Angle.TURN) + 0.5 , 8 + zoomLevel);
     }
+
+    //===================================== Méthodes privées ===========================================================
+
+    //constructeur privé pour rendre la classe non instantiable
+    private WebMercator(){}
 }

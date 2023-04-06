@@ -8,8 +8,9 @@ package ch.epfl.javions;
  */
 
 public final class Units {
-    private Units(){}
 
+
+    //===================================== Attributs publiques statiques ==============================================
     /**
      * Préfixe centi utile aux calculs d'unités
      */
@@ -19,6 +20,7 @@ public final class Units {
      */
     public static final double KILO = 1e3;
 
+    //===================================== Méthodes publiques statiques ===============================================
 
     /**
      * Convertit la valeur donnée, exprimée dans l'unité fromUnit, en l'unité toUnit
@@ -53,13 +55,12 @@ public final class Units {
     }
 
 
+    //===================================== Classes publiques statiques ================================================
     /**
      * Modélise les unités de longueurs avec comme référence le mètre
      */
 
     public static class Length{
-
-        private Length(){}
 
         /**
          * Unité de base de longueur
@@ -86,13 +87,14 @@ public final class Units {
          */
         public static final double NAUTICAL_MILE = 1852d * METER;
 
+        private Length(){} //classe non instanciable
+
     }
 
     /**
      * Modélise les unités de temps avec comme référence la seconde
      */
     public static class Time{
-        private Time(){}
 
         /**
          * Unité de base de temps
@@ -107,6 +109,8 @@ public final class Units {
          */
         public static final double HOUR = 60 * MINUTE;
 
+        private Time(){} //classe non instanciable
+
     }
 
     /**
@@ -114,7 +118,6 @@ public final class Units {
      */
 
     public static class Angle{
-        private Angle(){}
 
         /**
          * Unité de base de longueur
@@ -133,6 +136,8 @@ public final class Units {
          */
         public static final double T32 = TURN / Math.scalb(1.,32);
 
+        private Angle(){} //classe non instanciable
+
     }
 
     /**
@@ -140,7 +145,6 @@ public final class Units {
      */
 
     public static class Speed{
-        private Speed(){}
 
         /**
          * Unité de noeud
@@ -152,6 +156,11 @@ public final class Units {
          */
         public static final double KILOMETER_PER_HOUR = Length.KILOMETER / Time.HOUR;
 
+        private Speed(){} //classe non instanciable
+
     }
 
+    //===================================== Méthodes privées ===========================================================
+
+    private Units(){} //classe non instanciable
 }
