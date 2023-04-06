@@ -9,7 +9,8 @@ import java.util.Objects;
  * @author Julien Erbland (346893)
  */
 public class Bits {
-    private Bits(){}    //constructeur privé pour rendre la classe non instanciable
+
+    //===================================== Méthodes publiques statiques ===============================================
 
     /**
      * qui extrait du vecteur de 64 bits value la plage de size bits commençant au bit d'index start, qu'elle interprète comme une valeur non signée
@@ -23,8 +24,13 @@ public class Bits {
     public static int extractUInt(long value, int start, int size){
         Preconditions.checkArgument((size>0) && (size<Integer.SIZE));
         Objects.checkFromIndexSize(start,size,Long.SIZE);   //throw un IndexOutOfBundsException
-        value = value << Long.SIZE - size- start; // supprime tous les bits supplémentaires à gauche
-        value = value >>> Long.SIZE - size;       // supprime tous les bits supplémentaires à droite (mets des 0)
+
+        // supprime tous les bits supplémentaires à gauche
+        value = value << Long.SIZE - size - start;
+
+        // supprime tous les bits supplémentaires à droite (mets des 0)
+        value = value >>> Long.SIZE - size;
+
         return (int) value;
     }
 
@@ -36,8 +42,17 @@ public class Bits {
      * @return  vrai ssi le bit de value d'index donné vaut 1
      */
     public static boolean testBit(long value, int index){
-        Objects.checkIndex(index,Long.SIZE); //vérifie que index est bien entre 0 et 64 (throw IndexOutOfBoundsException)
-        long maskIndex = 1L << index;  //voir notes de cours "Types entiers" 5.5.1
-        return (value & maskIndex) == maskIndex;    //voir notes de cours "Types entiers" 5.5.2
+        //vérifie que index est bien entre 0 et 64 (throw IndexOutOfBoundsException)
+        Objects.checkIndex(index,Long.SIZE);
+
+        //crée un mask avec le bit à la position index à 1 (voir notes de cours "Types entiers" 5.5.1)
+        long maskIndex = 1L << index;
+
+        //test si le bit vaut 1 ou 0 (voir notes de cours "Types entiers" 5.5.2)
+        return (value & maskIndex) == maskIndex;
     }
+
+    //===================================== Méthodes privées ===========================================================
+
+    private Bits(){}    //constructeur privé pour rendre la classe non instanciable
 }

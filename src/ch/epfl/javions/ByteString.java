@@ -13,15 +13,11 @@ import java.util.Objects;
 
 public final class ByteString {
 
-    private final byte[] tab;
+    //===================================== Attributs privées statiques ================================================
 
-    /**
-     * Constructeur de byte en utilisant la fonction clone() pour éviter les problèmes de références
-     * @param bytes : tableau de bytes
-     */
-    public ByteString(byte[] bytes){
-        tab = bytes.clone();
-    }
+    private static final int TO_UNSIGNED_INT = 0xFF;
+
+    //===================================== Méthodes publiques statiques ===============================================
 
     /**
      * Retourne la chaîne d'octets dont la chaîne passée en argument est la représentation hexadécimale
@@ -32,18 +28,39 @@ public final class ByteString {
      */
     public static ByteString ofHexadecimalString(String hexString){
         Preconditions.checkArgument((hexString.length()%2)==0);
+
         try{
+
             return new ByteString(HexFormat.of().parseHex(hexString));
-        }catch(IllegalArgumentException e){ //la méthode parseHex throw IllegalArgumentException si la string n'est pas hexadécimal
-            throw new NumberFormatException(); //on souhaite pourtant throw NumberFormatException dans ce cas la donc on catch et throw le bon type d'exception voulu
+
+            //la méthode parseHex throw IllegalArgumentException si la string n'est pas hexadécimal
+        }catch(IllegalArgumentException illegalArgumentException){
+            //on souhaite pourtant throw NumberFormatException dans ce cas la donc on catch
+            // et throw le bon type d'exception voulu
+            throw new NumberFormatException();
         }
     }
+
+    //===================================== Attributs privés ===========================================================
+    private final byte[] tableauOctets;
+
+    //===================================== Méthodes publiques =========================================================
+
+    /**
+     * Constructeur de byte en utilisant la fonction clone() pour éviter les problèmes de références
+     * @param bytes : tableau de bytes
+     */
+    public ByteString(byte[] bytes){
+        tableauOctets = bytes.clone();
+    }
+
+
 
     /**
      * Retourne la taille du tableau de bytes
      * @return : la taille de tab
      */
-    public int size(){return tab.length;}
+    public int size(){return tableauOctets.length;}
 
 
     /**
@@ -53,8 +70,9 @@ public final class ByteString {
      * @return : l'octet correspondant à l'index dans le tableau
      */
     public int byteAt(int index){
-        Objects.checkIndex(index,tab.length);
-        return tab[index]&0xFF; //évite les problèmes de signes
+        Objects.checkIndex(index, tableauOctets.length);
+
+        return tableauOctets[index] & TO_UNSIGNED_INT; //évite les problèmes de signes
     }
 
 
@@ -68,16 +86,16 @@ public final class ByteString {
      * @return : valeur de type long construite par les bytes compris entre fromIndex et toIndex
      */
     public long bytesInRange(int fromIndex, int toIndex){
-        Objects.checkFromToIndex(fromIndex,toIndex,tab.length);
+        Objects.checkFromToIndex(fromIndex,toIndex, tableauOctets.length);
         Preconditions.checkArgument(toIndex-fromIndex<(Byte.SIZE));
 
-        byte[] output = java.util.Arrays.copyOfRange(tab,fromIndex,toIndex);
+        byte[] bytesInRange = java.util.Arrays.copyOfRange(tableauOctets,fromIndex,toIndex);
 
-        long number = Byte.toUnsignedInt(output[0]);
+        long number = Byte.toUnsignedInt(bytesInRange[0]);
 
-        for(int i = 1; i < output.length; ++i){
+        for(int i = 1; i < bytesInRange.length; ++i){
             number = number << Byte.SIZE;
-            number = number | Byte.toUnsignedInt(output[i]); //évite les problèmes de signes
+            number = number | Byte.toUnsignedInt(bytesInRange[i]); //évite les problèmes de signes
         }
 
         return number;
@@ -94,7 +112,8 @@ public final class ByteString {
     @Override
     public boolean equals(Object object) {
         Preconditions.checkArgument(object instanceof ByteString);
-        return Arrays.equals(tab,((ByteString) object).tab);
+
+        return Arrays.equals(tableauOctets,((ByteString) object).tableauOctets);
     }
 
     /**
@@ -104,7 +123,8 @@ public final class ByteString {
     @Override
     public String toString(){
         HexFormat hexFormat=HexFormat.of().withUpperCase();
-        return hexFormat.formatHex(tab);
+
+        return hexFormat.formatHex(tableauOctets);
     }
 
     /**
@@ -113,6 +133,6 @@ public final class ByteString {
      */
     @Override
     public int hashCode(){
-        return Arrays.hashCode(tab);
+        return Arrays.hashCode(tableauOctets);
     }
 }
