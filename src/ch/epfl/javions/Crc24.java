@@ -26,7 +26,7 @@ public final class Crc24 {
 
     //===================================== Attributs privés ===========================================================
 
-    private final int[] table;
+    private final int[] tableDeCRC24;
     private final int generator;
 
     //===================================== Méthodes privées ===========================================================
@@ -59,15 +59,16 @@ public final class Crc24 {
 
         int newGenerator = (generator &  mask23bits);
 
-        int[] table = {0, newGenerator};
+        //permet de choisir entre 0 et le newgenerator dan l'algo du calcul de crc
+        int[] TwoEntryTable = {0, newGenerator};
 
         for (byte elem : bytes){
             for (int j=0 ; j < Byte.SIZE ; ++j){
-                bit = Bits.extractUInt(elem,Byte.SIZE - j - 1,1);
+                bit = (Bits.testBit(elem,Byte.SIZE - j - 1)) ? 1 : 0;
 
                 index = (crc24 & mask23bits) >>> (CRC24LENGTH - 1);
 
-                crc24 = ((crc24 << 1) | bit) ^ table[index];
+                crc24 = ((crc24 << 1) | bit) ^ TwoEntryTable[index];
 
                 crc24 = crc24 &  mask23bits;
             }
@@ -77,7 +78,7 @@ public final class Crc24 {
 
             index=(crc24 & mask23bits) >>> (CRC24LENGTH - 1);
 
-            crc24 = (crc24 << 1) ^ table[index];
+            crc24 = (crc24 << 1) ^ TwoEntryTable[index];
 
             crc24 = crc24 &  mask23bits;
 
@@ -96,7 +97,7 @@ public final class Crc24 {
      */
     public Crc24(int generator){
         this.generator = generator;
-        table = buildTable();
+        tableDeCRC24 = buildTable();
     }
 
     /**
@@ -116,7 +117,7 @@ public final class Crc24 {
 
             index = Bits.extractUInt(crc, CRC24LENGTH - Byte.SIZE, Byte.SIZE);
 
-            crc = ((crc << Byte.SIZE) | byteString.byteAt(i)) ^ table[index];
+            crc = ((crc << Byte.SIZE) | byteString.byteAt(i)) ^ tableDeCRC24[index];
 
         }
 
@@ -124,7 +125,7 @@ public final class Crc24 {
 
             index = Bits.extractUInt(crc,CRC24LENGTH - Byte.SIZE, Byte.SIZE);
 
-            crc = (crc << Byte.SIZE) ^ table[index];
+            crc = (crc << Byte.SIZE) ^ tableDeCRC24[index];
 
         }
 

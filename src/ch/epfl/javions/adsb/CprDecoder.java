@@ -22,6 +22,9 @@ public class CprDecoder {
     private static final int ONE_TURN = 1;
     private static final double UPPER_BOUND_LATITUDE_LIMIT = 0.75d;
     private static final double LOWER_BOUND_LATITUDE_LIMIT = 0.25d;
+
+    private static final double POLAR_ZONE_LONGITUDE_EVEN = 1d;
+    private static final double POLAR_ZONE_LONGITUDE_ODD = POLAR_ZONE_LONGITUDE_EVEN-1;
     private static final  double[] NOMBRE_LATITUDES = {60d, 59d};
     private static final  double[] DELTA_LATITUDES = {1d / NOMBRE_LATITUDES[EVEN_INDEX],
                                                         1d / NOMBRE_LATITUDES[ODD_INDEX]};
@@ -72,10 +75,13 @@ public class CprDecoder {
                                     / (cos(latitudeRadianOdd) * cos(latitudeRadianOdd))));
 
         if(Double.isNaN(AEven) && Double.isNaN(AOdd)){  //en zone polaire
-            nombreLongitude[EVEN_INDEX] = 1;
-            nombreLongitude[ODD_INDEX] = 0;
+
+            nombreLongitude[EVEN_INDEX] = POLAR_ZONE_LONGITUDE_EVEN;
+            nombreLongitude[ODD_INDEX] = POLAR_ZONE_LONGITUDE_ODD;
             inPolarZone = true;
+
             return false;
+
         }else {
             double nombreLongitudesEven;
             inPolarZone = false;
@@ -85,11 +91,13 @@ public class CprDecoder {
                 return false;
             }
 
-            if((nombreLongitudesEven = floor((2. * PI)/AEven)) == floor((2.*PI)/AOdd)) {
+            if((nombreLongitudesEven = floor((2.*PI) / AEven)) == floor((2.*PI) / AOdd)) {
                 nombreLongitude[EVEN_INDEX] = nombreLongitudesEven;
                 nombreLongitude[ODD_INDEX] = nombreLongitude[EVEN_INDEX] - 1;
                 DELTA_LONGITUDES = new double[]{1d / nombreLongitude[EVEN_INDEX], 1d / nombreLongitude[ODD_INDEX]};
+
                 return true;
+
             }else {
                 return false;
             }

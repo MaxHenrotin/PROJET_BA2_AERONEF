@@ -55,9 +55,8 @@ public record AirbornePositionMessage
     public static final int FORMAT_LENGTH = 1;
 
 
-    //---------- Constantes utiles à l'extraction du bit Q ----------
+    //---------- Constantes utiles au test du bit Q ----------
     private static final int Q_INDEX = 4; //position du bit Q
-    private static final int Q_MASK = 1 << Q_INDEX; //mask permettant de récupérer le bit Q
 
     //---------- Constantes utiles au décodage si Q = 0 ----------
     private static final int Q0_BASE_ALTITUDE = -1000; //altitude de base quand Q = 0
@@ -83,7 +82,7 @@ public record AirbornePositionMessage
 
     //mask de {D1, D2, D4, A1, A2, A4, B1, B2, B4, C1, C2, C4}
     //Ces masks permettent le démêlage dans le cas où le bit Q vaut 0
-    private static final int[] MASK_DEMELAGE = {Q_MASK, 1 << D2_INDEX, D4_INDEX, 1 << A1_INDEX,
+    private static final int[] MASK_DEMELAGE = {1 << Q_INDEX, 1 << D2_INDEX, D4_INDEX, 1 << A1_INDEX,
                                                 1 << A2_INDEX, 1 << A4_INDEX, 1 << B1_INDEX, 1 << B2_INDEX,
                                                 1 <<B4_INDEX, 1 << C1_INDEX, 1 << C2_INDEX, 1 << C4_INDEX};
 
@@ -104,10 +103,13 @@ public record AirbornePositionMessage
      */
 
     private static int calculAltitude(int alt){
-        if((alt & Q_MASK) == Q_MASK){ //Q = 1
-            int temp = MASK_4BITS & alt;
-            alt = alt >> 5;
-            alt = (alt << 4) | temp;
+        if(Bits.testBit(alt,Q_INDEX)){ //Q = 1
+
+            int temp = MASK_4BITS & alt; //variable temporaire pour stocker les 4 bits de poids faible
+
+            alt = alt >> (Q_INDEX + 1); //supprime le bits Q
+
+            alt = (alt << Q_INDEX) | temp;//réinsére les 4 bits de poids faible
 
             return Q0_BASE_ALTITUDE + alt*Q1_ALTITUDE_FACTOR;
 
@@ -120,6 +122,7 @@ public record AirbornePositionMessage
 
             //récupère les bits du groupe fort
             int groupeFort = (demele & MASK_GROUPE_FORT) >> GROUPE_FAIBLE_SIZE;
+
             //réalise le décodage  de Gray
             groupeFort = decodeGray(groupeFort, GROUPE_FORT_SIZE);
 

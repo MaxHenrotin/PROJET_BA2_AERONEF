@@ -37,10 +37,10 @@ public class PowerComputer {
         int lastIndex0=lastIndex;
         int lastIndex1=lastIndex+1;
 
-        int p1 = tab[(lastIndex1+2)%NBR_ECHANTILLONS_MEMOIRE] - tab[(lastIndex1+4)%NBR_ECHANTILLONS_MEMOIRE]
-                    + tab[(lastIndex1+6)%NBR_ECHANTILLONS_MEMOIRE] - tab[lastIndex1];
-        int p2 = tab[(lastIndex0+2)%NBR_ECHANTILLONS_MEMOIRE] - tab[(lastIndex0+4)%NBR_ECHANTILLONS_MEMOIRE]
-                    + tab[(lastIndex0+6)%NBR_ECHANTILLONS_MEMOIRE] - tab[lastIndex0];
+        int p1 = tab[(lastIndex1+2) % NBR_ECHANTILLONS_MEMOIRE] - tab[(lastIndex1+4) % NBR_ECHANTILLONS_MEMOIRE]
+                    + tab[(lastIndex1+6) % NBR_ECHANTILLONS_MEMOIRE] - tab[lastIndex1];
+        int p2 = tab[(lastIndex0+2) % NBR_ECHANTILLONS_MEMOIRE] - tab[(lastIndex0+4) % NBR_ECHANTILLONS_MEMOIRE]
+                    + tab[(lastIndex0+6) % NBR_ECHANTILLONS_MEMOIRE] - tab[lastIndex0];
 
         return p1*p1 + p2*p2;
     }
