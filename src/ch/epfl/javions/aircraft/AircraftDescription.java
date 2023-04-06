@@ -16,7 +16,8 @@ import java.util.regex.Pattern;
 public record AircraftDescription(String string) {
 
     //Pattern d'écriture d'une description
-    private final static Pattern aircraftDescriptionExpression = Pattern.compile("[ABDGHLPRSTV-][0123468][EJPT-]");
+    private final static Pattern aircraftDescriptionExpression = Pattern
+                                                                    .compile("[ABDGHLPRSTV-][0123468][EJPT-]");
 
     /**
      * Constructeur compact
@@ -24,6 +25,8 @@ public record AircraftDescription(String string) {
      * @throws IllegalArgumentException : si la description ne respecte pas la syntaxe
      */
     public AircraftDescription {
-        Preconditions.checkArgument(aircraftDescriptionExpression.matcher(string).matches() || string.isEmpty());
+        Preconditions.checkArgument(aircraftDescriptionExpression
+                                                .matcher(string)
+                                                .matches() || string.isEmpty());
     }
 }

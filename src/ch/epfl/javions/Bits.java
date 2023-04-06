@@ -13,12 +13,15 @@ public class Bits {
     //===================================== Méthodes publiques statiques ===============================================
 
     /**
-     * qui extrait du vecteur de 64 bits value la plage de size bits commençant au bit d'index start, qu'elle interprète comme une valeur non signée
+     * qui extrait du vecteur de 64 bits value la plage de size bits commençant au bit d'index start,
+     * qu'elle interprète comme une valeur non signée
+     *
      * @param value vecteur de 64 bit du quel on extrait
      * @param start index du bit ou commence la plage à extraire
      * @param size  taille de la plage à extraire
      * @throws IllegalArgumentException si la taille n'est pas strictement supérieure à 0 et strictement inférieure à 32
-     * @throws IndexOutOfBoundsException si la plage décrite par start et size n'est pas totalement comprise entre 0 (inclus) et 64 (exclu)
+     * @throws IndexOutOfBoundsException si la plage décrite par start et size n'est pas totalement comprise
+     * entre 0 (inclus) et 64 (exclu)
      * @return vecteur contenant la plage de bit extraite
      */
     public static int extractUInt(long value, int start, int size){

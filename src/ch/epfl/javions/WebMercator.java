@@ -12,6 +12,7 @@ public class WebMercator {
 
     /**
      * retourne la coordonnée x correspondant à la longitude donnée (en radians) au niveau de zoom donné sur WebMercator
+     *
      * @param zoomLevel niveau de zoom (sur la projection WebMercator)
      * @param longitude longitude que l'on cherche à projeter
      * @return la coordonnée x correspondant à la longitude donnée (en radians) au niveau de zoom donné
@@ -23,6 +24,7 @@ public class WebMercator {
 
     /**
      * retourne la coordonnée y correspondant à la latitude donnée (en radians) au niveau de zoom donné sur WebMercator
+     *
      * @param zoomLevel niveau de zoom (sur la projection WebMercator)
      * @param latitude latitude que l'on cherche à projeter
      * @return la coordonnée y correspondant à la latitude donnée (en radians) au niveau de zoom donné.
