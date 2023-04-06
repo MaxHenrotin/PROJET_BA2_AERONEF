@@ -68,8 +68,9 @@ public record AirbornePositionMessage
     private static final int Q0_GROUPE_FORT_FACTOR = 500;
 
     //Ensemble des index correspondant à la position des bits avant démêlage
+    private static final int D1_INDEX = Q_INDEX;
     private static final int D2_INDEX = 2;
-    private static final int D4_INDEX = 1;
+    private static final int D4_INDEX = 0;
     private static final int A1_INDEX = 10;
     private static final int A2_INDEX = 8;
     private static final int A4_INDEX = 6;
@@ -80,15 +81,15 @@ public record AirbornePositionMessage
     private static final int C2_INDEX = 9;
     private static final int C4_INDEX = 7;
 
-    //mask de {D1, D2, D4, A1, A2, A4, B1, B2, B4, C1, C2, C4}
-    //Ces masks permettent le démêlage dans le cas où le bit Q vaut 0
-    private static final int[] MASK_DEMELAGE = {1 << Q_INDEX, 1 << D2_INDEX, D4_INDEX, 1 << A1_INDEX,
-                                                1 << A2_INDEX, 1 << A4_INDEX, 1 << B1_INDEX, 1 << B2_INDEX,
-                                                1 <<B4_INDEX, 1 << C1_INDEX, 1 << C2_INDEX, 1 << C4_INDEX};
+    //index de {D1, D2, D4, A1, A2, A4, B1, B2, B4, C1, C2, C4}
+    //Ces index permettent le démêlage dans le cas où le bit Q vaut 0
+    private static final int[] INDEX_DEMELAGE = {D1_INDEX, D2_INDEX, D4_INDEX,
+                                                    A1_INDEX, A2_INDEX, A4_INDEX,
+                                                    B1_INDEX, B2_INDEX, B4_INDEX,
+                                                    C1_INDEX, C2_INDEX, C4_INDEX};
 
     //---------- Constantes utiles au décodage si Q = 1 ----------
     private static final int Q1_BASE_ALTITUDE = -1300; //altitude de base quand Q = 1
-    private static final int MASK_4BITS = 0b1111; //mask qui récupère les 4 premiers bits
     private static final int Q1_ALTITUDE_FACTOR = 25;
 
 
@@ -105,7 +106,8 @@ public record AirbornePositionMessage
     private static int calculAltitude(int alt){
         if(Bits.testBit(alt,Q_INDEX)){ //Q = 1
 
-            int temp = MASK_4BITS & alt; //variable temporaire pour stocker les 4 bits de poids faible
+            //variable temporaire pour stocker les 4 bits de poids faible
+            int temp = Bits.extractUInt(alt,0,Q_INDEX);
 
             alt = alt >> (Q_INDEX + 1); //supprime le bits Q
 
@@ -155,14 +157,15 @@ public record AirbornePositionMessage
     private static int demeleIndex(int input){
         int output = 0;
 
-        for (int mask : MASK_DEMELAGE) {
-            int bit = ((input & mask) == mask) ? 1 : 0;
+        for (int bitIndex : INDEX_DEMELAGE) {
+            int bit = (Bits.testBit(input,bitIndex)) ? 1 : 0;
             output = (output << 1) | bit;
         }
+
         return output;
     }
 
-    /**Permet de décoder un code de Graay en interprétation binaire
+    /**Permet de décoder un code de Gray en interprétation binaire
      *
      * @param input : code de Gray
      * @param size : nombre de bits du code
@@ -215,6 +218,7 @@ public record AirbornePositionMessage
     public static AirbornePositionMessage of(RawMessage rawMessage){
         long attributME = rawMessage.payload();
 
+        //extrait toutes les valeurs nécessaires dans l'attribut ME du message reçu
         double lon_cpr = Bits.extractUInt(attributME, LONGITUDE_CPR_INDEX, LONGITUDE_CPR_LENGTH);
         double lat_cpr = Bits.extractUInt(attributME, LATITUDE_CPR_INDEX, LATITUDE_CPR_LENGTH);
         int format = Bits.extractUInt(attributME, FORMAT_INDEX, FORMAT_LENGTH); // 0 = paire, 1 = impaire
