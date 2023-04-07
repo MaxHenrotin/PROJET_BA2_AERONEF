@@ -21,6 +21,8 @@ public final class SamplesDecoder {
     private static final int ECHANTILLON_SIZE = 12; //en bit (ce que la AIRSPY nous donne)
     private static final int NBR_BYTE_PAR_ECHANTILLON = 2;  //On a besoin de 2 octets pour obtenir un échnatillon
 
+    private static final int TO_UNSIGNED_INT = 0xFF; //permet d'éviter les problèmes de signes
+
 
     //===================================== Attributs privées ==========================================================
 
@@ -73,13 +75,13 @@ public final class SamplesDecoder {
      */
     public int readBatch(short[] batch) throws IOException {
         Preconditions.checkArgument(batchSize == batch.length);
-        bytes = stream.readNBytes(batchSize*NBR_BYTE_PAR_ECHANTILLON);
+        bytes = stream.readNBytes(batchSize * NBR_BYTE_PAR_ECHANTILLON);
 
         for (int i=0; i < bytes.length ; i += NBR_BYTE_PAR_ECHANTILLON){
 
             //(1<<ECHANTILLON_SIZE) est equivalent à Math.scalb(1,ECHANTILLON_SIZE-1)
-            batch[i/2]= (short) (calculEchantillon((short) (bytes[i+1]&0xFF),
-                                                    (short) (bytes[i]&0xFF)) - (1<<ECHANTILLON_SIZE-1));
+            batch[i/2] = (short) (calculEchantillon((short) (bytes[i+1] & TO_UNSIGNED_INT),
+                                                    (short) (bytes[i] & TO_UNSIGNED_INT)) - (1<<ECHANTILLON_SIZE-1));
 
         }
         return bytes.length/NBR_BYTE_PAR_ECHANTILLON;

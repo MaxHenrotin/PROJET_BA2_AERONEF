@@ -19,7 +19,7 @@ public final class PowerWindow {
     //===================================== Attributs privées statiques ================================================
 
     //Taille d'un lot d'échantillons de puissance
-    private final static int BATCH_SIZE = 1<<16; //equivalent à Math.scalb(1,16); (= 2^16)
+    private final static int BATCH_SIZE = 1 << 16; //equivalent à Math.scalb(1,16); (= 2^16)
 
 
     //===================================== Attributs privées ==========================================================
