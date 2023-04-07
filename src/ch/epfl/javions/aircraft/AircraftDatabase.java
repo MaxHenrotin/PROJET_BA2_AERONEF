@@ -17,6 +17,8 @@ public final class AircraftDatabase {
     //===================================== Attributs privées ==========================================================
     private final String fileName;
 
+    //===================================== Méthodes publiques =========================================================
+
     /**
      * Constructeur qui retourne un objet représentant la base de données mictronics,
      * stockée dans le fichier de nom filename
@@ -24,9 +26,6 @@ public final class AircraftDatabase {
      * @param fileName : nom du fichier dans lequel est stockée la base de donnée
      * @throws NullPointerException si filename est nul
      */
-
-    //===================================== Méthodes publiques =========================================================
-
     //pour la base de donnée mictronics de notre projet : fileName = aircraft.zip
     public AircraftDatabase(String fileName) {
         Objects.requireNonNull(fileName);

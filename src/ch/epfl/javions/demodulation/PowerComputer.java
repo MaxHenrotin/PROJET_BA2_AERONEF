@@ -34,8 +34,8 @@ public class PowerComputer {
 
     //Utilise la formule de calcul de puissance donnée dans l'énoncé
     private int calculPuissanceEchantillon(int[] tab, int lastIndex){
-        int lastIndex0=lastIndex;
-        int lastIndex1=lastIndex+1;
+        int lastIndex0 = lastIndex;
+        int lastIndex1 = lastIndex + 1;
 
         int p1 = tab[(lastIndex1+2) % NBR_ECHANTILLONS_MEMOIRE] - tab[(lastIndex1+4) % NBR_ECHANTILLONS_MEMOIRE]
                     + tab[(lastIndex1+6) % NBR_ECHANTILLONS_MEMOIRE] - tab[lastIndex1];
@@ -57,13 +57,13 @@ public class PowerComputer {
      * @throws NullPointerException : si le flot est null
      */
     public PowerComputer(InputStream stream, int batchSize){
-        Preconditions.checkArgument(batchSize>0 && ((batchSize % NBR_ECHANTILLONS_MEMOIRE)==0));
+        Preconditions.checkArgument((batchSize > 0) && ((batchSize % NBR_ECHANTILLONS_MEMOIRE) == 0));
         Objects.requireNonNull(stream);
 
         this.batchSize = batchSize;
 
-        sample = new SamplesDecoder(stream,batchSize*NBR_ECHANTILLONS_PAR_PUISSANCE);
-        echantillons=new short[batchSize*NBR_ECHANTILLONS_PAR_PUISSANCE];
+        sample = new SamplesDecoder(stream,batchSize * NBR_ECHANTILLONS_PAR_PUISSANCE);
+        echantillons=new short[batchSize * NBR_ECHANTILLONS_PAR_PUISSANCE];
     }
 
     /**

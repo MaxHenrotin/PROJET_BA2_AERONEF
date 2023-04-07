@@ -52,6 +52,7 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {
      */
     public AircraftStateAccumulator(T stateSetter){
         Objects.requireNonNull(stateSetter);
+
         this.stateSetter = stateSetter;
     }
 
