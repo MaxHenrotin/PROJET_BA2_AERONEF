@@ -29,13 +29,6 @@ public record AirbornePositionMessage
 
 
     //===================================== Attributs privées statiques ================================================
-    //===================================== Méthodes privées statiques =================================================
-    //===================================== Attributs privés ===========================================================
-    //===================================== Méthodes privées ===========================================================
-    //===================================== Attributs publiques statiques ==============================================
-    //===================================== Méthodes publiques statiques ===============================================
-    //===================================== Attributs publiques ========================================================
-    //===================================== Méthodes publiques =========================================================
 
     //valeur utilisé pour transmettre l'information que l'altitude calculée est invalide
     private static final int INVALID_ALTITUDE_VALUE = -1;
@@ -44,7 +37,7 @@ public record AirbornePositionMessage
     private static final int NORMALISATION_EXPOSANT = -17;
 
 
-    //---------- Constantes utiles à l'extraction des différentes valeurs du message ----------
+    //---------- Constantes utiles à l'extraction des différentes valeurs du message dans l'attribut ME ----------
     private static final int LONGITUDE_CPR_INDEX = 0;
     private static final int LATITUDE_CPR_INDEX = 17;
     private static final int LONGITUDE_CPR_LENGTH = 17;
