@@ -40,7 +40,7 @@ public final class PowerWindow {
     private long position = 0;
 
     //Premier index du lot où il n'y a plus de nouvel echantillon de puissance
-    private long BatchEnd =-1;
+    private long BatchEnd = -1;
 
     /*
      * Permet de garder une information sur quel tableau est le "premier" tableau

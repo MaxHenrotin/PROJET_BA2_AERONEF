@@ -35,9 +35,9 @@ public final class Crc24 {
     private int[] buildTable(){
         int[] output= new int[MAX_CRC24_POSSIBLE];
 
-        for (int i=0;i< output.length;++i){
-            byte[] byteInTab = {(byte)i};
-            output[i]=crc_bitwise(generator,byteInTab);
+        for (int i=0 ; i < output.length ; ++i){
+            byte[] byteInTab = { (byte) i };
+            output[i] = crc_bitwise(generator,byteInTab);
         }
 
         return output;

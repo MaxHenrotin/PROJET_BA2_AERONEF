@@ -62,9 +62,8 @@ public final class AircraftDatabase {
 
                 String[] data = line.split(",",-1);
 
-                return new AircraftData(new AircraftRegistration(data[1]),
-                                        new AircraftTypeDesignator(data[2]), data[3], new AircraftDescription(data[4]),
-                                        WakeTurbulenceCategory.of(data[5]));
+                return new AircraftData(new AircraftRegistration(data[1]), new AircraftTypeDesignator(data[2]), data[3],
+                                        new AircraftDescription(data[4]), WakeTurbulenceCategory.of(data[5]));
 
             }else{
                 return null;    //si l'avion n'est pas dans la dataBase

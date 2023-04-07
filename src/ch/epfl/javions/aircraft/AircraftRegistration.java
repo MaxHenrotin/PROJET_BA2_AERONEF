@@ -23,6 +23,8 @@ public record AircraftRegistration(String string) {
      */
     public AircraftRegistration {
         Preconditions.checkArgument(!string.isEmpty());
-        Preconditions.checkArgument(aircraftRegistrationExpression.matcher(string).matches());
+        Preconditions.checkArgument(aircraftRegistrationExpression
+                                        .matcher(string)
+                                        .matches());
     }
 }

@@ -132,7 +132,7 @@ public final class ByteString {
      */
     @Override
     public String toString(){
-        HexFormat hexFormat=HexFormat.of().withUpperCase();
+        HexFormat hexFormat = HexFormat.of().withUpperCase();
 
         return hexFormat.formatHex(tableauOctets);
     }
