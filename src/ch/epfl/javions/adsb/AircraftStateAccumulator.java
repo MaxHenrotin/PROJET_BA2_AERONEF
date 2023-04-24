@@ -71,21 +71,22 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {
         switch (message) {
             //vérifie le type du message et en crée une instance
             case AircraftIdentificationMessage messageIdentification -> { //message d'identification
+                //met à jour le timestamps
+                stateSetter.setLastMessageTimeStampNs(messageIdentification.timeStampNs());
 
                 //met à jour la catégorie et le call sign
                 stateSetter.setCategory(messageIdentification.category());
                 stateSetter.setCallSign(messageIdentification.callSign());
 
-                //met à jour le timestamps
-                stateSetter.setLastMessageTimeStampNs(messageIdentification.timeStampNs());
+
             }
             case AirborneVelocityMessage messageVelocity -> { //message de vitesse et direction
+                // met à jour le timestamps
+                stateSetter.setLastMessageTimeStampNs(messageVelocity.timeStampNs());
+
                 //met à jour la vitesse et la direction
                 stateSetter.setVelocity(messageVelocity.speed());
                 stateSetter.setTrackOrHeading(messageVelocity.trackOrHeading());
-
-                //met à jour le timestamps
-                stateSetter.setLastMessageTimeStampNs(messageVelocity.timeStampNs());
             }
             case AirbornePositionMessage messagePosition -> { //message de position
 
@@ -94,8 +95,8 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {
                 messagesPositions[messagePositionParity] = messagePosition;
 
                 //met à jour l'altitude et le time stamps
-                stateSetter.setAltitude(messagePosition.altitude());
                 stateSetter.setLastMessageTimeStampNs(messagePosition.timeStampNs());
+                stateSetter.setAltitude(messagePosition.altitude());
 
                 if (checkValidPosition()) { //met à jour la position si elle est valide
                     double xEven = messagesPositions[EVEN_INDEX].x();

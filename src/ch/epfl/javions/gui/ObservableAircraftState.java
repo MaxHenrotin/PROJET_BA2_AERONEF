@@ -42,6 +42,8 @@ public final class ObservableAircraftState implements AircraftStateSetter {
 
     private ObservableList<AirbornePosition> trajectory;
 
+    private long lastUpdateTrajectoryTimeStampsNs;
+
 
     /**
      * Constructeur
@@ -58,7 +60,6 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     public IcaoAddress getIcaoAddress() { return icaoAddress; }
 
     public AircraftData getAircraftData() { return aircraftData; }
-
 
     @Override
     public void setLastMessageTimeStampNs(long timeStampNs) {
@@ -101,6 +102,8 @@ public final class ObservableAircraftState implements AircraftStateSetter {
 
     @Override
     public void setPosition(GeoPos position) {
+        updateTrajectory(new AirbornePosition(position,this.altitude.getValue()));
+
         this.position.set(position);
     }
 
@@ -114,6 +117,8 @@ public final class ObservableAircraftState implements AircraftStateSetter {
 
     @Override
     public void setAltitude(double altitude) {
+        updateTrajectory(new AirbornePosition(this.position.getValue(),altitude));
+
         this.altitude.set(altitude);
     }
 
@@ -154,5 +159,17 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         return FXCollections.unmodifiableObservableList(trajectory);
     }
 
-    public record AirbornePosition(GeoPos position, int altitude){}
+    private void updateTrajectory(AirbornePosition airbornePosition){
+        if(trajectory == null || !this.position.equals(airbornePosition.position())){
+
+            lastUpdateTrajectoryTimeStampsNs = lastMessageTimeStampNs.getValue();
+            trajectory.add(airbornePosition);
+
+        }else if(lastUpdateTrajectoryTimeStampsNs == lastMessageTimeStampNs.getValue()){
+            trajectory.remove(trajectory.size() - 1);
+            trajectory.add(airbornePosition);
+        }
+    }
+
+    public record AirbornePosition(GeoPos position, double altitude){}
 }
