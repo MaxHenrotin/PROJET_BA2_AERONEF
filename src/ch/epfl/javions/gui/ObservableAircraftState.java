@@ -7,6 +7,8 @@ import ch.epfl.javions.adsb.CallSign;
 import ch.epfl.javions.aircraft.AircraftData;
 import ch.epfl.javions.aircraft.IcaoAddress;
 
+import javax.swing.text.Position;
+
 
 /**
  * représente l'état d'un aeronef (observable au sens du patron de conception Observer)
@@ -36,6 +38,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     public IcaoAddress getIcaoAddress() { return icaoAddress; }
 
     public AircraftData getAircraftData() { return aircraftData; }
+
 
     @Override
     public void setLastMessageTimeStampNs(long timeStampNs) {
@@ -72,4 +75,5 @@ public final class ObservableAircraftState implements AircraftStateSetter {
 
     }
 
+    public record AirbornePosition(Position position,int altitude){}
 }
