@@ -64,9 +64,17 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         this.lastMessageTimeStampNs.set(timeStampNs);
     }
 
+    public long getLastMessageTimeStampsNs(){
+        return lastMessageTimeStampNs.getValue();
+    }
+
     @Override
     public void setCategory(int category) {
         this.category.set(category);
+    }
+
+    public int getCategory(){
+        return category.getValue();
     }
 
     @Override
@@ -74,9 +82,17 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         this.callSign.set(callSign);
     }
 
+    public CallSign getCallSign() {
+        return callSign.getValue();
+    }
+
     @Override
     public void setPosition(GeoPos position) {
         this.position.set(position);
+    }
+
+    public GeoPos getPosition(){
+        return position.getValue();
     }
 
     @Override
@@ -84,9 +100,17 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         this.altitude.set(altitude);
     }
 
+    public double getAltitude() {
+        return altitude.getValue();
+    }
+
     @Override
     public void setVelocity(double velocity) {
         this.velocity.set(velocity);
+    }
+
+    public double getVelocity() {
+        return velocity.getValue();
     }
 
     @Override
@@ -94,5 +118,9 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         this.trackOrHeading.set(trackOrHeading);
     }
 
-    public record AirbornePosition(Position position,int altitude){}
+    public double getTrackOrHeading() {
+        return trackOrHeading.getValue();
+    }
+
+    public record AirbornePosition(GeoPos position, int altitude){}
 }
