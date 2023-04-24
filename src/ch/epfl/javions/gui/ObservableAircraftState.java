@@ -2,7 +2,6 @@ package ch.epfl.javions.gui;
 //  Author:    Max Henrotin
 
 import ch.epfl.javions.GeoPos;
-import ch.epfl.javions.adsb.AirbornePositionMessage;
 import ch.epfl.javions.adsb.AircraftStateSetter;
 import ch.epfl.javions.adsb.CallSign;
 import ch.epfl.javions.aircraft.AircraftData;
@@ -10,9 +9,6 @@ import ch.epfl.javions.aircraft.IcaoAddress;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-import javax.swing.text.Position;
-import java.util.List;
 
 
 /**
@@ -42,7 +38,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
 
     private ObservableList<AirbornePosition> trajectory;
 
-    private ObservableList<AirbornePosition> viewTrajectory;
+    private ObservableList<AirbornePosition> viewOfTrajectory;
 
     private long lastUpdateTrajectoryTimeStampsNs;
 
@@ -58,7 +54,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         this.aircraftData = aircraftData;
 
         trajectory = FXCollections.observableArrayList();
-        viewTrajectory = FXCollections.unmodifiableObservableList(trajectory);
+        viewOfTrajectory = FXCollections.unmodifiableObservableList(trajectory);
     }
 
     public IcaoAddress getIcaoAddress() { return icaoAddress; }
@@ -160,7 +156,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     public ObservableList<AirbornePosition> trajectoryProperty() {
-        return viewTrajectory;
+        return viewOfTrajectory;
     }
 
     private void updateTrajectory(AirbornePosition airbornePosition){

@@ -3,12 +3,15 @@ package ch.epfl.javions.gui;
 
 import ch.epfl.javions.adsb.AircraftStateAccumulator;
 import ch.epfl.javions.adsb.AircraftStateSetter;
+import ch.epfl.javions.adsb.Message;
+import ch.epfl.javions.aircraft.AircraftData;
+import ch.epfl.javions.aircraft.AircraftDatabase;
 import ch.epfl.javions.aircraft.IcaoAddress;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Classe ayant pour but de garder à jour les états d'un ensemble d'aéronefs en fonction des messages reçus d'eux.
@@ -20,14 +23,60 @@ import java.util.Set;
 
 public final class AircraftStateManager {
 
+    private final static long ONE_MINUTE = (long) 60e9;
     /**
      * table associant un accumulateur d'état d'aéronef à l'adresse OACI de tout aéronef dont un message a été reçu récemment
      */
-    private Map< AircraftStateAccumulator<AircraftStateSetter> , IcaoAddress> managementTable = new HashMap<>();
+    private Map<IcaoAddress, AircraftStateAccumulator<ObservableAircraftState>> managementTable = new HashMap<>();
 
     /**
      * ensemble (observable) des états des aéronefs dont la position est connue
      */
-    private Set<ObservableAircraftState> observableAircraftStates = new HashSet<>();
 
+    private ObservableSet<ObservableAircraftState> observableAircraftStates;
+
+    private ObservableSet<ObservableAircraftState> viewOfObservableAircraftStates;
+
+    private long lastMessageTimeStampsNs;
+
+    private AircraftDatabase aircraftDatabase;
+    public AircraftStateManager(AircraftDatabase aircraftDatabase){
+        this.aircraftDatabase = aircraftDatabase;
+
+        observableAircraftStates = FXCollections.observableSet();
+        viewOfObservableAircraftStates = FXCollections.unmodifiableObservableSet(observableAircraftStates);
+        lastMessageTimeStampsNs = -1;
+    }
+
+    public ObservableSet<ObservableAircraftState> states(){
+        return viewOfObservableAircraftStates;
+    }
+
+    public void updateWithMessage(Message message) throws IOException {
+
+        IcaoAddress messageAdress = message.icaoAddress();
+        lastMessageTimeStampsNs = message.timeStampNs();
+
+        if(managementTable.containsKey(messageAdress)){
+            managementTable.get(messageAdress).update(message);
+        }else{
+            ObservableAircraftState observableAircraftState = new ObservableAircraftState
+                                                                        (messageAdress,
+                                                                                aircraftDatabase.get(messageAdress));
+
+            observableAircraftStates.add(observableAircraftState);
+            managementTable.put(messageAdress,
+                            new AircraftStateAccumulator<>
+                                    (observableAircraftState));
+        }
+    }
+
+    public void purge(){
+        for (ObservableAircraftState observableAircraftState: observableAircraftStates) {
+
+            if(lastMessageTimeStampsNs - observableAircraftState.getLastMessageTimeStampsNs() < ONE_MINUTE){
+                observableAircraftStates.remove(observableAircraftState);
+            }
+        }
+    }
 }
