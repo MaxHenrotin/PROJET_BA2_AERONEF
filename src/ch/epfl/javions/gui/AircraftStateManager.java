@@ -55,30 +55,30 @@ public final class AircraftStateManager {
     }
 
     public void updateWithMessage(Message message) throws IOException {
+        if(message != null) {
+            IcaoAddress messageAdress = message.icaoAddress();
+            lastMessageTimeStampsNs = message.timeStampNs();
 
-        IcaoAddress messageAdress = message.icaoAddress();
-        lastMessageTimeStampsNs = message.timeStampNs();
+            if (managementTable.containsKey(messageAdress)) {
 
-        if(managementTable.containsKey(messageAdress)){
+                managementTable.get(messageAdress).update(message);
 
-            managementTable.get(messageAdress).update(message);
+            } else {
+                ObservableAircraftState observableAircraftState = new ObservableAircraftState
+                        (messageAdress,
+                                aircraftDatabase.get(messageAdress));
 
-        }else{
-            ObservableAircraftState observableAircraftState = new ObservableAircraftState
-                                                                        (messageAdress,
-                                                                                aircraftDatabase.get(messageAdress));
-
-            observableAircraftStates.add(observableAircraftState);
-            managementTable.put(messageAdress,
-                            new AircraftStateAccumulator<>
-                                    (observableAircraftState));
+                observableAircraftStates.add(observableAircraftState);
+                managementTable.put(messageAdress,
+                        new AircraftStateAccumulator<>
+                                (observableAircraftState));
+            }
         }
     }
 
     public void purge(){
-        for (ObservableAircraftState observableAircraftState: observableAircraftStates) {
-
-            if(lastMessageTimeStampsNs - observableAircraftState.getLastMessageTimeStampsNs() < ONE_MINUTE){
+        for (ObservableAircraftState observableAircraftState : observableAircraftStates) {
+            if(lastMessageTimeStampsNs - observableAircraftState.getLastMessageTimeStampsNs() >= ONE_MINUTE){
                 observableAircraftStates.remove(observableAircraftState);
             }
         }
