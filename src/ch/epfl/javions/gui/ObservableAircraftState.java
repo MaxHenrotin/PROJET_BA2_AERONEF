@@ -8,6 +8,8 @@ import ch.epfl.javions.adsb.CallSign;
 import ch.epfl.javions.aircraft.AircraftData;
 import ch.epfl.javions.aircraft.IcaoAddress;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import javax.swing.text.Position;
 import java.util.List;
@@ -24,14 +26,15 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     private final IcaoAddress icaoAddress;
     private final AircraftData aircraftData;
 
-
     private LongProperty lastMessageTimeStampNs;
 
     private IntegerProperty category;
 
-    private ObjectProperty<CallSign> callSign = new SimpleObjectProperty<>();
+    private ObjectProperty<CallSign> callSign;
 
-    private ObjectProperty<GeoPos> position = new SimpleObjectProperty<>();
+    private ObjectProperty<GeoPos> position;
+
+    private ObservableList<AirbornePosition> trajectory;
 
     private DoubleProperty altitude;
 
@@ -39,7 +42,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
 
     private DoubleProperty trackOrHeading;
 
-    private List<AirbornePosition> trajectory;
+
 
 
     /**
@@ -64,9 +67,17 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         this.lastMessageTimeStampNs.set(timeStampNs);
     }
 
+    public ReadOnlyLongProperty lastMessageTimeStampNsProperty() {
+        return lastMessageTimeStampNs;
+    }
+
     @Override
     public void setCategory(int category) {
         this.category.set(category);
+    }
+
+    public ReadOnlyIntegerProperty categoryProperty() {
+        return category;
     }
 
     @Override
@@ -74,9 +85,21 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         this.callSign.set(callSign);
     }
 
+    public ReadOnlyObjectProperty<CallSign> callSignProperty() {
+        return callSign;
+    }
+
     @Override
     public void setPosition(GeoPos position) {
         this.position.set(position);
+    }
+
+    public ReadOnlyObjectProperty<GeoPos> positionProperty() {
+        return position;
+    }
+
+    public ObservableList<AirbornePosition> trajectoryProperty() {
+        return FXCollections.unmodifiableObservableList(trajectory);
     }
 
     @Override
@@ -84,9 +107,17 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         this.altitude.set(altitude);
     }
 
+    public ReadOnlyDoubleProperty altitudeProperty() {
+        return altitude;
+    }
+
     @Override
     public void setVelocity(double velocity) {
         this.velocity.set(velocity);
+    }
+
+    public ReadOnlyDoubleProperty velocityProperty() {
+        return velocity;
     }
 
     @Override
@@ -94,5 +125,9 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         this.trackOrHeading.set(trackOrHeading);
     }
 
-    public record AirbornePosition(Position position,int altitude){}
+    public ReadOnlyDoubleProperty trackOrHeadingProperty() {
+        return trackOrHeading;
+    }
+
+    public record AirbornePosition(GeoPos position,int altitude){}
 }
