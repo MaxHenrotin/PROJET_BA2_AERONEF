@@ -2,6 +2,7 @@ package ch.epfl.javions.gui;
 //  Author:    Max Henrotin
 
 import ch.epfl.javions.GeoPos;
+import ch.epfl.javions.adsb.AirbornePositionMessage;
 import ch.epfl.javions.adsb.AircraftStateSetter;
 import ch.epfl.javions.adsb.CallSign;
 import ch.epfl.javions.aircraft.AircraftData;
@@ -16,9 +17,26 @@ import ch.epfl.javions.aircraft.IcaoAddress;
  */
 
 public final class ObservableAircraftState implements AircraftStateSetter {
-
     private final IcaoAddress icaoAddress;
     private final AircraftData aircraftData;
+
+    private long lastMessageTimeStampNs;
+
+    private int category;
+
+    private CallSign callSign;
+
+    private GeoPos position;
+
+    //private List<AirbornePosition> trajectory;
+
+    private double altitude;
+
+    private double velocity;
+
+    private double trackOrHeading;
+
+
 
 
     /**
