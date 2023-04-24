@@ -24,13 +24,15 @@ import java.util.*;
 public final class AircraftStateManager {
 
     private final static long ONE_MINUTE = (long) 60e9;
+
     /**
      * table associant un accumulateur d'état d'aéronef à l'adresse OACI de tout aéronef dont un message a été reçu récemment
      */
     private Map<IcaoAddress, AircraftStateAccumulator<ObservableAircraftState>> managementTable = new HashMap<>();
 
     /**
-     * ensemble (observable) des états des aéronefs dont la position est connue
+     * Ensemble (observable) des états de tous les aéronefs dont la position est connue
+     * (en gros représente la liste de tous les aéronefs avec lesquels on est en train d'intéragir)
      */
 
     private ObservableSet<ObservableAircraftState> observableAircraftStates;
