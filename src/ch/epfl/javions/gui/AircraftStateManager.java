@@ -60,7 +60,9 @@ public final class AircraftStateManager {
         lastMessageTimeStampsNs = message.timeStampNs();
 
         if(managementTable.containsKey(messageAdress)){
+
             managementTable.get(messageAdress).update(message);
+
         }else{
             ObservableAircraftState observableAircraftState = new ObservableAircraftState
                                                                         (messageAdress,
