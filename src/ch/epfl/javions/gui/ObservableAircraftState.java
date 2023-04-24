@@ -7,8 +7,10 @@ import ch.epfl.javions.adsb.AircraftStateSetter;
 import ch.epfl.javions.adsb.CallSign;
 import ch.epfl.javions.aircraft.AircraftData;
 import ch.epfl.javions.aircraft.IcaoAddress;
+import javafx.beans.property.*;
 
 import javax.swing.text.Position;
+import java.util.List;
 
 
 /**
@@ -22,23 +24,22 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     private final IcaoAddress icaoAddress;
     private final AircraftData aircraftData;
 
-    private long lastMessageTimeStampNs;
 
-    private int category;
+    private LongProperty lastMessageTimeStampNs;
 
-    private CallSign callSign;
+    private IntegerProperty category;
 
-    private GeoPos position;
+    private ObjectProperty<CallSign> callSign = new SimpleObjectProperty<>();
 
-    //private List<AirbornePosition> trajectory;
+    private ObjectProperty<GeoPos> position = new SimpleObjectProperty<>();
 
-    private double altitude;
+    private DoubleProperty altitude;
 
-    private double velocity;
+    private DoubleProperty velocity;
 
-    private double trackOrHeading;
+    private DoubleProperty trackOrHeading;
 
-
+    private List<AirbornePosition> trajectory;
 
 
     /**
@@ -60,37 +61,37 @@ public final class ObservableAircraftState implements AircraftStateSetter {
 
     @Override
     public void setLastMessageTimeStampNs(long timeStampNs) {
-
+        this.lastMessageTimeStampNs.set(timeStampNs);
     }
 
     @Override
     public void setCategory(int category) {
-
+        this.category.set(category);
     }
 
     @Override
     public void setCallSign(CallSign callSign) {
-
+        this.callSign.set(callSign);
     }
 
     @Override
     public void setPosition(GeoPos position) {
-
+        this.position.set(position);
     }
 
     @Override
     public void setAltitude(double altitude) {
-
+        this.altitude.set(altitude);
     }
 
     @Override
     public void setVelocity(double velocity) {
-
+        this.velocity.set(velocity);
     }
 
     @Override
     public void setTrackOrHeading(double trackOrHeading) {
-
+        this.trackOrHeading.set(trackOrHeading);
     }
 
     public record AirbornePosition(Position position,int altitude){}
