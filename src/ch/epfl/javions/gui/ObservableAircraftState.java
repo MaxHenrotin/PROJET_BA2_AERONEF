@@ -30,11 +30,9 @@ public final class ObservableAircraftState implements AircraftStateSetter {
 
     private IntegerProperty category;
 
-    private ObjectProperty<CallSign> callSign;
+    private ObjectProperty<CallSign> callSign = new SimpleObjectProperty<>();
 
-    private ObjectProperty<GeoPos> position;
-
-    private ObservableList<AirbornePosition> trajectory;
+    private ObjectProperty<GeoPos> position = new SimpleObjectProperty<>();
 
     private DoubleProperty altitude;
 
@@ -42,7 +40,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
 
     private DoubleProperty trackOrHeading;
 
-
+    private ObservableList<AirbornePosition> trajectory;
 
 
     /**
@@ -71,6 +69,10 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         return lastMessageTimeStampNs;
     }
 
+    public long getLastMessageTimeStampsNs(){
+        return lastMessageTimeStampNs.getValue();
+    }
+
     @Override
     public void setCategory(int category) {
         this.category.set(category);
@@ -80,6 +82,10 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         return category;
     }
 
+    public int getCategory(){
+        return category.getValue();
+    }
+
     @Override
     public void setCallSign(CallSign callSign) {
         this.callSign.set(callSign);
@@ -87,6 +93,10 @@ public final class ObservableAircraftState implements AircraftStateSetter {
 
     public ReadOnlyObjectProperty<CallSign> callSignProperty() {
         return callSign;
+    }
+
+    public CallSign getCallSign() {
+        return callSign.getValue();
     }
 
     @Override
@@ -102,6 +112,10 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         return FXCollections.unmodifiableObservableList(trajectory);
     }
 
+    public GeoPos getPosition(){
+        return position.getValue();
+    }
+
     @Override
     public void setAltitude(double altitude) {
         this.altitude.set(altitude);
@@ -111,6 +125,10 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         return altitude;
     }
 
+    public double getAltitude() {
+        return altitude.getValue();
+    }
+
     @Override
     public void setVelocity(double velocity) {
         this.velocity.set(velocity);
@@ -118,6 +136,10 @@ public final class ObservableAircraftState implements AircraftStateSetter {
 
     public ReadOnlyDoubleProperty velocityProperty() {
         return velocity;
+    }
+
+    public double getVelocity() {
+        return velocity.getValue();
     }
 
     @Override
@@ -130,4 +152,9 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     public record AirbornePosition(GeoPos position,int altitude){}
+    public double getTrackOrHeading() {
+        return trackOrHeading.getValue();
+    }
+
+    public record AirbornePosition(GeoPos position, int altitude){}
 }
