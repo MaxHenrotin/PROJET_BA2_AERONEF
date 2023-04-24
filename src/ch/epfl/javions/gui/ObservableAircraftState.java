@@ -108,10 +108,6 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         return position;
     }
 
-    public ObservableList<AirbornePosition> trajectoryProperty() {
-        return FXCollections.unmodifiableObservableList(trajectory);
-    }
-
     public GeoPos getPosition(){
         return position.getValue();
     }
@@ -150,10 +146,12 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     public ReadOnlyDoubleProperty trackOrHeadingProperty() {
         return trackOrHeading;
     }
-
-    public record AirbornePosition(GeoPos position,int altitude){}
     public double getTrackOrHeading() {
         return trackOrHeading.getValue();
+    }
+
+    public ObservableList<AirbornePosition> trajectoryProperty() {
+        return FXCollections.unmodifiableObservableList(trajectory);
     }
 
     public record AirbornePosition(GeoPos position, int altitude){}
