@@ -24,23 +24,23 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     private final IcaoAddress icaoAddress;
     private final AircraftData aircraftData;
 
-    private LongProperty lastMessageTimeStampNs;
+    private final LongProperty lastMessageTimeStampNs;
 
-    private IntegerProperty category;
+    private final IntegerProperty category;
 
-    private ObjectProperty<CallSign> callSign;
+    private final ObjectProperty<CallSign> callSign;
 
-    private ObjectProperty<GeoPos> position;
+    private final ObjectProperty<GeoPos> position;
 
-    private DoubleProperty altitude;
+    private final DoubleProperty altitude;
 
-    private DoubleProperty velocity;
+    private final DoubleProperty velocity;
 
-    private DoubleProperty trackOrHeading;
+    private final DoubleProperty trackOrHeading;
 
-    private ObservableList<AirbornePosition> trajectory;
+    private final ObservableList<AirbornePosition> trajectory;
 
-    private ObservableList<AirbornePosition> viewOfTrajectory;
+    private final ObservableList<AirbornePosition> viewOfTrajectory;
 
     private long lastUpdateTrajectoryTimeStampsNs;
 

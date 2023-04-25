@@ -113,6 +113,7 @@ class AircraftStateManagerTest {
         }
     }
 
+    @Test
     public static void main(String[] args) throws URISyntaxException {
 
         URL res = AircraftStateManagerTest.class.getClassLoader().getResource("aircraft.zip");
@@ -159,9 +160,10 @@ class AircraftStateManagerTest {
                         }
                         System.out.format(alignFormat, state.getIcaoAddress().string(), callsign,
                                 state.getAircraftData().registration().string(),  state.getAircraftData().model(),
-                                state.getPosition().longitude(), state.getPosition().latitude(),
+                                Units.convert(state.getPosition().longitude(),Units.Angle.RADIAN,Units.Angle.DEGREE),
+                                Units.convert(state.getPosition().latitude(),Units.Angle.RADIAN,Units.Angle.DEGREE),
                                 state.getAltitude(),
-                                state.getVelocity(), state.getTrackOrHeading());
+                                (state.getVelocity()*3.6), state.getTrackOrHeading());
                         System.out.println("amog");
                     }
                 }
