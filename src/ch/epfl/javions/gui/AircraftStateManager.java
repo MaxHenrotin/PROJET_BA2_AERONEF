@@ -25,8 +25,8 @@ public final class AircraftStateManager {
 
     private final static long ONE_MINUTE = (long) 60e9;
 
-    /*
-     * table associant un accumulateur d'état d'aéronef à l'adresse OACI de tout aéronef dont un message a été reçu récemment
+    /**
+     * table associant un accumulateur d'état d'aéronef à l'adresse OACI de tout aéronef dont un message a été reçu
      */
     private Map<IcaoAddress, AircraftStateAccumulator<ObservableAircraftState>> managementTable;
 
@@ -78,7 +78,7 @@ public final class AircraftStateManager {
 
             if(currentObservableStateSetter.getPosition() != null) observableAircraftStates.add(currentObservableStateSetter);
 
-            }
+        }
 
     }
 
