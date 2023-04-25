@@ -43,65 +43,6 @@ class AircraftStateManagerTest {
         catch (IOException e) {}
     }
 
-    @Test
-    public void testSurDataBase(){
-
-        String dataBaseAdress = getClass().getResource("/aircraft.zip").getFile();
-        dataBaseAdress = URLDecoder.decode(dataBaseAdress, UTF_8);
-        AircraftDatabase aircraftDatabase = new AircraftDatabase(dataBaseAdress);
-
-        int counterToPurge = 0;
-
-        try (DataInputStream stream = new DataInputStream(
-                new BufferedInputStream(
-                        new FileInputStream("resources\\messages_20230318_0915.bin")))){
-
-            byte[] bytes = new byte[RawMessage.LENGTH];
-            AircraftStateManager aircraftStateManager = new AircraftStateManager(aircraftDatabase);
-
-            //System.out.println("OACI  Indicatif  Immat.   Modèle                      Longitude   Latitude   Alt.   Vit.");
-            //System.out.println("----------------------------------------------------------------------------------------");
-
-            while (true) {
-                long timeStampNs = stream.readLong();
-                int bytesRead = stream.readNBytes(bytes, 0, bytes.length);
-                assert bytesRead == RawMessage.LENGTH;
-                //ByteString message = new ByteString(bytes);
-                RawMessage message = RawMessage.of(timeStampNs,bytes);
-
-                for (int i = 0; i < 20; i++) {
-
-
-                    if (message != null) {
-
-                        aircraftStateManager.updateWithMessage(MessageParser.parse(message));
-
-                        List<ObservableAircraftState> states = new ArrayList<>(aircraftStateManager.states());
-                        states.sort(new AddressComparator());
-
-                        for (ObservableAircraftState s : states) {
-                            System.out.println(
-                                    (s.getIcaoAddress() == null ? "\t" : s.getIcaoAddress().string()) + "\t" +
-                                            (s.getCallSign() == null ? "\t" : s.getCallSign().string()) + "\t" +
-                                            (s.getAircraftData() == null ? "\t" : s.getAircraftData().registration().string()) + "\t" +
-                                            (s.getAircraftData() == null ? "\t" : s.getAircraftData().model()) + "\t" +
-                                            (s.getPosition() == null ? "\t" : s.getPosition().toString()) + "\t" +
-                                            (Math.rint(s.getAltitude())) + "\t" +
-                                            Math.rint(s.getVelocity() * 3.6));
-                        }
-                    }
-                }
-
-                aircraftStateManager.purge();
-
-            }
-        }
-        catch (EOFException e) { /* nothing to do */ }
-        catch (FileNotFoundException e) {}
-        catch (IOException e) {}
-    }
-
-
     private static class AddressComparator
             implements Comparator<ObservableAircraftState> {
         @Override
@@ -114,7 +55,7 @@ class AircraftStateManagerTest {
     }
 
     @Test
-    public static void main(String[] args) throws URISyntaxException {
+    public void testSurData() throws URISyntaxException {
 
         URL res = AircraftStateManagerTest.class.getClassLoader().getResource("aircraft.zip");
         File fileAircraftZip = Paths.get(res.toURI()).toFile();
