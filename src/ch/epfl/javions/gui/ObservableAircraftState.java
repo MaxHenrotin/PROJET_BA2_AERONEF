@@ -1,5 +1,4 @@
 package ch.epfl.javions.gui;
-//  Author:    Max Henrotin
 
 import ch.epfl.javions.GeoPos;
 import ch.epfl.javions.adsb.AircraftStateSetter;
@@ -21,6 +20,9 @@ import java.util.Objects;
  */
 
 public final class ObservableAircraftState implements AircraftStateSetter {
+
+    //===================================== Attributs privées ==========================================================
+
     private final IcaoAddress icaoAddress;
     private final AircraftData aircraftData;
 
@@ -44,6 +46,25 @@ public final class ObservableAircraftState implements AircraftStateSetter {
 
     private long lastUpdateTrajectoryTimeStampsNs;
 
+
+    //===================================== Méthodes privées ===========================================================
+
+    private void updateTrajectory(AirbornePosition airbornePosition){
+        if(trajectory.isEmpty() || !Objects.equals(this.position.get(),airbornePosition.position())){
+
+            lastUpdateTrajectoryTimeStampsNs = lastMessageTimeStampNs.getValue();
+            if(airbornePosition.position() != null){
+                trajectory.add(airbornePosition);
+            }
+
+        }else if(lastUpdateTrajectoryTimeStampsNs == lastMessageTimeStampNs.getValue()){
+            trajectory.remove(trajectory.size() - 1);
+            trajectory.add(airbornePosition);
+        }
+    }
+
+
+    //===================================== Méthodes publiques =========================================================
 
     /**
      * Constructeur d'un état d'aéronef
@@ -266,24 +287,11 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         return viewOfTrajectory;
     }
 
-    private void updateTrajectory(AirbornePosition airbornePosition){
-        if(trajectory.isEmpty() || !Objects.equals(this.position.get(),airbornePosition.position())){
-
-            lastUpdateTrajectoryTimeStampsNs = lastMessageTimeStampNs.getValue();
-            if(airbornePosition.position() != null){
-                trajectory.add(airbornePosition);
-            }
-
-        }else if(lastUpdateTrajectoryTimeStampsNs == lastMessageTimeStampNs.getValue()){
-            trajectory.remove(trajectory.size() - 1);
-            trajectory.add(airbornePosition);
-        }
-    }
-
     /**
      * Enregistrement imbriqué représentant une position d'aéronef (dans les 3 dimensions)
      * @param position : position de l'aéronef (dans les 2 dimensions longitude et latitude)
      * @param altitude : altitude de l'aéronef
      */
     public record AirbornePosition(GeoPos position, double altitude){}
+
 }

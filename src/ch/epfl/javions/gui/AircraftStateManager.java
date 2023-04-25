@@ -29,7 +29,7 @@ public final class AircraftStateManager {
 
     /*
      * table associant un accumulateur d'état d'aéronef à l'adresse OACI de tout aéronef
-     *  dont un message a été reçu récemment
+     *  dont un message a été reçu
      */
     private final Map<IcaoAddress, AircraftStateAccumulator<ObservableAircraftState>> managementTable;
 
