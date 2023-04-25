@@ -44,10 +44,12 @@ public final class AircraftStateManager {
     private AircraftDatabase aircraftDatabase;
     public AircraftStateManager(AircraftDatabase aircraftDatabase){
         this.aircraftDatabase = aircraftDatabase;
+
         managementTable = new HashMap<>();
 
         observableAircraftStates = FXCollections.observableSet();
         viewOfObservableAircraftStates = FXCollections.unmodifiableObservableSet(observableAircraftStates);
+
         lastMessageTimeStampsNs = -1;
     }
 
@@ -60,21 +62,24 @@ public final class AircraftStateManager {
             IcaoAddress messageAdress = message.icaoAddress();
             lastMessageTimeStampsNs = message.timeStampNs();
 
-            if (managementTable.containsKey(messageAdress)) {
-                managementTable.get(messageAdress).update(message);
-
-            } else {
+            if (!managementTable.containsKey(messageAdress)) {
                 ObservableAircraftState observableAircraftState = new ObservableAircraftState
-                                                                                    (messageAdress,
-                                                                                    aircraftDatabase.get(messageAdress));
-                AircraftStateAccumulator<ObservableAircraftState> newAccumulator = new AircraftStateAccumulator<>
-                                                                                            (observableAircraftState);
+                                                                        (messageAdress,
+                                                                            aircraftDatabase.get(messageAdress));
 
-                observableAircraftStates.add(observableAircraftState);
+                AircraftStateAccumulator<ObservableAircraftState> newAccumulator = new AircraftStateAccumulator<>(observableAircraftState);
                 managementTable.put(messageAdress, newAccumulator);
-                newAccumulator.update(message);
+
             }
-        }
+
+            ObservableAircraftState currentObservableStateSetter = managementTable.get(messageAdress).stateSetter();
+
+            managementTable.get(messageAdress).update(message);
+
+            if(currentObservableStateSetter.getPosition() != null) observableAircraftStates.add(currentObservableStateSetter);
+
+            }
+
     }
 
     public void purge(){

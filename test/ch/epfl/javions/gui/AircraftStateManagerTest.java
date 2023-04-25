@@ -159,7 +159,8 @@ class AircraftStateManagerTest {
                         }
                         System.out.format(alignFormat, state.getIcaoAddress().string(), callsign,
                                 state.getAircraftData().registration().string(),  state.getAircraftData().model(),
-                                state.getPosition().longitude(), state.getPosition().latitude(), state.getAltitude(),
+                                state.getPosition().longitude(), state.getPosition().latitude(),
+                                state.getAltitude(),
                                 state.getVelocity(), state.getTrackOrHeading());
                         System.out.println("amog");
                     }
