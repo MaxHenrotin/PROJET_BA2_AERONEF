@@ -29,6 +29,11 @@ public record AirbornePositionMessage
 
 
     //===================================== Attributs privées statiques ================================================
+    //===================================== Méthodes privées statiques =================================================
+    //===================================== Méthodes publiques statiques ===============================================
+    //===================================== Attributs privées ==========================================================
+    //===================================== Méthodes publiques =========================================================
+    //===================================== Méthodes privées ===========================================================
 
     //valeur utilisé pour transmettre l'information que l'altitude calculée est invalide
     private static final int INVALID_ALTITUDE_VALUE = -1;
