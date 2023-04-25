@@ -10,6 +10,8 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.Objects;
+
 
 /**
  * représente l'état d'un aeronef (observable au sens du patron de conception Observer)
@@ -168,10 +170,12 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     private void updateTrajectory(AirbornePosition airbornePosition){
-        if(trajectory == null || !this.position.equals(airbornePosition.position())){
+        if(trajectory.isEmpty() || !Objects.equals(this.position.getValue(),airbornePosition.position())){
 
             lastUpdateTrajectoryTimeStampsNs = lastMessageTimeStampNs.getValue();
-            trajectory.add(airbornePosition);
+            if(airbornePosition.position() != null){
+                trajectory.add(airbornePosition);
+            }
 
         }else if(lastUpdateTrajectoryTimeStampsNs == lastMessageTimeStampNs.getValue()){
             trajectory.remove(trajectory.size() - 1);

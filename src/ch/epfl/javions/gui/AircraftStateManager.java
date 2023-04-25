@@ -28,7 +28,7 @@ public final class AircraftStateManager {
     /**
      * table associant un accumulateur d'état d'aéronef à l'adresse OACI de tout aéronef dont un message a été reçu récemment
      */
-    private Map<IcaoAddress, AircraftStateAccumulator<ObservableAircraftState>> managementTable = new HashMap<>();
+    private Map<IcaoAddress, AircraftStateAccumulator<ObservableAircraftState>> managementTable;
 
     /**
      * Ensemble (observable) des états de tous les aéronefs dont la position est connue
@@ -44,6 +44,7 @@ public final class AircraftStateManager {
     private AircraftDatabase aircraftDatabase;
     public AircraftStateManager(AircraftDatabase aircraftDatabase){
         this.aircraftDatabase = aircraftDatabase;
+        managementTable = new HashMap<>();
 
         observableAircraftStates = FXCollections.observableSet();
         viewOfObservableAircraftStates = FXCollections.unmodifiableObservableSet(observableAircraftStates);
@@ -60,18 +61,18 @@ public final class AircraftStateManager {
             lastMessageTimeStampsNs = message.timeStampNs();
 
             if (managementTable.containsKey(messageAdress)) {
-
                 managementTable.get(messageAdress).update(message);
 
             } else {
                 ObservableAircraftState observableAircraftState = new ObservableAircraftState
-                        (messageAdress,
-                                aircraftDatabase.get(messageAdress));
+                                                                                    (messageAdress,
+                                                                                    aircraftDatabase.get(messageAdress));
+                AircraftStateAccumulator<ObservableAircraftState> newAccumulator = new AircraftStateAccumulator<>
+                                                                                            (observableAircraftState);
 
                 observableAircraftStates.add(observableAircraftState);
-                managementTable.put(messageAdress,
-                        new AircraftStateAccumulator<>
-                                (observableAircraftState));
+                managementTable.put(messageAdress, newAccumulator);
+                newAccumulator.update(message);
             }
         }
     }
