@@ -2,6 +2,9 @@ package ch.epfl.javions.gui;
 
 import javafx.scene.image.Image;
 
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,7 +23,8 @@ public class TileManager {
 
     private final String serverName;
 
-    private Map<TileId, Image> cacheMemory = new LinkedHashMap<>();
+    //constantes utilisées à la ligne suivante (HASHMAPCAPACITY = 100, DEFAULT_LOADFACTOR = 0.75f,ACCESSORDER = true)
+    private Map<TileId, Image> cacheMemory = new LinkedHashMap<>(100, 0.75f, true);
 
     /**
      * Enregistrement imbriqué représentant l'identité d'une tuile OSM
@@ -53,6 +57,17 @@ public class TileManager {
      * @return : image correspondant à la tuile OSM voulue
      */
     public Image imageOfTile(TileId tileId){
+        Image image = cacheMemory.get(tileId);
+        if(image != null){
+            return image;
+        }else {
+            image = new Image(filePath + "/" + tileId.zoomLevel() + "/" + tileId.x() + "/" + tileId.y() + ".png");
+            if (image != null) {
+                cacheMemory.put(tileId, image);
+                //supprimer automatiquement
+                return image;
+            }
+        }
         //recherche dans le cache mémoire
             //si existe, retourner image
             //sinon recherche dans le cache disque
