@@ -2,7 +2,6 @@ package ch.epfl.javions.gui;
 
 import javafx.scene.image.Image;
 
-import javax.imageio.ImageIO;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
@@ -23,6 +22,8 @@ import java.util.StringJoiner;
 
 public class TileManager {
 
+    //===================================== Attributs privées statiques ================================================
+
     private static final int CACHE_MEMORY_CAPACITY = 100;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final boolean CACHE_MEMORY_LINKED_IN_ACCESS_ORDER = true;
@@ -31,11 +32,53 @@ public class TileManager {
     private static final String FILE_EXTENSION = ".png";
     private static final String HTTPS_PROTOCOL_CONSTANT = "https://";
 
+
+    //===================================== Attributs privées ==========================================================
+
     private final Path filePath;
     private final String serverName;    //p.ex : "tile.openstreetmap.org"
-    private Map<TileId, Image> cacheMemory = new LinkedHashMap<>(CACHE_MEMORY_CAPACITY, DEFAULT_LOAD_FACTOR, CACHE_MEMORY_LINKED_IN_ACCESS_ORDER);
-    private Iterator<TileId> cacheMemoryIterator = cacheMemory.keySet().iterator();
+    private final Map<TileId, Image> cacheMemory = new LinkedHashMap<>(
+            CACHE_MEMORY_CAPACITY, DEFAULT_LOAD_FACTOR, CACHE_MEMORY_LINKED_IN_ACCESS_ORDER);
 
+
+    //===================================== Méthodes privées ===========================================================
+
+    private void deleteCacheMemoryLRUIfFull(){
+        if(cacheMemory.size() >= CACHE_MEMORY_CAPACITY){
+            Iterator<TileId> cacheMemoryIterator = cacheMemory.keySet().iterator();
+            TileId keyToRemove = cacheMemoryIterator.next();
+            cacheMemory.remove(keyToRemove);
+        }
+    }
+
+    private Path DiscPathOfTile(TileId tileId) {
+        return filePath
+                .resolve(String.valueOf(tileId.zoomLevel()))
+                .resolve(String.valueOf(tileId.x()))
+                .resolve(tileId.y() + FILE_EXTENSION);
+    }
+
+    private void createDirectoryForTile(TileId tileId) throws IOException{
+        Path directoryPath = filePath
+                .resolve(String.valueOf(tileId.zoomLevel))
+                .resolve(String.valueOf(tileId.x));
+        Files.createDirectories(directoryPath);
+    }
+
+    private URLConnection serverConnectionForTile(TileId tileId) throws IOException {
+        StringJoiner urlAdress = new StringJoiner("/", HTTPS_PROTOCOL_CONSTANT, FILE_EXTENSION);
+        urlAdress.add(serverName)
+                .add(String.valueOf(tileId.zoomLevel()))
+                .add(String.valueOf(tileId.x()))
+                .add(String.valueOf(tileId.y()));
+        URL url = new URL(urlAdress.toString());
+        URLConnection urlConnection = url.openConnection();
+        urlConnection.setRequestProperty(URL_CONNECTION_REQUEST_KEY, URL_CONNECTION_REQUEST_VALUE);
+        return urlConnection;
+    }
+
+
+    //===================================== Méthodes publiques =========================================================
 
     /**
      * Enregistrement imbriqué représentant l'identité d'une tuile OSM
@@ -76,53 +119,35 @@ public class TileManager {
             return image;
         }else {
             //sinon recherche dans le cache disque
-            Path imagePath = filePath
-                    .resolve(String.valueOf(tileId.zoomLevel()))
-                    .resolve(String.valueOf(tileId.x()))
-                    .resolve(tileId.y() + FILE_EXTENSION);
+            Path imagePath = DiscPathOfTile(tileId);
 
             if (Files.exists(imagePath)) {
                 // supprimer 100eme image du cache memoire si il y a 100
-                if(cacheMemory.size() >= CACHE_MEMORY_CAPACITY){
-                    TileId keyToRemove = cacheMemoryIterator.next();
-                    cacheMemory.remove(keyToRemove);
-                }
-                //puis placer dans cache memoire
+                deleteCacheMemoryLRUIfFull();
+                //recupere l'image depuis le cache disque
                 try(InputStream stream = new FileInputStream(imagePath.toFile())){
                     image = new Image(stream);
+                    //puis placer dans cache memoire
                     cacheMemory.put(tileId, image);
                     //puis retourner image
                     return image;
                 }
             }else{
                 //sinon télécharger depuis le serveur de tuiles
-                StringJoiner urlAdress = new StringJoiner("/", HTTPS_PROTOCOL_CONSTANT, FILE_EXTENSION);
-                urlAdress.add(serverName)
-                         .add(String.valueOf(tileId.zoomLevel()))
-                         .add(String.valueOf(tileId.x()))
-                         .add(String.valueOf(tileId.y()));
-                URL url = new URL(urlAdress.toString());
-                URLConnection urlConnection = url.openConnection();
-                urlConnection.setRequestProperty(URL_CONNECTION_REQUEST_KEY, URL_CONNECTION_REQUEST_VALUE);
-
-                //créer un nouveau repertoire disque si il n'existe pas
-                Path directoryPath = filePath
-                        .resolve(String.valueOf(tileId.zoomLevel()))
-                        .resolve(String.valueOf(tileId.x()));
-                Files.createDirectories(directoryPath);
+                URLConnection urlConnection = serverConnectionForTile(tileId);
 
                 try(InputStream inputStream = urlConnection.getInputStream();
-                    OutputStream outputStream = Files.newOutputStream(imagePath);){
-
+                    OutputStream outputStream = Files.newOutputStream(imagePath)){
+                    //copie le stream d'entrée dans un tableau d'octet
                     byte[] imageInBytes = inputStream.readAllBytes();
+
+                    //créer un nouveau repertoire disque si il n'existe pas
+                    createDirectoryForTile(tileId);
                     //placer dans le cache disque
                     outputStream.write(imageInBytes);
 
                     //puis supprimer 100eme image du cache memoire si il y a 100
-                    if(cacheMemory.size() >= CACHE_MEMORY_CAPACITY){
-                        TileId keyToRemove = cacheMemoryIterator.next();
-                        cacheMemory.remove(keyToRemove);
-                    }
+                    deleteCacheMemoryLRUIfFull();
                     //puis placer dans cache memoire
                     image = new Image(new ByteArrayInputStream(imageInBytes));
                     cacheMemory.put(tileId, image);
@@ -132,6 +157,4 @@ public class TileManager {
             }
         }
     }
-
-
 }
