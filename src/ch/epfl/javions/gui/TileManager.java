@@ -3,8 +3,10 @@ package ch.epfl.javions.gui;
 import javafx.scene.image.Image;
 
 import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,12 +21,15 @@ import java.util.Map;
 
 public class TileManager {
 
-    private final Path filePath;
+    private static final int CACHE_MEMORY_CAPACITY = 100;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final boolean CACHE_MEMORY_LINKED_IN_ACCESS_ORDER = true;
 
-    private final String serverName;
+    //constante pour .png ??
 
-    //constantes utilisées à la ligne suivante (HASHMAPCAPACITY = 100, DEFAULT_LOADFACTOR = 0.75f,ACCESSORDER = true)
-    private Map<TileId, Image> cacheMemory = new LinkedHashMap<>(100, 0.75f, true);
+    private final Path filePath;    //p.ex : "
+    private final String serverName;    //p.ex : "https://tile.openstreetmap.org"
+    private Map<TileId, Image> cacheMemory = new LinkedHashMap<>(CACHE_MEMORY_CAPACITY, DEFAULT_LOAD_FACTOR, CACHE_MEMORY_LINKED_IN_ACCESS_ORDER);
 
     /**
      * Enregistrement imbriqué représentant l'identité d'une tuile OSM
@@ -56,31 +61,51 @@ public class TileManager {
      * @param tileId : identité de la tuile OSM voulue
      * @return : image correspondant à la tuile OSM voulue
      */
-    public Image imageOfTile(TileId tileId){
+    public Image imageOfTile(TileId tileId) throws IOException {
+
+        //recherche dans le cache mémoire
         Image image = cacheMemory.get(tileId);
+        //si existe, retourner image
         if(image != null){
             return image;
         }else {
-            image = new Image(filePath + "/" + tileId.zoomLevel() + "/" + tileId.x() + "/" + tileId.y() + ".png");
-            if (image != null) {
-                cacheMemory.put(tileId, image);
-                //supprimer automatiquement
-                return image;
+            //sinon recherche dans le cache disque
+            Path imagePath = filePath
+                    .resolve(tileId.zoomLevel() + "")   //équivalent à : Integer.toString(tileId.zoomLevel())
+                    .resolve(tileId.x() + "")           //équivalent à : String.valueOf(tileId.x())
+                    .resolve(tileId.y() + ".png");
+
+            if (Files.exists(imagePath)) {
+                try(InputStream stream = new FileInputStream(imagePath.toFile())){
+                    image = new Image(stream);
+                    //si existe, placer dans cache memoire
+                    cacheMemory.put(tileId, image); //supprime automatiquement le 101e élément accédé (grâce au constructeur) ???? --> NON IL FAUT ENCORE GERER LA SUPPRESSION
+                    //puis supprimer 101eme image du cache memoire si il y a 101
+                    //puis retourner image
+                    return image;
+                }
+            }else{
+                //sinon télécharger depuis le serveur de tuiles
+                URL url = new URL(serverName
+                                    + "/" + tileId.zoomLevel() + "/" + tileId.x() + "/" + tileId.y() + ".png");
+                URLConnection urlConnection = url.openConnection();
+                urlConnection.setRequestProperty("User-Agent", "Javions");  //créer des constantes !!!
+
+                try(InputStream stream = urlConnection.getInputStream()){
+                    byte[] imageInBytes = stream.readAllBytes();
+
+                    //si existe, placer dans le cache disque
+
+                    image = new Image(new ByteArrayInputStream(imageInBytes));
+                    //puis placer dans cache memoire
+                    cacheMemory.put(tileId, image); //gerer suppression 101
+                    //puis supprimer 101eme image du cache memoire si il y a 101
+                    //puis retourner image
+                    return image;
+                }
+                //sinon throw Exception (automatique grace à try-with-resources)
             }
         }
-        //recherche dans le cache mémoire
-            //si existe, retourner image
-            //sinon recherche dans le cache disque
-                //si existe, placer dans cache memoire
-                            //puis supprimer 101eme image du cache memoire si il y a 101
-                            //puis retourner image
-                //sinon télécharger depuis le serveur de tuiles
-                        //si existe, placer dans le cache disque
-                                //puis placer dans cache memoire
-                                //puis supprimer 101eme image du cache memoire si il y a 101
-                                //puis retourner image
-                        //sinon throw Exeption
-        return null;
     }
 
 
