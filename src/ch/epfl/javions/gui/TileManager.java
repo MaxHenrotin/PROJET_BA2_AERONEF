@@ -136,13 +136,14 @@ public class TileManager {
                 //sinon télécharger depuis le serveur de tuiles
                 URLConnection urlConnection = serverConnectionForTile(tileId);
 
+                //créer un nouveau repertoire disque si il n'existe pas
+                createDirectoryForTile(tileId);
+
                 try(InputStream inputStream = urlConnection.getInputStream();
                     OutputStream outputStream = Files.newOutputStream(imagePath)){
                     //copie le stream d'entrée dans un tableau d'octet
                     byte[] imageInBytes = inputStream.readAllBytes();
 
-                    //créer un nouveau repertoire disque si il n'existe pas
-                    createDirectoryForTile(tileId);
                     //placer dans le cache disque
                     outputStream.write(imageInBytes);
 
