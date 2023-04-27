@@ -46,9 +46,7 @@ public final class MapParameters {
      * @param deltaZoom : différence de zoom que l'on veut appliqué au zoom actuel
      */
     public void changeZoomLevel(int deltaZoom){
-        zoom.set(zoom.get() + deltaZoom);
-        Preconditions.checkArgument(Math2.clamp(MIN_ZOOM,zoom.get(), MAX_ZOOM) == zoom.get());
-
+        zoom.set(Math2.clamp(MIN_ZOOM,zoom.get() + deltaZoom, MAX_ZOOM));
         minX.set(WebMercator.x(zoom.get(),minX.get()));
         minY.set(WebMercator.y(zoom.get(),minY.get()));
     }
