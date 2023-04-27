@@ -24,6 +24,8 @@ public class TileManager {
 
     //===================================== Attributs privées statiques ================================================
 
+    private static final int MIN_ZOOM = 6;
+    private static final int MAX_ZOOM = 19;
     private static final int CACHE_MEMORY_CAPACITY = 100;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final boolean CACHE_MEMORY_LINKED_IN_ACCESS_ORDER = true;
@@ -89,8 +91,8 @@ public class TileManager {
     public record TileId(int zoomLevel, int x, int y){
 
         public static boolean isValid(int zoomLevel, int x, int y){
-            int indexMax = 1<<zoomLevel - 1 ; //= 2^zoomLevel - 1
-            return zoomLevel >= 6 && zoomLevel <= 19 && x >=0 && x <= indexMax && y >= 0 && y <= indexMax;
+            int indexMax = 1 << zoomLevel; //= 2^zoomLevel
+            return zoomLevel >= MIN_ZOOM && zoomLevel <= MAX_ZOOM && x >=0 && x < indexMax && y >= 0 && y < indexMax;
         }
 
     }

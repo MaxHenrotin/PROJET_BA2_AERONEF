@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
         public void start(Stage primaryStage) throws Exception {
             new TileManager(Path.of("tile-cache"),
                     "tile.openstreetmap.org")
-                    .imageOfTile(new TileManager.TileId(17, 67947, 46355));
+                    .imageOfTile(new TileManager.TileId(0, 0, 0));
             Platform.exit();
         }
     }
