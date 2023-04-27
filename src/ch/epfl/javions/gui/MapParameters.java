@@ -63,26 +63,50 @@ public final class MapParameters {
         minY.set(minY.get() + y);
     }
 
+    /**
+     * Retourne la propriété minX
+     * @return : propriété de la coordonnée x du coin en haut à gauche de la partie visible
+     */
     public ReadOnlyDoubleProperty minXProperty(){
         return minX;
     }
 
+    /**
+     * Retourne la propiété minY
+     * @return propriété de la coordonnée y du coin en haut à gauche de la partie visible
+     */
     public ReadOnlyDoubleProperty minYProperty(){
         return minY;
     }
 
+    /**
+     * Retourne la propriété zoom
+     * @return : propriété du niveau de zoom
+     */
     public ReadOnlyIntegerProperty zoomProperty(){
         return zoom;
     }
 
+    /**
+     * Retourne la valeur de minX
+     * @return : coordonnée x du coin en haut à gauche
+     */
     public double getminX(){
         return minX.get();
     }
 
+    /**
+     * Retourne la valeur de minY
+     * @return : coordonnée y du coin en haut à gauche
+     */
     public double getminY(){
         return minY.get();
     }
 
+    /**
+     * Retourne la valeur de zoom
+     * @return : niveau de zoom
+     */
     public int getZoom(){
         return zoom.get();
     }
