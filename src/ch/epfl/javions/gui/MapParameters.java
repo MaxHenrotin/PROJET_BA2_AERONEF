@@ -47,8 +47,8 @@ public final class MapParameters {
      */
     public void changeZoomLevel(int deltaZoom){
         zoom.set(Math2.clamp(MIN_ZOOM,zoom.get() + deltaZoom, MAX_ZOOM));
-        minX.set(WebMercator.x(zoom.get(),minX.get()));
-        minY.set(WebMercator.y(zoom.get(),minY.get()));
+        //minX.set(WebMercator.x(zoom.get(),minX.get()));
+        //minY.set(WebMercator.y(zoom.get(),minY.get()));
     }
 
     /**

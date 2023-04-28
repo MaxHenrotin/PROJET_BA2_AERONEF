@@ -5,10 +5,15 @@ import ch.epfl.javions.GeoPos;
 import ch.epfl.javions.Units;
 import ch.epfl.javions.WebMercator;
 import javafx.application.Platform;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 
+import java.awt.*;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 
 /**
@@ -49,6 +54,40 @@ public class BaseMapController {
             assert oldS == null;
             newS.addPreLayoutPulseListener(this::redrawIfNeeded);
         });
+
+        LongProperty minScrollTime = new SimpleLongProperty();
+        pane.setOnScroll(e -> {
+            int zoomDelta = (int) Math.signum(e.getDeltaY());
+            if (zoomDelta == 0) return;
+
+            long currentTime = System.currentTimeMillis();
+            if (currentTime < minScrollTime.get()) return;
+            minScrollTime.set(currentTime + 200);
+
+            // … à faire : appeler les méthodes de MapParameters
+            System.out.println("change de zoom : "+zoomDelta);
+            double minX = mapParameters.getminX();
+            double minY = mapParameters.getminY();
+            mapParameters.scroll( e.getX() - minX,e.getY() - minY);
+            mapParameters.changeZoomLevel(zoomDelta);
+            mapParameters.scroll(minX - e.getX(),minY - e.getY());
+            redrawOnNextPulse();
+        });
+
+        SimpleObjectProperty<Point2D> mousePressed = new SimpleObjectProperty<>();
+
+        pane.setOnMousePressed(event -> {
+            mousePressed.set(new Point2D.Double(event.getX(),event.getY()));
+        });
+
+        pane.setOnMouseDragged(event ->{
+            mapParameters.scroll(mousePressed.get().getX() - event.getX(), mousePressed.get().getY() - event.getY());
+            mousePressed.set(new Point2D.Double(event.getX(),event.getY()));
+            redrawOnNextPulse();
+        });
+
+        pane.setOnMouseReleased(event -> redrawIfNeeded());
+
     }
 
     private void redrawOnNextPulse() {
