@@ -30,8 +30,8 @@ public final class MapParameters {
     /**
      * Constructeur
      * @param zoom : niveau de zoom
-     * @param minX : coordonnée x du coin en haut à gauche de la partie visible
-     * @param minY : coordonnée y du coin en haut à gauche de la partie visible
+     * @param minX : coordonnée x du coin en haut à gauche de la partie visible (dans le systeme de coordonnées WebMercator)
+     * @param minY : coordonnée y du coin en haut à gauche de la partie visible (dans le systeme de coordonnées WebMercator)
      */
     public MapParameters(int zoom,double minX, double minY){
         Preconditions.checkArgument(Math2.clamp(MIN_ZOOM,zoom, MAX_ZOOM) == zoom);
