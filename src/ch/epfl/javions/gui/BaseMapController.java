@@ -41,6 +41,9 @@ public class BaseMapController {
         return new Pane();
     }
 
+    private int coordonneesToTileIndex(double coord){
+        return (int) Math.floor(coord / 256d);
+    }
     public void centerOn(GeoPos newCenter){
 
     }
