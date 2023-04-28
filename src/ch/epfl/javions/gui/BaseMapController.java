@@ -30,9 +30,13 @@ public class BaseMapController {
         canvas.widthProperty().bind(pane.widthProperty());
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
+
         return new Pane();
     }
 
+    private int coordonneesToTileIndex(double coord){
+        return (int) Math.floor(coord / 256d);
+    }
     public void centerOn(GeoPos newCenter){
 
     }
