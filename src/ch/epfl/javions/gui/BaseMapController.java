@@ -66,27 +66,32 @@ public class BaseMapController {
 
             // … à faire : appeler les méthodes de MapParameters
             System.out.println("change de zoom : "+zoomDelta);
-            double minX = mapParameters.getminX();
-            double minY = mapParameters.getminY();
-            mapParameters.scroll( e.getX() - minX,e.getY() - minY);
+            double deltaX = e.getX() - mapParameters.getminX();
+            double deltaY = e.getY() - mapParameters.getminY();
+            System.out.println("zoom avant scroll : "+mapParameters.getZoom());
+            System.out.println("coin avant scroll : "+mapParameters.getminX()+" "+mapParameters.getminY());
+            mapParameters.scroll(deltaX,deltaY);
             mapParameters.changeZoomLevel(zoomDelta);
-            mapParameters.scroll(minX - e.getX(),minY - e.getY());
+            mapParameters.scroll(-deltaX,-deltaY);
+            System.out.println("zoom après scroll : "+mapParameters.getZoom());
+            System.out.println("coin après scroll : "+mapParameters.getminX()+" "+mapParameters.getminY());
+
             redrawOnNextPulse();
         });
 
-        SimpleObjectProperty<Point2D> mousePressed = new SimpleObjectProperty<>();
+        SimpleObjectProperty<Point2D> mouseCoordinate = new SimpleObjectProperty<>();
 
         pane.setOnMousePressed(event -> {
-            mousePressed.set(new Point2D.Double(event.getX(),event.getY()));
+            mouseCoordinate.set(new Point2D.Double(event.getX(),event.getY()));
         });
 
         pane.setOnMouseDragged(event ->{
-            mapParameters.scroll(mousePressed.get().getX() - event.getX(), mousePressed.get().getY() - event.getY());
-            mousePressed.set(new Point2D.Double(event.getX(),event.getY()));
+            mapParameters.scroll(mouseCoordinate.get().getX() - event.getX(), mouseCoordinate.get().getY() - event.getY());
+            mouseCoordinate.set(new Point2D.Double(event.getX(),event.getY()));
             redrawOnNextPulse();
         });
 
-        pane.setOnMouseReleased(event -> redrawIfNeeded());
+        pane.setOnMouseReleased(event -> redrawOnNextPulse());
 
     }
 
