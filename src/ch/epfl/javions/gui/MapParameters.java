@@ -37,8 +37,8 @@ public final class MapParameters {
         Preconditions.checkArgument(Math2.clamp(MIN_ZOOM,zoom, MAX_ZOOM) == zoom);
 
         this.zoom = new SimpleIntegerProperty(zoom);
-        this.minX = new SimpleDoubleProperty(WebMercator.x(zoom,minX));
-        this.minY = new SimpleDoubleProperty(WebMercator.y(zoom,minY));
+        this.minX = new SimpleDoubleProperty(minX);
+        this.minY = new SimpleDoubleProperty(minY);
     }
 
     /**
