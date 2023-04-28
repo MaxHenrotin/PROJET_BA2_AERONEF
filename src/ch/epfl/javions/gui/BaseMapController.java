@@ -1,6 +1,9 @@
 package ch.epfl.javions.gui;
 
+
 import ch.epfl.javions.GeoPos;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 
 /**
@@ -14,12 +17,21 @@ public class BaseMapController {
 
     private MapParameters mapParameters;
     private TileManager tileManager;
+
+
     public BaseMapController(TileManager tileManager,MapParameters mapParameters){
         this.mapParameters = mapParameters;
         this.tileManager = tileManager;
+
     }
 
-    public Pane pane(){}
+    public Pane pane(Canvas canvas){
+        Pane pane = new Pane();
+        canvas.widthProperty().bind(pane.widthProperty());
+        GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
+
+        return new Pane();
+    }
 
     public void centerOn(GeoPos newCenter){
 
