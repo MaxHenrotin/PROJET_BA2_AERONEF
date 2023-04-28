@@ -30,6 +30,14 @@ public class BaseMapController {
         canvas.widthProperty().bind(pane.widthProperty());
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
+        double gauche = mapParameters.getminX();
+        double haut = mapParameters.getminY();
+        double droite = gauche + canvas.getWidth();
+        double bas = haut + canvas.getHeight();
+        int zoom = mapParameters.getZoom();
+
+        TileManager.TileId tileIdGaucheHaut = coordonneesToTileIndex(zoom,gauche,haut);
+
         return new Pane();
     }
 
