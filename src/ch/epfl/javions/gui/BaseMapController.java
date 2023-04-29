@@ -2,7 +2,6 @@ package ch.epfl.javions.gui;
 
 
 import ch.epfl.javions.GeoPos;
-import ch.epfl.javions.Units;
 import ch.epfl.javions.WebMercator;
 import javafx.application.Platform;
 import javafx.beans.property.LongProperty;
@@ -12,7 +11,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 
@@ -114,7 +112,7 @@ public class BaseMapController {
         int decalageX = (int) (minX % TILE_SIZE_IN_PIXEL);
         int decalageY = (int) (minY % TILE_SIZE_IN_PIXEL);
 
-        TileManager.TileId[][] tabOfTileId = initTable(minX,minY,maxX,maxY,zoom);
+        TileManager.TileId[][] tabOfTileId = tabOfTileId(minX,minY,maxX,maxY,zoom);
 
 
         for (int i = 0; i < tabOfTileId.length; i++) {
@@ -134,7 +132,7 @@ public class BaseMapController {
         return (int) Math.floor(coord / 256d);
     }
 
-    private TileManager.TileId[][] initTable(double minX,double minY,double maxX,double maxY,int zoom){
+    private TileManager.TileId[][] tabOfTileId(double minX, double minY, double maxX, double maxY, int zoom){
         int minXTileId = coordonneesToTileIndex(minX);
         int minYTileId = coordonneesToTileIndex(minY);
         int maxXTileId = coordonneesToTileIndex(maxX);
