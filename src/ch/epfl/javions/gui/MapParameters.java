@@ -50,11 +50,11 @@ public final class MapParameters {
         }
         zoom.set(Math2.clamp(MIN_ZOOM,zoom.get() + deltaZoom, MAX_ZOOM));
         if(deltaZoom < 0){
-            minX.set(minX.get()/(2*(-deltaZoom)));
-            minY.set(minY.get()/2*(-deltaZoom));
+            minX.set(minX.get() / Math.scalb(1,-deltaZoom));
+            minY.set(minY.get() / Math.scalb(1,-deltaZoom));
         }else{
-            minX.set(minX.get()*2*deltaZoom);
-            minY.set(minY.get()*2*deltaZoom);
+            minX.set(minX.get() * Math.scalb(1,deltaZoom));
+            minY.set(minY.get() * Math.scalb(1,deltaZoom));
         }
     }
 
