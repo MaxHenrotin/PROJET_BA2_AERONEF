@@ -65,18 +65,13 @@ public class BaseMapController {
             minScrollTime.set(currentTime + 200);
 
             // … à faire : appeler les méthodes de MapParameters
-            System.out.println("change de zoom : "+zoomDelta);
-            double deltaX = mapParameters.getminX() - e.getX();
-            double deltaY = mapParameters.getminY() - e.getY();
-            //System.out.println("zoom avant scroll : "+mapParameters.getZoom());
-            //System.out.println("coin avant scroll : "+mapParameters.getminX()+" "+mapParameters.getminY());
-            //System.out.println("decalage : "+deltaX+" "+deltaY);
-            //mapParameters.scroll(deltaX,deltaY);
-            mapParameters.changeZoomLevel(zoomDelta);
-            //mapParameters.scroll(-deltaX,-deltaY);
-            //System.out.println("zoom après scroll : "+mapParameters.getZoom());
-            //System.out.println("coin après scroll : "+mapParameters.getminX()+" "+mapParameters.getminY());
 
+            double deltaX = e.getX();
+            double deltaY = e.getY();
+            mapParameters.scroll(deltaX,deltaY);
+            mapParameters.changeZoomLevel(zoomDelta);
+            mapParameters.scroll(-deltaX,-deltaY);
+            System.out.println("zoom : "+mapParameters.getZoom());
             redrawOnNextPulse();
         });
 
