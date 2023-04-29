@@ -2,7 +2,6 @@ package ch.epfl.javions.gui;
 
 import ch.epfl.javions.Math2;
 import ch.epfl.javions.Preconditions;
-import ch.epfl.javions.WebMercator;
 import javafx.beans.property.*;
 
 /**
@@ -46,9 +45,17 @@ public final class MapParameters {
      * @param deltaZoom : différence de zoom que l'on veut appliqué au zoom actuel
      */
     public void changeZoomLevel(int deltaZoom){
+        if (deltaZoom == 0){
+            return;
+        }
         zoom.set(Math2.clamp(MIN_ZOOM,zoom.get() + deltaZoom, MAX_ZOOM));
-        //minX.set(WebMercator.x(zoom.get(),minX.get()));
-        //minY.set(WebMercator.y(zoom.get(),minY.get()));
+        if(deltaZoom < 0){
+            minX.set(minX.get()/(2*(-deltaZoom)));
+            minY.set(minY.get()/2*(-deltaZoom));
+        }else{
+            minX.set(minX.get()*2*deltaZoom);
+            minY.set(minY.get()*2*deltaZoom);
+        }
     }
 
     /**
