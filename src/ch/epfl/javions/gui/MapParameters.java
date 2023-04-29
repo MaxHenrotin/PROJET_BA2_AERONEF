@@ -45,17 +45,15 @@ public final class MapParameters {
      * @param deltaZoom : différence de zoom que l'on veut appliqué au zoom actuel
      */
     public void changeZoomLevel(int deltaZoom){
-        if (deltaZoom == 0){
-            return;
-        }
-        zoom.set(Math2.clamp(MIN_ZOOM,zoom.get() + deltaZoom, MAX_ZOOM));
-        if(deltaZoom < 0){
+        if (deltaZoom == 0) return;
+        if(deltaZoom < 0 && zoom.get() != MIN_ZOOM){
             minX.set(minX.get() / Math.scalb(1,-deltaZoom));
             minY.set(minY.get() / Math.scalb(1,-deltaZoom));
-        }else{
+        }else if(deltaZoom > 0 && zoom.get() != MAX_ZOOM){
             minX.set(minX.get() * Math.scalb(1,deltaZoom));
             minY.set(minY.get() * Math.scalb(1,deltaZoom));
         }
+        zoom.set(Math2.clamp(MIN_ZOOM,zoom.get() + deltaZoom, MAX_ZOOM));
     }
 
     /**

@@ -62,6 +62,9 @@ public class BaseMapController {
             if (currentTime < minScrollTime.get()) return;
             minScrollTime.set(currentTime + 200);
 
+
+
+
             // … à faire : appeler les méthodes de MapParameters
 
             double deltaX = e.getX();
