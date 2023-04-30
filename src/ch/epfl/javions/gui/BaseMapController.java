@@ -27,7 +27,7 @@ public class BaseMapController {
     //===================================== Attributs privées statiques ================================================
     public static final double TILE_SIZE_IN_PIXEL = 256d;
 
-    public static final int ARBITRARY_PREDOWNLOAD_SIZE = 2;
+    public static final int ARBITRARY_PREDOWNLOAD_SIZE = 2; //pastrop grand pour pas perdre l'utilité du cache memoire
 
     //===================================== Attributs privées ==========================================================
     private boolean redrawNeeded = true;
