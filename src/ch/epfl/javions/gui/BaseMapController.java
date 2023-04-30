@@ -7,6 +7,7 @@ import javafx.application.Platform;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.concurrent.Task;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
@@ -26,8 +27,12 @@ public class BaseMapController {
     //===================================== Attributs privées statiques ================================================
     public static final double TILE_SIZE_IN_PIXEL = 256d;
 
+    public static final int ARBITRARY_PREDOWNLOAD_SIZE = 2;
+
     //===================================== Attributs privées ==========================================================
     private boolean redrawNeeded = true;
+
+    private boolean tilesPrepared = false;
 
     private final TileManager tileManager;
 
@@ -44,9 +49,19 @@ public class BaseMapController {
         Platform.requestNextPulse();
     }
     private void redrawIfNeeded(){
-        if (!redrawNeeded) return;
+        if (!redrawNeeded) {
+            //pour potentiellement gagner en fluidité (prétéléchargement des tuiles) à voir si c'est utile et sans souci
+            /*
+            if (!canvas.isPressed() && !tilesPrepared) {
+                prepareTiles();
+                tilesPrepared = true;
+            }
+             */
+            return;
+        }
         redrawNeeded = false;
         redraw();
+        tilesPrepared = false;
     }
 
     private void redraw() {
@@ -64,13 +79,13 @@ public class BaseMapController {
         int decalageY = (int) (minY % TILE_SIZE_IN_PIXEL);
 
         //récupère l'ensemble des TileId coresspondant aux tuiles qu'il faut dessiner
-        TileManager.TileId[][] tabOfTileId = tabOfTileId(minX,minY,maxX,maxY,zoom);
+        TileManager.TileId[][] tabOfTileIdToDisplay = tabOfTileIdToDisplay(minX,minY,maxX,maxY,zoom);
 
         //dessine toutes les tuiles en récupérant les images grâce au TileManager
-        for (int i = 0; i < tabOfTileId.length; i++) {
-            for (int j = 0; j < tabOfTileId[0].length; j++) {
+        for (int i = 0; i < tabOfTileIdToDisplay.length; i++) {
+            for (int j = 0; j < tabOfTileIdToDisplay[0].length; j++) {
                 try {
-                    graphicsContext.drawImage(tileManager.imageOfTile(tabOfTileId[i][j]),
+                    graphicsContext.drawImage(tileManager.imageOfTile(tabOfTileIdToDisplay[i][j]),
                                         TILE_SIZE_IN_PIXEL * i - decalageX, TILE_SIZE_IN_PIXEL * j - decalageY);
                 }catch (IOException e) {
                     //fait rien
@@ -83,7 +98,7 @@ public class BaseMapController {
         return (int) Math.floor(coord / 256d);
     }
 
-    private TileManager.TileId[][] tabOfTileId(double minX, double minY, double maxX, double maxY, int zoom){
+    private TileManager.TileId[][] tabOfTileIdToDisplay(double minX, double minY, double maxX, double maxY, int zoom){
         int minXTileId = coordonneesToTileIndex(minX);
         int minYTileId = coordonneesToTileIndex(minY);
         int maxXTileId = coordonneesToTileIndex(maxX);
@@ -98,6 +113,31 @@ public class BaseMapController {
         return tabOfTileId;
     }
 
+    //pour potentiellement gagner en fluidité (prétéléchargement des tuiles) à voir si c'est utile et sans soucis
+    private void prepareTiles(){
+
+        int minXTileId = coordonneesToTileIndex(mapParameters.getminX());
+        int minYTileId = coordonneesToTileIndex(mapParameters.getminY());
+        int maxXTileId = coordonneesToTileIndex(mapParameters.getminX() + canvas.getWidth() + TILE_SIZE_IN_PIXEL);
+        int maxYTileId = coordonneesToTileIndex(mapParameters.getminY() + canvas.getHeight() + TILE_SIZE_IN_PIXEL);
+
+        int sizeX = maxXTileId-minXTileId+2*ARBITRARY_PREDOWNLOAD_SIZE;
+        int sizeY = maxYTileId-minYTileId+2*ARBITRARY_PREDOWNLOAD_SIZE;
+
+        for (int i = 0; i < sizeX; i++) {
+            for (int j = 0; j < sizeY; j++) {
+                if(i==0 || j==0 || i==sizeX-1 || j==sizeY-1) {
+                    try {
+                        tileManager.imageOfTile(new TileManager.TileId(mapParameters.getZoom(),
+                                minXTileId + i + ARBITRARY_PREDOWNLOAD_SIZE, minYTileId + j + ARBITRARY_PREDOWNLOAD_SIZE));
+                    } catch (IOException e) {
+                        //fait rien
+                    }
+                }
+            }
+        }
+    }
+
     private void eventHandler(){
         //observer de la largeur du canvas et qui le redessine quand il change
         canvas.widthProperty().addListener((observable, oldValue, newValue) -> redrawOnNextPulse());
@@ -105,7 +145,7 @@ public class BaseMapController {
         //observer de la hauteur du canvas et qui le redessine quand il change
         canvas.heightProperty().addListener((observable, oldValue, newValue) -> redrawOnNextPulse());
 
-        //permet de retarder le redessin du canvas
+        //retarde le redessin du canvas pour faire des économies de ressources et ne pas dessiner trop souvent
         canvas.sceneProperty().addListener((p, oldS, newS) -> {
             assert oldS == null;
             newS.addPreLayoutPulseListener(this::redrawIfNeeded);
@@ -128,7 +168,6 @@ public class BaseMapController {
             mapParameters.scroll(deltaX,deltaY);
             mapParameters.changeZoomLevel(zoomDelta);
             mapParameters.scroll(-deltaX,-deltaY);
-            System.out.println("zoom : "+mapParameters.getZoom());
             redrawOnNextPulse();
         });
 
