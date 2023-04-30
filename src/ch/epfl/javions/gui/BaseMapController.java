@@ -23,74 +23,21 @@ import java.io.IOException;
 
 public class BaseMapController {
 
+    //===================================== Attributs privées statiques ================================================
     public static final double TILE_SIZE_IN_PIXEL = 256d;
-    private MapParameters mapParameters;
+
+    //===================================== Attributs privées ==========================================================
+    private boolean redrawNeeded = true;
+
     private final TileManager tileManager;
 
     private final Canvas canvas;
 
     private final Pane pane;
 
-    private boolean redrawNeeded = true;
+    private MapParameters mapParameters;
 
-
-    public BaseMapController(TileManager tileManager,MapParameters mapParameters){
-        this.mapParameters = mapParameters;
-        this.tileManager = tileManager;
-
-        canvas = new Canvas();
-        pane = new Pane(canvas);
-
-        canvas.widthProperty().bind(pane.widthProperty());
-        canvas.heightProperty().bind(pane.heightProperty());
-
-        canvas.widthProperty().addListener((observable, oldValue, newValue) -> redrawOnNextPulse());
-
-        canvas.heightProperty().addListener((observable, oldValue, newValue) -> redrawOnNextPulse());
-
-        canvas.sceneProperty().addListener((p, oldS, newS) -> {
-            assert oldS == null;
-            newS.addPreLayoutPulseListener(this::redrawIfNeeded);
-        });
-
-        LongProperty minScrollTime = new SimpleLongProperty();
-        pane.setOnScroll(e -> {
-            int zoomDelta = (int) Math.signum(e.getDeltaY());
-            if (zoomDelta == 0) return;
-
-            long currentTime = System.currentTimeMillis();
-            if (currentTime < minScrollTime.get()) return;
-            minScrollTime.set(currentTime + 200);
-
-
-
-
-            // … à faire : appeler les méthodes de MapParameters
-
-            double deltaX = e.getX();
-            double deltaY = e.getY();
-            mapParameters.scroll(deltaX,deltaY);
-            mapParameters.changeZoomLevel(zoomDelta);
-            mapParameters.scroll(-deltaX,-deltaY);
-            System.out.println("zoom : "+mapParameters.getZoom());
-            redrawOnNextPulse();
-        });
-
-        SimpleObjectProperty<Point2D> mouseCoordinate = new SimpleObjectProperty<>();
-
-        pane.setOnMousePressed(event -> {
-            mouseCoordinate.set(new Point2D.Double(event.getX(),event.getY()));
-        });
-
-        pane.setOnMouseDragged(event ->{
-            mapParameters.scroll(mouseCoordinate.get().getX() - event.getX(), mouseCoordinate.get().getY() - event.getY());
-            mouseCoordinate.set(new Point2D.Double(event.getX(),event.getY()));
-            redrawOnNextPulse();
-        });
-
-        pane.setOnMouseReleased(event -> redrawOnNextPulse());
-
-    }
+    //===================================== Méthodes privées ===========================================================
 
     private void redrawOnNextPulse() {
         redrawNeeded = true;
@@ -106,6 +53,7 @@ public class BaseMapController {
 
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
+        //récuppère les coordonnées de la partie visible et le niveau de zoom
         double minX = mapParameters.getminX();
         double minY = mapParameters.getminY();
         double maxX = minX + canvas.getWidth() + TILE_SIZE_IN_PIXEL;
@@ -115,21 +63,21 @@ public class BaseMapController {
         int decalageX = (int) (minX % TILE_SIZE_IN_PIXEL);
         int decalageY = (int) (minY % TILE_SIZE_IN_PIXEL);
 
+        //récupère l'ensemble des TileId coresspondant aux tuiles qu'il faut dessiner
         TileManager.TileId[][] tabOfTileId = tabOfTileId(minX,minY,maxX,maxY,zoom);
 
-
+        //dessine toutes les tuiles en récupérant les images grâce au TileManager
         for (int i = 0; i < tabOfTileId.length; i++) {
             for (int j = 0; j < tabOfTileId[0].length; j++) {
                 try {
-                    graphicsContext.drawImage(tileManager.imageOfTile(tabOfTileId[i][j]), TILE_SIZE_IN_PIXEL * i - decalageX, TILE_SIZE_IN_PIXEL * j - decalageY);
+                    graphicsContext.drawImage(tileManager.imageOfTile(tabOfTileId[i][j]),
+                                        TILE_SIZE_IN_PIXEL * i - decalageX, TILE_SIZE_IN_PIXEL * j - decalageY);
                 }catch (IOException e) {
                     //fait rien
                 }
             }
         }
     }
-
-    public Pane pane() { return pane; }
 
     private int coordonneesToTileIndex(double coord){
         return (int) Math.floor(coord / 256d);
@@ -150,6 +98,91 @@ public class BaseMapController {
         return tabOfTileId;
     }
 
+    private void eventHandler(){
+        //observer de la largeur du canvas et qui le redessine quand il change
+        canvas.widthProperty().addListener((observable, oldValue, newValue) -> redrawOnNextPulse());
+
+        //observer de la hauteur du canvas et qui le redessine quand il change
+        canvas.heightProperty().addListener((observable, oldValue, newValue) -> redrawOnNextPulse());
+
+        //permet de retarder le redessin du canvas
+        canvas.sceneProperty().addListener((p, oldS, newS) -> {
+            assert oldS == null;
+            newS.addPreLayoutPulseListener(this::redrawIfNeeded);
+        });
+
+        //gère le zoom avec la molette de la souris
+        LongProperty minScrollTime = new SimpleLongProperty();
+        pane.setOnScroll(e -> {
+            //évite les oscillations avec la molette qui pourrait amener à des bugs
+            int zoomDelta = (int) Math.signum(e.getDeltaY());
+            if (zoomDelta == 0) return;
+
+            long currentTime = System.currentTimeMillis();
+            if (currentTime < minScrollTime.get()) return;
+            minScrollTime.set(currentTime + 200);
+
+            //réalise le zoom autour du curseur
+            double deltaX = e.getX();
+            double deltaY = e.getY();
+            mapParameters.scroll(deltaX,deltaY);
+            mapParameters.changeZoomLevel(zoomDelta);
+            mapParameters.scroll(-deltaX,-deltaY);
+            System.out.println("zoom : "+mapParameters.getZoom());
+            redrawOnNextPulse();
+        });
+
+        SimpleObjectProperty<Point2D> mouseCoordinate = new SimpleObjectProperty<>();
+
+        //prend les coordonnée du curseur quand l'utilisateur clique sur la souris
+        pane.setOnMousePressed(event -> mouseCoordinate.set(new Point2D.Double(event.getX(),event.getY())));
+
+        //déplace le canvas en fonction du déplacement du curseur
+        pane.setOnMouseDragged(event ->{
+            mapParameters.scroll(mouseCoordinate.get().getX() - event.getX(),
+                                 mouseCoordinate.get().getY() - event.getY());
+            mouseCoordinate.set(new Point2D.Double(event.getX(),event.getY()));
+            redrawOnNextPulse();
+        });
+
+        //redessine une dernière fois la carte quand l'utilisateur relache la souris
+        pane.setOnMouseReleased(event -> redrawOnNextPulse());
+
+    }
+
+    //===================================== Méthodes publiques =========================================================
+
+    /**
+     * Constructeur
+     * @param tileManager : gestionnaire des tuiles à afficher
+     * @param mapParameters : paramètres de la carte
+     */
+    public BaseMapController(TileManager tileManager,MapParameters mapParameters){
+        this.mapParameters = mapParameters;
+        this.tileManager = tileManager;
+
+        canvas = new Canvas();
+        pane = new Pane(canvas);
+
+        //lie les propriétés de largeur et de hauteur du canvas avec le panneau
+        canvas.widthProperty().bind(pane.widthProperty());
+        canvas.heightProperty().bind(pane.heightProperty());
+
+        //met en place la gestion des événements
+        eventHandler();
+    }
+
+
+    /**
+     * Retourne le panneau JavaFX affichant le fond de carte
+     * @return : le panneau JavaFX
+     */
+    public Pane pane() { return pane;}
+
+    /**
+     * Déplace la portion visible de la carte afin qu'elle soit centrée en ce point
+     * @param newCenter : un point à la surface de la Terre
+     */
     //pour tester la classe centerOn copier ce code par exemple à la fin de redraw()
     /*
     double longitude = 7.0349930;
@@ -159,7 +192,10 @@ public class BaseMapController {
     public void centerOn(GeoPos newCenter){
         double centreX = WebMercator.x(mapParameters.getZoom(), newCenter.longitude());
         double centreY = WebMercator.y(mapParameters.getZoom(), newCenter.latitude());
-        mapParameters = new MapParameters(mapParameters.getZoom(), centreX - canvas.getWidth() / 2.0, centreY - canvas.getHeight() / 2.0);
+
+        mapParameters = new MapParameters(mapParameters.getZoom(),
+                                    centreX - canvas.getWidth() / 2.0, centreY - canvas.getHeight() / 2.0);
+
         redrawOnNextPulse();
     }
 }
