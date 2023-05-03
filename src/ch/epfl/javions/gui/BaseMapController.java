@@ -53,7 +53,7 @@ public class BaseMapController {
 
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
-        //récuppère les coordonnées de la partie visible et le niveau de zoom
+        //récupère les coordonnées de la partie visible et le niveau de zoom
         double minX = mapParameters.getminX();
         double minY = mapParameters.getminY();
         double maxX = minX + canvas.getWidth() + TILE_SIZE_IN_PIXEL;
@@ -63,9 +63,9 @@ public class BaseMapController {
         int decalageX = (int) (minX % TILE_SIZE_IN_PIXEL);
         int decalageY = (int) (minY % TILE_SIZE_IN_PIXEL);
 
-        //récupère l'ensemble des TileId coresspondant aux tuiles qu'il faut dessiner
+        //récupère l'ensemble des TileId corespondant aux tuiles qu'il faut dessiner
         TileManager.TileId[][] tabOfTileId = tabOfTileId(minX,minY,maxX,maxY,zoom);
-
+/*
         //dessine toutes les tuiles en récupérant les images grâce au TileManager
         for (int i = 0; i < tabOfTileId.length; i++) {
             for (int j = 0; j < tabOfTileId[0].length; j++) {
@@ -76,7 +76,10 @@ public class BaseMapController {
                     //fait rien
                 }
             }
-        }
+        }*/
+        try {
+            graphicsContext.drawImage(tileManager.imageOfTile(new TileManager.TileId(6,0,0)),0,0);
+        }catch (IOException e){}
     }
 
     private int coordonneesToTileIndex(double coord){
@@ -146,7 +149,9 @@ public class BaseMapController {
         });
 
         //redessine une dernière fois la carte quand l'utilisateur relache la souris
-        pane.setOnMouseReleased(event -> redrawOnNextPulse());
+        pane.setOnMouseReleased(event -> {
+            mouseCoordinate.set(null);
+            redrawOnNextPulse();});
 
     }
 
@@ -177,7 +182,7 @@ public class BaseMapController {
      * Retourne le panneau JavaFX affichant le fond de carte
      * @return : le panneau JavaFX
      */
-    public Pane pane() { return pane;}
+    public Pane pane() {return pane;}
 
     /**
      * Déplace la portion visible de la carte afin qu'elle soit centrée en ce point
