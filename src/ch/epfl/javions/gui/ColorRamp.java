@@ -24,14 +24,13 @@ public final class ColorRamp {
 
     public Color colorAt(double colorRange){
         int firstColorIndex = (int) Math.floor(colorRange/ecart);
-        int secondColorIndex = firstColorIndex+1;
-        //System.out.println("first index : "+firstColorIndex);
-        //System.out.println("second index : "+secondColorIndex);
+        int secondColorIndex = Math2.clamp(0,firstColorIndex+1,tabOfColors.length-1);
+
 
 
         double upperBound = ecart*secondColorIndex;
         double gap = upperBound - colorRange;
-        //System.out.println("rapport est de : "+gap);
+
         return tabOfColors[firstColorIndex].interpolate(tabOfColors[secondColorIndex],gap/ecart);
     }
 

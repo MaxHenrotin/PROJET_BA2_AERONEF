@@ -35,7 +35,7 @@ public final class AircraftController {
         this.mapParameters = mapParameters;
         this.states = states;
         this.currentAircraft = currentAicraftState;
-        //plasma = ColorRamp.PLASMA;
+        plasma = ColorRamp.PLASMA;
 
         pane = new Pane();
         pane.setPickOnBounds(false);
@@ -133,11 +133,11 @@ public final class AircraftController {
             }
         }));
 
-        /*iconSVG.fillProperty().bind(aircraftState.altitudeProperty().map(alt -> {
+        iconSVG.fillProperty().bind(aircraftState.altitudeProperty().map(alt -> {
             double colorRampValue = Math.pow((alt.doubleValue()/12000d) , 1d/3d);
             return plasma.colorAt(colorRampValue);
-        }));*/
-        iconSVG.setFill(Color.DARKGREY);
+        }));
+        //iconSVG.setFill(Color.DARKGREY);
 
 
         return iconSVG;
