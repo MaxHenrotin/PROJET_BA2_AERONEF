@@ -4,6 +4,7 @@ import ch.epfl.javions.Units;
 import ch.epfl.javions.WebMercator;
 import ch.epfl.javions.aircraft.AircraftData;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
@@ -70,12 +71,15 @@ public final class AircraftController {
 
         Group affichage = new Group(etiquette,icone);
 
+        //DoubleBinding posXBinding = Bindings.createDoubleBinding(() -> WebMercator.x(mapParameters.getZoom(), aircraftState.getPosition().longitude()) - mapParameters.getminX(),aircraftState.positionProperty());
         affichage.layoutXProperty().bind(aircraftState.positionProperty().map(pos ->
             WebMercator.x(mapParameters.getZoom(), pos.longitude()) - mapParameters.getminX()
         ));
         affichage.layoutYProperty().bind(aircraftState.positionProperty().map(pos ->
                 WebMercator.y(mapParameters.getZoom(), pos.latitude()) - mapParameters.getminY()
         ));
+
+        affichage.viewOrderProperty().bind(aircraftState.altitudeProperty().negate());
 
         return affichage;
     }
@@ -111,28 +115,35 @@ public final class AircraftController {
     private Group nodeForEtiquette(ObservableAircraftState aircraftState) {
 
         Text info = new Text();
-        StringBinding stringBinding = Bindings.createStringBinding(() ->
-                String.format("%s\n%s km/h\u2002%s m",
-                        (aircraftState.getAircraftData().registration() != null) ?
-                                aircraftState.getAircraftData().registration().string() :
+        StringBinding stringBinding = Bindings.createStringBinding(() ->{
+            String registration;
+                if(aircraftState.getAircraftData() == null){
+                    registration = null;
+                }else {
+                    registration = aircraftState.getAircraftData().registration().string();
+                }
+                return String.format("%s\n%skm/h\u2002%sm",
+                        (registration != null) ?
+                                registration :
                                 ((aircraftState.getCallSign() != null) ?
                                         aircraftState.getCallSign().string() : aircraftState.getIcaoAddress().string()),
                         (Double.isNaN(aircraftState.getVelocity())) ?
-                                "?" : String.valueOf(Units.convert(aircraftState.getVelocity(), Units.Speed.KNOT, Units.Speed.KILOMETER_PER_HOUR)),
+                                "?" : String.valueOf((int)Units.convert(aircraftState.getVelocity(), Units.Speed.KNOT, Units.Speed.KILOMETER_PER_HOUR)),
                         (Double.isNaN(aircraftState.getAltitude())) ?
-                                "?" : String.valueOf(aircraftState.getAltitude()),
-                aircraftState.altitudeProperty(),aircraftState.velocityProperty()
-                ));
+                                "?" : String.valueOf((int)aircraftState.getAltitude()));},
+                aircraftState.altitudeProperty(),aircraftState.velocityProperty());
 
         info.textProperty().bind(stringBinding);
 
         //création du rectangle dans lequel mettre les infos
-        Rectangle rectangle = new Rectangle(10,10, Color.LIGHTGRAY);
+        Rectangle rectangle = new Rectangle(10,10,Color.TRANSPARENT);
         rectangle.widthProperty().bind(info.layoutBoundsProperty().map(b -> b.getWidth() + 4));
+        rectangle.heightProperty().bind(info.layoutBoundsProperty().map(b -> b.getHeight() +4));
 
         //étiquette des infos de l'aéronef
         Group etiquette = new Group(rectangle, info);
         etiquette.getStyleClass().add("label");
+        etiquette.visibleProperty().bind(mapParameters.zoomProperty().map(zoom -> (zoom.intValue() >= 11)));
 
         //retourne un groupe composé de tout ce qui est nécessaire pour l'étiquette
         return etiquette;

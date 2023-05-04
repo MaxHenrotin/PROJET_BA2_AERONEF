@@ -17,7 +17,7 @@ public final class ColorRamp {
         Preconditions.checkArgument(tabOfColors.length >= 2);
 
         this.tabOfColors = tabOfColors.clone();
-        ecart = 1d/ (tabOfColors.length-1);
+        ecart = 1d / (tabOfColors.length-1);
     }
 
     public Color colorAt(double colorRange){
