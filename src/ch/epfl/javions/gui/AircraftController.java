@@ -60,7 +60,7 @@ public final class AircraftController {
     }
 
     private Group groupForAircraft(ObservableAircraftState aircraftState){
-        Group trajectoryGroup = new Group();
+        Path trajectoryGroup = groupForTrajectory();
         Group afficheAircraft = groupForAffichageAircraft(aircraftState);
 
         Group annotatedAircraft = new Group(trajectoryGroup,afficheAircraft);
@@ -69,11 +69,30 @@ public final class AircraftController {
         return annotatedAircraft;
     }
 
-    private Group groupForTrajectory(ObservableAircraftState aircraftState){
+    private Path groupForTrajectory(){
+
+        Path trajectoryGroup = new Path();
+        trajectoryGroup.getStyleClass().add("trajectory");
+        trajectoryGroup.visibleProperty().bind(Bindings.createBooleanBinding(() -> currentAircraft.get() != null,currentAircraft,mapParameters.zoomProperty()));
+
+        int zoom = mapParameters.getZoom();
+        double minX = mapParameters.getminX();
+        double minY = mapParameters.getminY();
+
+        if(trajectoryGroup.isVisible()){
+            ObservableList<ObservableAircraftState.AirbornePosition> trajView = currentAircraft.get().trajectoryProperty();
+            trajView.addListener((ListChangeListener<ObservableAircraftState.AirbornePosition>) change -> {
+                GeoPos pos = change.getList().get(0).position();
+                LineTo lineTo = new LineTo(WebMercator.x(zoom,pos.longitude())-minX,WebMercator.y(zoom, pos.latitude())-minY);
+                trajectoryGroup.getElements().add(lineTo);
+                trajectoryGroup.setStroke(Color.RED);
+            });
+        }
+
+/*
         Group trajectoryGroup = new Group();
         trajectoryGroup.getStyleClass().add("trajectory");
-        trajectoryGroup.visibleProperty().bind(Bindings.createBooleanBinding(() -> aircraftState == currentAircraft.get(),currentAircraft,mapParameters.zoomProperty()));
-
+        trajectoryGroup.visibleProperty().bind(Bindings.createBooleanBinding(() -> currentAircraft.get() != null,currentAircraft,mapParameters.zoomProperty()));
         ObservableList<ObservableAircraftState.AirbornePosition> traj = aircraftState.trajectoryProperty();
         Path path = new Path();
         GeoPos startPos = traj.get(0).position();
@@ -89,7 +108,7 @@ public final class AircraftController {
                 path.getElements().add(lineTo);
             });
             trajectoryGroup.getChildren().add(path);
-        }
+        }*/
 
         return trajectoryGroup;
     }
@@ -137,8 +156,9 @@ public final class AircraftController {
             double colorRampValue = Math.pow((alt.doubleValue()/12000d) , 1d/3d);
             return plasma.colorAt(colorRampValue);
         }));
-        //iconSVG.setFill(Color.DARKGREY);
 
+        iconSVG.setOnMouseClicked(event -> {currentAircraft.set(aircraftState);
+            System.out.println("Clicked on : "+aircraftState.getIcaoAddress().string());});
 
         return iconSVG;
     }
