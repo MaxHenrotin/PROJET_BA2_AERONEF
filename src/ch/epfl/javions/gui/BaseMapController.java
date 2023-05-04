@@ -77,10 +77,6 @@ public class BaseMapController {
                 }
             }
         }
-        /*
-        try {
-            graphicsContext.drawImage(tileManager.imageOfTile(new TileManager.TileId(6,0,0)),0,0);
-        }catch (IOException e){}*/
     }
 
     private int coordonneesToTileIndex(double coord){
@@ -132,7 +128,6 @@ public class BaseMapController {
             mapParameters.scroll(deltaX,deltaY);
             mapParameters.changeZoomLevel(zoomDelta);
             mapParameters.scroll(-deltaX,-deltaY);
-            System.out.println("zoom : "+mapParameters.getZoom());
             redrawOnNextPulse();
         });
 

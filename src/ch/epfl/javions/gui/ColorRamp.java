@@ -1,5 +1,6 @@
 package ch.epfl.javions.gui;
 
+import ch.epfl.javions.Math2;
 import ch.epfl.javions.Preconditions;
 import javafx.scene.paint.Color;
 
@@ -18,15 +19,19 @@ public final class ColorRamp {
 
         this.tabOfColors = tabOfColors.clone();
         ecart = 1d / (tabOfColors.length-1);
+        //System.out.println("l'écart est de : " +ecart);
     }
 
     public Color colorAt(double colorRange){
         int firstColorIndex = (int) Math.floor(colorRange/ecart);
         int secondColorIndex = firstColorIndex+1;
+        //System.out.println("first index : "+firstColorIndex);
+        //System.out.println("second index : "+secondColorIndex);
+
 
         double upperBound = ecart*secondColorIndex;
         double gap = upperBound - colorRange;
-
+        //System.out.println("rapport est de : "+gap);
         return tabOfColors[firstColorIndex].interpolate(tabOfColors[secondColorIndex],gap/ecart);
     }
 
