@@ -80,9 +80,9 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         category = new SimpleIntegerProperty();
         callSign = new SimpleObjectProperty<>();
         position = new SimpleObjectProperty<>();
-        altitude = new SimpleDoubleProperty();
-        velocity = new SimpleDoubleProperty();
-        trackOrHeading = new SimpleDoubleProperty();
+        altitude = new SimpleDoubleProperty(Double.NaN);
+        velocity = new SimpleDoubleProperty(Double.NaN);
+        trackOrHeading = new SimpleDoubleProperty(Double.NaN);
 
         trajectory = FXCollections.observableArrayList();
         viewOfTrajectory = FXCollections.unmodifiableObservableList(trajectory);

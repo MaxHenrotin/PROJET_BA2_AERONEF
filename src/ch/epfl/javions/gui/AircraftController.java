@@ -1,9 +1,14 @@
 package ch.epfl.javions.gui;
 
 import ch.epfl.javions.Units;
+import ch.epfl.javions.WebMercator;
 import ch.epfl.javions.aircraft.AircraftData;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringBinding;
+import javafx.beans.property.ObjectProperty;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -18,14 +23,12 @@ public final class AircraftController {
 
     private MapParameters mapParameters;
     private ObservableSet<ObservableAircraftState> states;
-    private SimpleObjectProperty<ObservableAircraftState> currentAircraft;
+    private ObjectProperty<ObservableAircraftState> currentAircraft;
 
     private ColorRamp plasma;
 
     private Pane pane;
-    private Canvas canvas;
-
-    public AircraftController(MapParameters mapParameters, ObservableSet<ObservableAircraftState> states, SimpleObjectProperty<ObservableAircraftState> currentAicraftState){
+    public AircraftController(MapParameters mapParameters, ObservableSet<ObservableAircraftState> states, ObjectProperty<ObservableAircraftState> currentAicraftState){
         this.mapParameters = mapParameters;
         this.states = states;
         this.currentAircraft = currentAicraftState;
@@ -33,84 +36,106 @@ public final class AircraftController {
 
         pane = new Pane();
         pane.setPickOnBounds(false);
+        layoutVisibleAircrafts();
     }
 
-    private Node groupForAircraft(ObservableAircraftState aircraftState){
+    private void layoutVisibleAircrafts(){
+        states.addListener((SetChangeListener<ObservableAircraftState>) change -> {
+            if(change.wasAdded()){
+                pane.getChildren().add(groupForAffichageAircraft(change.getElementAdded()));
+            }else {
+                ObservableList<Node> paneChildrens = pane.getChildren();
+                String icaoAdressToRemove = change.getElementRemoved().getIcaoAddress().string();
+                for (Node child : paneChildrens) {
+                    if(child.getId().equals(icaoAdressToRemove)) paneChildrens.remove(child);
+                }
+            }
+        }
+        );
+    }
+
+    private Group groupForAircraft(ObservableAircraftState aircraftState){
         Group trajectoryGroup = new Group();
-        Group afficheAircraft = new Group();
-        return new Group(trajectoryGroup,afficheAircraft);
+        Group afficheAircraft = groupForAffichageAircraft(aircraftState);
+
+        Group annotatedAircraft = new Group(trajectoryGroup,afficheAircraft);
+        annotatedAircraft.setId(aircraftState.getIcaoAddress().string());
+
+        return annotatedAircraft;
     }
 
-    private Node groupForAffichageAircraft(ObservableAircraftState aircraftState){
+    private Group groupForAffichageAircraft(ObservableAircraftState aircraftState){
         Group etiquette = nodeForEtiquette(aircraftState);
-        Group icone = new Group();
+        Node icone = nodeForIcone(aircraftState);
 
-        return new Group(etiquette,icone);
+        Group affichage = new Group(etiquette,icone);
+
+        affichage.layoutXProperty().bind(aircraftState.positionProperty().map(pos ->
+            WebMercator.x(mapParameters.getZoom(), pos.longitude()) - mapParameters.getminX()
+        ));
+        affichage.layoutYProperty().bind(aircraftState.positionProperty().map(pos ->
+                WebMercator.y(mapParameters.getZoom(), pos.latitude()) - mapParameters.getminY()
+        ));
+
+        return affichage;
     }
 
     private Node nodeForIcone(ObservableAircraftState aircraftState){
         AircraftData aircraftData = aircraftState.getAircraftData();
+
         AircraftIcon aircraftIcon = AircraftIcon.iconFor(aircraftData.typeDesignator(),aircraftData.description(),
                                                 aircraftState.getCategory(),aircraftData.wakeTurbulenceCategory());
 
-        SVGPath iconSVGPath = new SVGPath();
+        SVGPath iconSVG = new SVGPath();
+        iconSVG.setContent(aircraftIcon.svgPath());
+        iconSVG.getStyleClass().add("aircraft");
 
-        if(aircraftIcon.canRotate()) {
-            double angle = Units.convertTo(aircraftState.getTrackOrHeading(), Units.Angle.DEGREE);
-        }
+        iconSVG.rotateProperty().bind(aircraftState.trackOrHeadingProperty().map(dir -> {
+            if(aircraftIcon.canRotate()) {
+                return Units.convertTo(aircraftState.getTrackOrHeading(), Units.Angle.DEGREE);
+            }else {
+                return 0;
+            }
+        }));
 
-        if(aircraftState.altitudeProperty() == null){
-            double colorRampValue = Math.pow((aircraftState.getAltitude()/12000),1/3);
-            //plasma.colorAt(colorRampValue);
-        }
+        iconSVG.fillProperty().bind(aircraftState.altitudeProperty().map(alt -> {
+            double colorRampValue = Math.pow((alt.doubleValue()/12000d) , 1d/3d);
+            return plasma.colorAt(colorRampValue);
+        }));
 
-        return null;
+
+        return iconSVG;
     }
 
     private Group nodeForEtiquette(ObservableAircraftState aircraftState) {
+
+        Text info = new Text();
+        StringBinding stringBinding = Bindings.createStringBinding(() ->
+                String.format("%s\n%s km/h\u2002%s m",
+                        (aircraftState.getAircraftData().registration() != null) ?
+                                aircraftState.getAircraftData().registration().string() :
+                                ((aircraftState.getCallSign() != null) ?
+                                        aircraftState.getCallSign().string() : aircraftState.getIcaoAddress().string()),
+                        (Double.isNaN(aircraftState.getVelocity())) ?
+                                "?" : String.valueOf(Units.convert(aircraftState.getVelocity(), Units.Speed.KNOT, Units.Speed.KILOMETER_PER_HOUR)),
+                        (Double.isNaN(aircraftState.getAltitude())) ?
+                                "?" : String.valueOf(aircraftState.getAltitude()),
+                aircraftState.altitudeProperty(),aircraftState.velocityProperty()
+                ));
+
+        info.textProperty().bind(stringBinding);
+
         //création du rectangle dans lequel mettre les infos
-        Rectangle rectangle = new Rectangle(20, 20, Color.LIGHTGRAY);
+        Rectangle rectangle = new Rectangle(10,10, Color.LIGHTGRAY);
+        rectangle.widthProperty().bind(info.layoutBoundsProperty().map(b -> b.getWidth() + 4));
 
-        //création du texte d'info
-        Text info;
-
-        if (aircraftState.getAircraftData().registration() != null) {
-            info = new Text(aircraftState.getAircraftData().registration().string());
-        } else if (aircraftState.getCallSign() != null) {
-            info = new Text(aircraftState.getCallSign().string());
-        } else {
-            info = new Text(aircraftState.getIcaoAddress().string());
-        }
-
-        //création du texte de vitesse et d'altitude
-        Text speedAndAlt;
-
-        String altitude;
-        String speed;
-
-        if (aircraftState.velocityProperty() == null) {
-            altitude = "?";
-        } else {
-            altitude = String.valueOf(Units.convert(aircraftState.getAltitude(), Units.Length.FOOT, Units.Length.METER));
-        }
-
-        if (aircraftState.altitudeProperty() == null) {
-            speed = "?";
-        } else {
-            speed = String.valueOf(Units.convert(aircraftState.getVelocity(), Units.Speed.KNOT, Units.Speed.KILOMETER_PER_HOUR));
-        }
-
-        StringBuilder speedAndAltString = new StringBuilder().
-                append(speed).
-                append("km/h").
-                append("\u2002").
-                append(altitude).
-                append("m");
-
-        speedAndAlt = new Text(speedAndAltString.toString());
+        //étiquette des infos de l'aéronef
+        Group etiquette = new Group(rectangle, info);
+        etiquette.getStyleClass().add("label");
 
         //retourne un groupe composé de tout ce qui est nécessaire pour l'étiquette
-        return new Group(rectangle, info, speedAndAlt);
+        return etiquette;
     }
+
     public Pane pane(){return pane;}
 }
