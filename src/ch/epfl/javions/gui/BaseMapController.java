@@ -65,7 +65,7 @@ public class BaseMapController {
 
         //récupère l'ensemble des TileId corespondant aux tuiles qu'il faut dessiner
         TileManager.TileId[][] tabOfTileId = tabOfTileId(minX,minY,maxX,maxY,zoom);
-/*
+
         //dessine toutes les tuiles en récupérant les images grâce au TileManager
         for (int i = 0; i < tabOfTileId.length; i++) {
             for (int j = 0; j < tabOfTileId[0].length; j++) {
@@ -76,10 +76,11 @@ public class BaseMapController {
                     //fait rien
                 }
             }
-        }*/
+        }
+        /*
         try {
             graphicsContext.drawImage(tileManager.imageOfTile(new TileManager.TileId(6,0,0)),0,0);
-        }catch (IOException e){}
+        }catch (IOException e){}*/
     }
 
     private int coordonneesToTileIndex(double coord){

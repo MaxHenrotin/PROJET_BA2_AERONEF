@@ -19,7 +19,7 @@ public final class BaseMapControllerTest extends Application {
 
     public void start(Stage primaryStage) throws IOException {
         Path tileCache = Path.of("tile-cache");
-        TileManager tm = new TileManager(tileCache, "a.tile.openstreetmap.fr/hot");  // "tile.openstreetmap.org"
+        TileManager tm = new TileManager(tileCache, "tile.openstreetmap.org");  // "tile.openstreetmap.org"
         MapParameters mp = new MapParameters(17, 17_389_327, 11_867_430);
         BaseMapController bmc = new BaseMapController(tm, mp);
 
