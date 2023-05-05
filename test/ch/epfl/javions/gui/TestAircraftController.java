@@ -83,6 +83,7 @@ public final class TestAircraftController extends Application {
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
                 }
+                asm.purge();
             }
         }.start();
     }
