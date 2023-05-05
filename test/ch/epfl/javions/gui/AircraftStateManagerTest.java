@@ -72,6 +72,8 @@ class AircraftStateManagerTest {
         File file = Paths.get(ulrres.toURI()).toFile();
         String absolutePath = file.getAbsolutePath();
 
+        int counter = 0;
+
         try (DataInputStream s = new DataInputStream(
                 new BufferedInputStream(
                         new FileInputStream(absolutePath)))){
@@ -108,8 +110,6 @@ class AircraftStateManagerTest {
                         System.out.println("amog");
                     }
                 }
-
-
             }
         } catch (IOException e) {
             System.out.println(e);

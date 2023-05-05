@@ -20,6 +20,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
 
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -49,18 +50,14 @@ public final class AircraftController {
             if(change.wasAdded()){
                 pane.getChildren().add(groupForAircraft(change.getElementAdded()));
             }else{
-                ObservableList<Node> paneChildrens = pane.getChildren();
                 String icaoAdressToRemove = change.getElementRemoved().getIcaoAddress().string();
-
-                for (Node child : paneChildrens) {
-                    if(child.getId().equals(icaoAdressToRemove)) paneChildrens.remove(child);
-                }
+                pane.getChildren().removeIf(node -> node.getId().equals(icaoAdressToRemove));
             }
         });
     }
 
     private Group groupForAircraft(ObservableAircraftState aircraftState){
-        Path trajectoryGroup = groupForTrajectory();
+        Group trajectoryGroup = groupForTrajectory();
         Group afficheAircraft = groupForAffichageAircraft(aircraftState);
 
         Group annotatedAircraft = new Group(trajectoryGroup,afficheAircraft);
@@ -69,9 +66,9 @@ public final class AircraftController {
         return annotatedAircraft;
     }
 
-    private Path groupForTrajectory(){
+    private Group groupForTrajectory(){
 
-        Path trajectoryGroup = new Path();
+        Group trajectoryGroup = new Group();
         trajectoryGroup.getStyleClass().add("trajectory");
         trajectoryGroup.visibleProperty().bind(Bindings.createBooleanBinding(() -> currentAircraft.get() != null,currentAircraft,mapParameters.zoomProperty()));
 
@@ -79,15 +76,27 @@ public final class AircraftController {
         double minX = mapParameters.getminX();
         double minY = mapParameters.getminY();
 
-        if(trajectoryGroup.isVisible()){
+
+
+        if(trajectoryGroup.isVisible()) {
             ObservableList<ObservableAircraftState.AirbornePosition> trajView = currentAircraft.get().trajectoryProperty();
             trajView.addListener((ListChangeListener<ObservableAircraftState.AirbornePosition>) change -> {
-                GeoPos pos = change.getList().get(0).position();
-                LineTo lineTo = new LineTo(WebMercator.x(zoom,pos.longitude())-minX,WebMercator.y(zoom, pos.latitude())-minY);
-                trajectoryGroup.getElements().add(lineTo);
-                trajectoryGroup.setStroke(Color.RED);
+                trajectoryGroup.getChildren().clear();
+                if (trajView.size() > 1) {
+                    for(int i = 1; i < change.getList().size(); ++i) {
+                        GeoPos pos = change.getList().get(i).position();
+                        GeoPos oldpos = change.getList().get(i-1).position();
+                        double oldX = WebMercator.x(mapParameters.getZoom(), oldpos.longitude()) - mapParameters.getminX();
+                        double oldY = WebMercator.y(mapParameters.getZoom(), oldpos.latitude()) - mapParameters.getminY();
+                        double newX = WebMercator.x(mapParameters.getZoom(), pos.longitude()) - mapParameters.getminX();
+                        double newY = WebMercator.y(mapParameters.getZoom(), pos.latitude()) - mapParameters.getminY();
+                        Line newLine = new Line(oldX, oldY, newX, newY);
+                        trajectoryGroup.getChildren().add(newLine);
+                    }
+                }
             });
         }
+
 
 /*
         Group trajectoryGroup = new Group();
@@ -169,11 +178,8 @@ public final class AircraftController {
 
         StringBinding stringBinding = Bindings.createStringBinding(() ->{
             String registration;
-                if(aircraftState.getAircraftData() == null){
-                    registration = null;
-                }else {
+                if(aircraftState.getAircraftData() != null) {
                     registration = aircraftState.getAircraftData().registration().string();
-                }
                 return String.format("%s\n%skm/h\u2002%sm",
                         (registration != null) ?
                                 registration :
@@ -182,8 +188,12 @@ public final class AircraftController {
                         (Double.isNaN(aircraftState.getVelocity())) ?
                                 "?" : String.valueOf((int)Units.convert(aircraftState.getVelocity(), Units.Speed.KNOT, Units.Speed.KILOMETER_PER_HOUR)),
                         (Double.isNaN(aircraftState.getAltitude())) ?
-                                "?" : String.valueOf((int)aircraftState.getAltitude()));},
-                aircraftState.altitudeProperty(),aircraftState.velocityProperty());
+                                "?" : String.valueOf((int)aircraftState.getAltitude()));
+                }else{
+                    return String.format("");
+                }
+            },
+            aircraftState.altitudeProperty(),aircraftState.velocityProperty());
 
         txtInfo.textProperty().bind(stringBinding);
 
