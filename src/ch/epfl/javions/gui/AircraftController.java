@@ -81,11 +81,11 @@ public final class AircraftController {
         trajectoryGroup.layoutYProperty().bind(mapParameters.minYProperty().negate());
 
         aircraftState.trajectoryProperty().addListener((ListChangeListener<ObservableAircraftState.AirbornePosition>) c -> {
-            if (trajectoryGroup.isVisible()) drawTrajectory(trajectoryGroup, aircraftState.trajectoryProperty());
+            drawTrajectory(trajectoryGroup, aircraftState.trajectoryProperty());
         });
 
         mapParameters.zoomProperty().addListener((observable, oldValue, newValue) -> {
-            if(trajectoryGroup.isVisible())drawTrajectory(trajectoryGroup, aircraftState.trajectoryProperty());
+            drawTrajectory(trajectoryGroup, aircraftState.trajectoryProperty());
         });
 
         trajectoryGroup.visibleProperty().addListener((observable, oldValue, newValue) ->
@@ -189,7 +189,7 @@ public final class AircraftController {
                                 ((aircraftState.getCallSign() != null) ?
                                         aircraftState.getCallSign().string() : aircraftState.getIcaoAddress().string()),
                         (Double.isNaN(aircraftState.getVelocity())) ?
-                                "?" : String.valueOf((int)Units.convert(aircraftState.getVelocity(), Units.Speed.KNOT, Units.Speed.KILOMETER_PER_HOUR)),
+                                "?" : String.valueOf((int)Units.convertTo(aircraftState.getVelocity(), Units.Speed.KILOMETER_PER_HOUR)),
                         (Double.isNaN(aircraftState.getAltitude())) ?
                                 "?" : String.valueOf((int)aircraftState.getAltitude()));
                 }else{
@@ -208,7 +208,8 @@ public final class AircraftController {
         //étiquette des infos de l'aéronef
         Group etiquette = new Group(rectangle,txtInfo);
         etiquette.getStyleClass().add("label");
-        etiquette.visibleProperty().bind(mapParameters.zoomProperty().map(zoom -> (zoom.intValue() >= 11)));
+
+        etiquette.visibleProperty().bind(Bindings.createBooleanBinding(() -> (mapParameters.zoomProperty().intValue() >= 11 || (Objects.nonNull(currentAircraft.get()) && currentAircraft.get().equals(aircraftState))),mapParameters.zoomProperty(),currentAircraft));
 
         //retourne un groupe composé de tout ce qui est nécessaire pour l'étiquette
         return etiquette;
