@@ -17,12 +17,16 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+
+import static javafx.scene.paint.CycleMethod.NO_CYCLE;
 
 
 public final class AircraftController {
@@ -105,6 +109,18 @@ public final class AircraftController {
             double newX = WebMercator.x(zoom, pos.longitude()) - minX - trajectoryGroup.getLayoutX();
             double newY = WebMercator.y(zoom, pos.latitude()) - minY - trajectoryGroup.getLayoutY();
             Line newLine = new Line(oldX, oldY, newX, newY);
+
+            double alt = trajView.get(i).altitude();
+            double oldAlt = trajView.get(i-1).altitude();
+            if(alt == oldAlt){
+                newLine.setStroke(plasma.colorAt(Math.pow((alt/12000d) , 1d/3d)));
+            }else {
+                Stop s0 = new Stop(0,plasma.colorAt(Math.pow((alt/12000d) , 1d/3d)));
+                Stop s1 = new Stop(1,plasma.colorAt(Math.pow((oldAlt/12000d) , 1d/3d)));
+                LinearGradient linearGradient = new LinearGradient(0, 0, 1, 0, true, NO_CYCLE, s0, s1);
+                newLine.setStroke(linearGradient);
+            }
+
             trajectoryGroup.getChildren().add(newLine);
         }
     }
