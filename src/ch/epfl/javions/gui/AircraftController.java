@@ -71,13 +71,20 @@ public final class AircraftController {
 
         Group trajectoryGroup = new Group();
         trajectoryGroup.getStyleClass().add("trajectory");
-        //trajectoryGroup.visibleProperty().bind(Bindings.createBooleanBinding(() -> currentAircraft.get() != null,currentAircraft));
+        trajectoryGroup.visibleProperty().bind(Bindings.createBooleanBinding(() -> Objects.nonNull(currentAircraft.get()) && aircraftState.equals(currentAircraft.get()),currentAircraft));
 
         trajectoryGroup.layoutXProperty().bind(mapParameters.minXProperty().negate());
         trajectoryGroup.layoutYProperty().bind(mapParameters.minYProperty().negate());
 
         aircraftState.trajectoryProperty().addListener((ListChangeListener<ObservableAircraftState.AirbornePosition>) c -> {
-            drawTrajectory(trajectoryGroup, aircraftState.trajectoryProperty());
+            if (trajectoryGroup.isVisible()) drawTrajectory(trajectoryGroup, aircraftState.trajectoryProperty());
+        });
+        trajectoryGroup.visibleProperty().addListener((observable, oldValue, newValue) -> {
+            if(trajectoryGroup.isVisible()){
+                drawTrajectory(trajectoryGroup, currentAircraft.get().trajectoryProperty());
+            }else {
+                trajectoryGroup.getChildren().clear();
+            }
         });
 
         return trajectoryGroup;
