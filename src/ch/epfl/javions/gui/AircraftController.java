@@ -57,7 +57,7 @@ public final class AircraftController {
     }
 
     private Group groupForAircraft(ObservableAircraftState aircraftState){
-        Group trajectoryGroup = groupForTrajectory();
+        Group trajectoryGroup = groupForTrajectory(aircraftState);
         Group afficheAircraft = groupForAffichageAircraft(aircraftState);
 
         Group annotatedAircraft = new Group(trajectoryGroup,afficheAircraft);
@@ -66,32 +66,41 @@ public final class AircraftController {
         return annotatedAircraft;
     }
 
-    private Group groupForTrajectory(){
+    private Group groupForTrajectory(ObservableAircraftState aircraftState){
 
         Group trajectoryGroup = new Group();
         trajectoryGroup.getStyleClass().add("trajectory");
-        trajectoryGroup.visibleProperty().bind(Bindings.createBooleanBinding(() -> currentAircraft.get() != null,currentAircraft,mapParameters.zoomProperty()));
+        trajectoryGroup.visibleProperty().bind(Bindings.createBooleanBinding(() -> currentAircraft.get() != null,currentAircraft));
+
+
 
         int zoom = mapParameters.getZoom();
         double minX = mapParameters.getminX();
         double minY = mapParameters.getminY();
 
 
+        if(currentAircraft.get() != null) {
 
-        if(trajectoryGroup.isVisible()) {
+            trajectoryGroup.layoutXProperty().bind(mapParameters.minXProperty().negate());
+            trajectoryGroup.layoutYProperty().bind(mapParameters.minYProperty().negate());
+
+
+
             ObservableList<ObservableAircraftState.AirbornePosition> trajView = currentAircraft.get().trajectoryProperty();
+
             trajView.addListener((ListChangeListener<ObservableAircraftState.AirbornePosition>) change -> {
                 trajectoryGroup.getChildren().clear();
                 if (trajView.size() > 1) {
                     for(int i = 1; i < change.getList().size(); ++i) {
                         GeoPos pos = change.getList().get(i).position();
                         GeoPos oldpos = change.getList().get(i-1).position();
-                        double oldX = WebMercator.x(mapParameters.getZoom(), oldpos.longitude()) - mapParameters.getminX();
-                        double oldY = WebMercator.y(mapParameters.getZoom(), oldpos.latitude()) - mapParameters.getminY();
-                        double newX = WebMercator.x(mapParameters.getZoom(), pos.longitude()) - mapParameters.getminX();
-                        double newY = WebMercator.y(mapParameters.getZoom(), pos.latitude()) - mapParameters.getminY();
+                        double oldX = WebMercator.x(zoom, oldpos.longitude()) - minX - trajectoryGroup.getLayoutX();
+                        double oldY = WebMercator.y(zoom, oldpos.latitude()) - minY - trajectoryGroup.getLayoutY();
+                        double newX = WebMercator.x(zoom, pos.longitude()) - minX - trajectoryGroup.getLayoutX();
+                        double newY = WebMercator.y(zoom, pos.latitude()) - minY - trajectoryGroup.getLayoutY();
                         Line newLine = new Line(oldX, oldY, newX, newY);
                         trajectoryGroup.getChildren().add(newLine);
+
                     }
                 }
             });
