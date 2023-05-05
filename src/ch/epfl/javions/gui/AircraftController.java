@@ -83,13 +83,13 @@ public final class AircraftController {
         aircraftState.trajectoryProperty().addListener((ListChangeListener<ObservableAircraftState.AirbornePosition>) c -> {
             if (trajectoryGroup.isVisible()) drawTrajectory(trajectoryGroup, aircraftState.trajectoryProperty());
         });
-        trajectoryGroup.visibleProperty().addListener((observable, oldValue, newValue) -> {
-            if(trajectoryGroup.isVisible()){
-                drawTrajectory(trajectoryGroup, currentAircraft.get().trajectoryProperty());
-            }else {
-                trajectoryGroup.getChildren().clear();
-            }
+
+        mapParameters.zoomProperty().addListener((observable, oldValue, newValue) -> {
+            if(trajectoryGroup.isVisible())drawTrajectory(trajectoryGroup, aircraftState.trajectoryProperty());
         });
+
+        trajectoryGroup.visibleProperty().addListener((observable, oldValue, newValue) ->
+            drawTrajectory(trajectoryGroup, currentAircraft.get().trajectoryProperty()));
 
         return trajectoryGroup;
     }
