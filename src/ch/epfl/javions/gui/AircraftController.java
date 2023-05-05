@@ -79,16 +79,40 @@ public final class AircraftController {
         double minY = mapParameters.getminY();
 
 
-        if(currentAircraft.get() != null) {
+        trajectoryGroup.layoutXProperty().bind(mapParameters.minXProperty().negate());
+        trajectoryGroup.layoutYProperty().bind(mapParameters.minYProperty().negate());
 
-            trajectoryGroup.layoutXProperty().bind(mapParameters.minXProperty().negate());
-            trajectoryGroup.layoutYProperty().bind(mapParameters.minYProperty().negate());
+        /*
+        trajectoryGroup.layoutXProperty().bind(
+                Bindings.createDoubleBinding(() -> WebMercator.x(mapParameters.getZoom(), currentAircraft.get().getPosition().longitude()) - mapParameters.getminX(),
+                        currentAircraft.get().positionProperty(),mapParameters.zoomProperty(),mapParameters.minXProperty()));
 
+        trajectoryGroup.layoutYProperty().bind(
+                Bindings.createDoubleBinding(() -> WebMercator.y(mapParameters.getZoom(), currentAircraft.get().getPosition().latitude()) - mapParameters.getminY(),
+                        currentAircraft.get().positionProperty(),mapParameters.zoomProperty(),mapParameters.minYProperty()));
+         */
+
+        if(trajectoryGroup.isVisible()) {
 
 
             ObservableList<ObservableAircraftState.AirbornePosition> trajView = currentAircraft.get().trajectoryProperty();
 
             trajView.addListener((ListChangeListener<ObservableAircraftState.AirbornePosition>) change -> {
+
+
+                GeoPos pos = change.getList().get(change.getList().size()-1).position();
+                GeoPos oldpos = change.getList().get(change.getList().size()-2).position();
+                double oldX = WebMercator.x(zoom, oldpos.longitude()) - minX - trajectoryGroup.getLayoutX();
+                double oldY = WebMercator.y(zoom, oldpos.latitude()) - minY - trajectoryGroup.getLayoutY();
+                double newX = WebMercator.x(zoom, pos.longitude()) - minX - trajectoryGroup.getLayoutX();
+                double newY = WebMercator.y(zoom, pos.latitude()) - minY - trajectoryGroup.getLayoutY();
+                Line newLine = new Line(oldX, oldY, newX, newY);
+                trajectoryGroup.getChildren().add(newLine);
+
+
+                 /*
+
+
                 trajectoryGroup.getChildren().clear();
                 if (trajView.size() > 1) {
                     for(int i = 1; i < change.getList().size(); ++i) {
@@ -103,6 +127,9 @@ public final class AircraftController {
 
                     }
                 }
+                                */
+
+
             });
         }
 
