@@ -22,6 +22,7 @@ import javafx.scene.text.Text;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 
 public final class AircraftController {
@@ -70,92 +71,35 @@ public final class AircraftController {
 
         Group trajectoryGroup = new Group();
         trajectoryGroup.getStyleClass().add("trajectory");
-        trajectoryGroup.visibleProperty().bind(Bindings.createBooleanBinding(() -> currentAircraft.get() != null,currentAircraft));
-
-
-
-        int zoom = mapParameters.getZoom();
-        double minX = mapParameters.getminX();
-        double minY = mapParameters.getminY();
-
+        //trajectoryGroup.visibleProperty().bind(Bindings.createBooleanBinding(() -> currentAircraft.get() != null,currentAircraft));
 
         trajectoryGroup.layoutXProperty().bind(mapParameters.minXProperty().negate());
         trajectoryGroup.layoutYProperty().bind(mapParameters.minYProperty().negate());
 
-        /*
-        trajectoryGroup.layoutXProperty().bind(
-                Bindings.createDoubleBinding(() -> WebMercator.x(mapParameters.getZoom(), currentAircraft.get().getPosition().longitude()) - mapParameters.getminX(),
-                        currentAircraft.get().positionProperty(),mapParameters.zoomProperty(),mapParameters.minXProperty()));
+        aircraftState.trajectoryProperty().addListener((ListChangeListener<ObservableAircraftState.AirbornePosition>) c -> {
+            drawTrajectory(trajectoryGroup, aircraftState.trajectoryProperty());
+        });
 
-        trajectoryGroup.layoutYProperty().bind(
-                Bindings.createDoubleBinding(() -> WebMercator.y(mapParameters.getZoom(), currentAircraft.get().getPosition().latitude()) - mapParameters.getminY(),
-                        currentAircraft.get().positionProperty(),mapParameters.zoomProperty(),mapParameters.minYProperty()));
-         */
+        return trajectoryGroup;
+    }
 
-        if(trajectoryGroup.isVisible()) {
+    private void drawTrajectory(Group trajectoryGroup,ObservableList<ObservableAircraftState.AirbornePosition> trajView){
+        trajectoryGroup.getChildren().clear();
 
-
-            ObservableList<ObservableAircraftState.AirbornePosition> trajView = currentAircraft.get().trajectoryProperty();
-
-            trajView.addListener((ListChangeListener<ObservableAircraftState.AirbornePosition>) change -> {
-
-
-                GeoPos pos = change.getList().get(change.getList().size()-1).position();
-                GeoPos oldpos = change.getList().get(change.getList().size()-2).position();
-                double oldX = WebMercator.x(zoom, oldpos.longitude()) - minX - trajectoryGroup.getLayoutX();
-                double oldY = WebMercator.y(zoom, oldpos.latitude()) - minY - trajectoryGroup.getLayoutY();
-                double newX = WebMercator.x(zoom, pos.longitude()) - minX - trajectoryGroup.getLayoutX();
-                double newY = WebMercator.y(zoom, pos.latitude()) - minY - trajectoryGroup.getLayoutY();
-                Line newLine = new Line(oldX, oldY, newX, newY);
-                trajectoryGroup.getChildren().add(newLine);
-
-
-                 /*
-
-
-                trajectoryGroup.getChildren().clear();
-                if (trajView.size() > 1) {
-                    for(int i = 1; i < change.getList().size(); ++i) {
-                        GeoPos pos = change.getList().get(i).position();
-                        GeoPos oldpos = change.getList().get(i-1).position();
-                        double oldX = WebMercator.x(zoom, oldpos.longitude()) - minX - trajectoryGroup.getLayoutX();
-                        double oldY = WebMercator.y(zoom, oldpos.latitude()) - minY - trajectoryGroup.getLayoutY();
-                        double newX = WebMercator.x(zoom, pos.longitude()) - minX - trajectoryGroup.getLayoutX();
-                        double newY = WebMercator.y(zoom, pos.latitude()) - minY - trajectoryGroup.getLayoutY();
-                        Line newLine = new Line(oldX, oldY, newX, newY);
-                        trajectoryGroup.getChildren().add(newLine);
-
-                    }
-                }
-                                */
-
-
-            });
-        }
-
-
-/*
-        Group trajectoryGroup = new Group();
-        trajectoryGroup.getStyleClass().add("trajectory");
-        trajectoryGroup.visibleProperty().bind(Bindings.createBooleanBinding(() -> currentAircraft.get() != null,currentAircraft,mapParameters.zoomProperty()));
-        ObservableList<ObservableAircraftState.AirbornePosition> traj = aircraftState.trajectoryProperty();
-        Path path = new Path();
-        GeoPos startPos = traj.get(0).position();
         int zoom = mapParameters.getZoom();
         double minX = mapParameters.getminX();
         double minY = mapParameters.getminY();
-        MoveTo moveTo = new MoveTo(WebMercator.x(zoom,startPos.longitude()) - minX,WebMercator.y(zoom,startPos.latitude()-minY));
-        path.getElements().add(moveTo);
-        if(!trajectoryGroup.isVisible()){
-            traj.addListener((ListChangeListener<ObservableAircraftState.AirbornePosition>) change -> {
-                GeoPos pos = change.getList().get(0).position();
-                LineTo lineTo = new LineTo(WebMercator.x(zoom,pos.longitude())-minX,WebMercator.y(zoom, pos.latitude())-minY);
-                path.getElements().add(lineTo);
-            });
-            trajectoryGroup.getChildren().add(path);
-        }*/
 
-        return trajectoryGroup;
+        for(int i = 1; i < trajView.size(); ++i) {
+            GeoPos pos = trajView.get(i).position();
+            GeoPos oldpos = trajView.get(i-1).position();
+            double oldX = WebMercator.x(zoom, oldpos.longitude()) - minX - trajectoryGroup.getLayoutX();
+            double oldY = WebMercator.y(zoom, oldpos.latitude()) - minY - trajectoryGroup.getLayoutY();
+            double newX = WebMercator.x(zoom, pos.longitude()) - minX - trajectoryGroup.getLayoutX();
+            double newY = WebMercator.y(zoom, pos.latitude()) - minY - trajectoryGroup.getLayoutY();
+            Line newLine = new Line(oldX, oldY, newX, newY);
+            trajectoryGroup.getChildren().add(newLine);
+        }
     }
 
     private Group groupForAffichageAircraft(ObservableAircraftState aircraftState){
