@@ -9,6 +9,13 @@ import java.util.Map;
 
 import static ch.epfl.javions.aircraft.WakeTurbulenceCategory.HEAVY;
 
+
+/**
+ * Enumeration représentant les différentes icônes d'aéronefs disponibles.
+ *
+ * @author Mr.Schinz
+ */
+
 public enum AircraftIcon {
     AIRLINER("""
             M 0.01 14.75 c -0.26 0 -0.74 -0.71 -0.86 -1.41 l -3.33 0.86 L -4.5
@@ -145,10 +152,6 @@ public enum AircraftIcon {
             -1.05 0.67 H 1.27 v 3.19 l 1.61 0.59 l 1 0.36 a 1.05 1.05 0 0 1 0.8
             1.11 c -0.07 0.39 -0.47 0.86 -1.39 0.86 Z""");
 
-    private static final Map<AircraftTypeDesignator, AircraftIcon> TYPE_DESIGNATOR_TABLE = createTypeDesignatorTable();
-    private final boolean canRotate;
-    private final String svgPath;
-
     AircraftIcon(boolean canRotate, String svgPath) {
         this.canRotate = canRotate;
         this.svgPath = svgPath;
@@ -157,6 +160,13 @@ public enum AircraftIcon {
     AircraftIcon(String svgPath) {
         this(true, svgPath);
     }
+
+    //===================================== Attributs privées statiques ================================================
+
+    private static final Map<AircraftTypeDesignator, AircraftIcon> TYPE_DESIGNATOR_TABLE = createTypeDesignatorTable();
+
+
+    //===================================== Méthodes privées statiques =================================================
 
     private static Map<AircraftTypeDesignator, AircraftIcon> createTypeDesignatorTable() {
         // Note: we don't use Map.ofEntries here, as IntelliJ becomes slow if we do.
@@ -402,6 +412,17 @@ public enum AircraftIcon {
         return Map.copyOf(map);
     }
 
+
+    //===================================== Méthodes publiques statiques ===============================================
+
+    /**
+     * Permet de déterminer l'icône à utiliser en fonction d'un aéronef
+     * @param typeDesignator : indicateur de type de l'aéronef dont on veut l'icône
+     * @param typeDescription : description donnant le type de l'aéronef dont on veut l'icône
+     * @param category : catégorie de l'aéronef dont on veut l'icône
+     * @param wakeTurbulenceCategory : catégorie de turbulence de sillage de l'aéronef dont on veut l'icône
+     * @return l'icône correspondant le mieux à l'aéronef dont les caractéristiques sont celles données
+     */
     public static AircraftIcon iconFor(AircraftTypeDesignator typeDesignator,
                                        AircraftDescription typeDescription,
                                        int category,
@@ -443,10 +464,27 @@ public enum AircraftIcon {
         };
     }
 
+
+    //===================================== Attributs privées ==========================================================
+
+    private final boolean canRotate;
+    private final String svgPath;
+
+
+    //===================================== Méthodes publiques =========================================================
+
+    /**
+     * Indique si l'icône peut (et doit) être tourné afin d'indiquer le cap de l'aéronef
+     * @return vrai si et seulement si l'icône peut (et doit) être tourné afin d'indiquer le cap de l'aéronef
+     */
     public boolean canRotate() {
         return canRotate;
     }
 
+    /**
+     * Donne le chemin SVG (= description de dessin) correspondant à l'icône
+     * @return le chemin SVG correspondant à l'icône
+     */
     public String svgPath() {
         return svgPath;
     }

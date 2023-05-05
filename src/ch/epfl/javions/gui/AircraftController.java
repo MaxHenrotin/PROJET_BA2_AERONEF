@@ -169,8 +169,7 @@ public final class AircraftController {
             return plasma.colorAt(colorRampValue);
         }));
 
-        iconSVG.setOnMouseClicked(event -> {currentAircraft.set(aircraftState);
-            System.out.println("Clicked on : "+aircraftState.getIcaoAddress().string());});
+        iconSVG.setOnMouseClicked(event -> currentAircraft.set(aircraftState));
 
         return iconSVG;
     }
