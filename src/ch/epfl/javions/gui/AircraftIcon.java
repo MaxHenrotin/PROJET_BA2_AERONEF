@@ -1,13 +1,15 @@
+
+
 package ch.epfl.javions.gui;
 
-import ch.epfl.javions.aircraft.AircraftDescription;
-import ch.epfl.javions.aircraft.AircraftTypeDesignator;
-import ch.epfl.javions.aircraft.WakeTurbulenceCategory;
+        import ch.epfl.javions.aircraft.AircraftDescription;
+        import ch.epfl.javions.aircraft.AircraftTypeDesignator;
+        import ch.epfl.javions.aircraft.WakeTurbulenceCategory;
 
-import java.util.HashMap;
-import java.util.Map;
+        import java.util.HashMap;
+        import java.util.Map;
 
-import static ch.epfl.javions.aircraft.WakeTurbulenceCategory.HEAVY;
+        import static ch.epfl.javions.aircraft.WakeTurbulenceCategory.HEAVY;
 
 
 /**
@@ -489,3 +491,4 @@ public enum AircraftIcon {
         return svgPath;
     }
 }
+

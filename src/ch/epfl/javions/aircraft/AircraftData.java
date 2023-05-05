@@ -24,7 +24,7 @@ public record AircraftData(AircraftRegistration registration, AircraftTypeDesign
      * Constructeur compact
      *
      * @param registration : numéro d'immatriculation
-     * @param typeDesignator :indicateur de type
+     * @param typeDesignator : indicateur de type
      * @param model : modèle (model), donnant généralement le nom du fabricant
      *              et celui du modèle spécifique de l'aéronef
      * @param description : description(description), un code de trois lettres donnant le type de l'aéronef,

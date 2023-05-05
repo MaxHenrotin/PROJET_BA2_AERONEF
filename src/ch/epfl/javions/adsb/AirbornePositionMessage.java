@@ -27,7 +27,6 @@ import java.util.Objects;
 public record AirbornePositionMessage
         (long timeStampNs, IcaoAddress icaoAddress,double altitude, int parity, double x, double y) implements Message{
 
-
     //===================================== Attributs privées statiques ================================================
     //===================================== Attributs publiques statiques ==============================================
     //===================================== Méthodes privées statiques =================================================
