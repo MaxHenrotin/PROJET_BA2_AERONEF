@@ -3,6 +3,8 @@ package ch.epfl.javions.gui;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.Pane;
 
@@ -18,6 +20,7 @@ import java.util.function.Consumer;
 
 public final class AircraftTableController {
 
+    private static final String TABLE_STYLESHEET = "table.css";
     private ObservableSet<ObservableAircraftState> states;
     private ObjectProperty<ObservableAircraftState> currentAircraft;
     private TableView pane;
@@ -31,7 +34,28 @@ public final class AircraftTableController {
                                    ObjectProperty<ObservableAircraftState> currentAicraftState){
         this.states = states;
         this.currentAircraft = currentAicraftState;
+
         pane = new TableView();
+        pane.getStylesheets().add(TABLE_STYLESHEET);
+        pane.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
+        pane.setTableMenuButtonVisible(true);
+    }
+
+    private void implementCollumns(){
+        TableColumn<ObservableAircraftState,String> OACICollumn = new TableColumn<>("OACI");
+        //OACICollumn.getStyleClass().add("numeric"); //si donnee numerique
+        OACICollumn.setPrefWidth(60);
+        pane.getColumns().add(OACICollumn);
+
+        //pas encore sur quil faille ça
+        states.addListener((SetChangeListener<ObservableAircraftState>) change -> {
+            if(change.wasAdded()){
+                //pane.getChildren().add(groupForAircraft(change.getElementAdded()));
+            }else{
+                //String icaoAdressToRemove = change.getElementRemoved().getIcaoAddress().string();
+                //pane.getChildren().removeIf(node -> node.getId().equals(icaoAdressToRemove));
+            }
+        });
     }
 
     /**
