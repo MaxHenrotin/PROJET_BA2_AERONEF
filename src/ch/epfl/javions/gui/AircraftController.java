@@ -48,7 +48,7 @@ public final class AircraftController {
     private MapParameters mapParameters;
     private ObservableSet<ObservableAircraftState> states;
     private ObjectProperty<ObservableAircraftState> currentAircraft;
-    private Pane pane;
+    private Pane pane = new Pane();
 
 
     //===================================== Méthodes privées ===========================================================
@@ -240,7 +240,7 @@ public final class AircraftController {
         this.mapParameters = mapParameters;
         this.states = states;
         this.currentAircraft = currentAicraftState;
-        pane = new Pane();
+
         pane.setPickOnBounds(false);
         pane.getStylesheets().add(PANE_STYLESHEETS);
         layoutVisibleAircrafts();
