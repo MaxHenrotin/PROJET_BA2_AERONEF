@@ -69,7 +69,7 @@ public final class AircraftTableController {
             if(change.wasAdded()){
                 ObservableAircraftState aircraftState = change.getElementAdded();
                 ObservableValue<String> constantObservable = new ReadOnlyObjectWrapper<>("JAVION");
-                //Collumn.getColumns().add(0, Collumn);
+                //Collumn.getColumns().add(0, constantObservable);
             }else{
                 //String icaoAdressToRemove = change.getElementRemoved().getIcaoAddress().string();
                 //pane.getChildren().removeIf(node -> node.getId().equals(icaoAdressToRemove));
