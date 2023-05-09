@@ -2,11 +2,13 @@ package ch.epfl.javions.gui;
 //  Author:    Max Henrotin
 
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.Pane;
 
 import java.util.function.Consumer;
 
@@ -39,23 +41,50 @@ public final class AircraftTableController {
         pane.getStylesheets().add(TABLE_STYLESHEET);
         pane.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
         pane.setTableMenuButtonVisible(true);
+        setUpTable();
     }
 
-    private void implementCollumns(){
-        TableColumn<ObservableAircraftState,String> OACICollumn = new TableColumn<>("OACI");
-        //OACICollumn.getStyleClass().add("numeric"); //si donnee numerique
-        OACICollumn.setPrefWidth(60);
-        pane.getColumns().add(OACICollumn);
+    private void setUpTable(){
+        setUpCollumn("OACI",60);
+        setUpCollumn("Indicatif",70);
+        setUpCollumn("Immatriculation",90);
+        setUpCollumn("Modèle",230);
+        setUpCollumn("Type",50);
+        setUpCollumn("Description",70);
+        setUpCollumn("Longitude (°)");
+        setUpCollumn("Latitude (°)");
+        setUpCollumn("Altitude (m)");
+        setUpCollumn("Vitesse (km/h)");
+        //a faire pour chaque collonne
 
-        //pas encore sur quil faille ça
+    }
+
+    //pour les collones non numériques
+    private void setUpCollumn(String name, int width){
+        TableColumn<ObservableAircraftState,String> Collumn = new TableColumn<>(name);
+        Collumn.setPrefWidth(width);
+
+        //pas encore sûr qu'il faille ça
         states.addListener((SetChangeListener<ObservableAircraftState>) change -> {
             if(change.wasAdded()){
-                //pane.getChildren().add(groupForAircraft(change.getElementAdded()));
+                ObservableAircraftState aircraftState = change.getElementAdded();
+                ObservableValue<String> constantObservable = new ReadOnlyObjectWrapper<>("JAVION");
+                //Collumn.getColumns().add(0, Collumn);
             }else{
                 //String icaoAdressToRemove = change.getElementRemoved().getIcaoAddress().string();
                 //pane.getChildren().removeIf(node -> node.getId().equals(icaoAdressToRemove));
             }
         });
+
+        pane.getColumns().add(Collumn);
+    }
+
+    //pour les collones numériques
+    private void setUpCollumn(String name){
+        TableColumn<ObservableAircraftState,String> Collumn = new TableColumn<>(name);
+        Collumn.getStyleClass().add("numeric"); //si donnee numerique
+        Collumn.setPrefWidth(85);
+        pane.getColumns().add(Collumn);
     }
 
     /**
