@@ -38,17 +38,17 @@ public final class AircraftController {
     private final static String LABEL_STYLECLASS = "label";
     private final static String LABEL_TEXT_FORMATTING = "%s\n%skm/h\u2002%sm";
     private final static int MIN_ZOOM_FOR_LABEL = 11;
-    private final static int LABEL_WIDTH = 4;
+    private final static int LABEL_SIZE_FORMAT = 4;
     private final static double MAX_ALTITUDE_APPROXIMATION = 12000d;
     private final static double EXPONENT_FOR_CUBE_ROOT = 1d/3d;
 
 
     //===================================== Attributs privées ==========================================================
 
-    private MapParameters mapParameters;
-    private ObservableSet<ObservableAircraftState> states;
-    private ObjectProperty<ObservableAircraftState> currentAircraft;
-    private Pane pane = new Pane();
+    private final MapParameters mapParameters;
+    private final ObservableSet<ObservableAircraftState> states;
+    private final ObjectProperty<ObservableAircraftState> currentAircraft;
+    private final Pane pane;
 
 
     //===================================== Méthodes privées ===========================================================
@@ -67,8 +67,11 @@ public final class AircraftController {
     private Group groupForAircraft(ObservableAircraftState aircraftState){
         Group trajectoryGroup = groupForTrajectory(aircraftState);
         Group afficheAircraft = groupForAffichageAircraft(aircraftState);
+
         Group annotatedAircraft = new Group(trajectoryGroup,afficheAircraft);
+
         annotatedAircraft.setId(aircraftState.getIcaoAddress().string());
+
         return annotatedAircraft;
     }
 
@@ -77,6 +80,7 @@ public final class AircraftController {
         trajectoryGroup.getStyleClass().add(TRAJECTORY_STYLECLASS);
         trajectoryGroup.visibleProperty().bind(Bindings.createBooleanBinding(() ->
                 Objects.nonNull(currentAircraft.get()) && aircraftState.equals(currentAircraft.get()),currentAircraft));
+
         trajectoryGroup.layoutXProperty().bind(mapParameters.minXProperty().negate());
         trajectoryGroup.layoutYProperty().bind(mapParameters.minYProperty().negate());
 
@@ -127,6 +131,7 @@ public final class AircraftController {
     private Group groupForAffichageAircraft(ObservableAircraftState aircraftState){
         Group etiquette = nodeForLabel(aircraftState);
         Node icone = nodeForIcone(aircraftState);
+
         Group affichage = new Group(etiquette,icone);
 
         affichage.layoutXProperty().bind(
@@ -155,9 +160,11 @@ public final class AircraftController {
         if (aircraftData == null)return new Group();
         AircraftIcon aircraftIcon = AircraftIcon.iconFor(aircraftData.typeDesignator(),aircraftData.description(),
                 aircraftState.getCategory(),aircraftData.wakeTurbulenceCategory());
+
         SVGPath iconSVG = new SVGPath();
         iconSVG.setContent(aircraftIcon.svgPath());
         iconSVG.getStyleClass().add(ICON_STYLECLASS);
+
         iconSVG.rotateProperty().bind(aircraftState.trackOrHeadingProperty().map(dir -> {
             if(aircraftIcon.canRotate()) {
                 return Units.convertTo(aircraftState.getTrackOrHeading(), Units.Angle.DEGREE);
@@ -169,7 +176,9 @@ public final class AircraftController {
             double colorRampValue = colorRampValue(alt.doubleValue());
             return ColorRamp.PLASMA.colorAt(colorRampValue);
         }));
+
         iconSVG.setOnMouseClicked(event -> currentAircraft.set(aircraftState));
+
         return iconSVG;
     }
 
@@ -193,12 +202,13 @@ public final class AircraftController {
                 return UNKNOWN_INFORMATION_TEXT;
             }
         }, aircraftState.altitudeProperty(),aircraftState.velocityProperty());
-
         txtInfo.textProperty().bind(stringBinding);
+
         //création du rectangle dans lequel mettre les infos
         Rectangle rectangle = new Rectangle();
-        rectangle.widthProperty().bind(txtInfo.layoutBoundsProperty().map(b -> b.getWidth() + LABEL_WIDTH));
-        rectangle.heightProperty().bind(txtInfo.layoutBoundsProperty().map(b -> b.getHeight() + LABEL_WIDTH));
+        rectangle.widthProperty().bind(txtInfo.layoutBoundsProperty().map(b -> b.getWidth() + LABEL_SIZE_FORMAT));
+        rectangle.heightProperty().bind(txtInfo.layoutBoundsProperty().map(b -> b.getHeight() + LABEL_SIZE_FORMAT));
+
         //étiquette des infos de l'aéronef
         Group etiquette = new Group(rectangle,txtInfo);
         etiquette.getStyleClass().add(LABEL_STYLECLASS);
@@ -241,6 +251,7 @@ public final class AircraftController {
         this.states = states;
         this.currentAircraft = currentAicraftState;
 
+        pane = new Pane();
         pane.setPickOnBounds(false);
         pane.getStylesheets().add(PANE_STYLESHEETS);
         layoutVisibleAircrafts();
