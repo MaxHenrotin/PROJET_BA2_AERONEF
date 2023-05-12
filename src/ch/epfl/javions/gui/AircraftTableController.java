@@ -36,6 +36,7 @@ public final class AircraftTableController {
     private static final int MODEL_COLUMN_WIDTH = 230;
     private static final int TYPE_COLUMN_WIDTH = 50;
     private static final int DESCRIPTION_COLUMN_WIDTH = 70;
+    private static final int NUMERIC_COLUMN_WIDTH = 85;
     private static final String TABLE_STYLESHEET = "table.css";
     private static final NumberFormat positionNumberFormat = numberFormatOfMaxAndMinDecimal(4);
     private static final NumberFormat otherNumericCollumnNumberFormat = numberFormatOfMaxAndMinDecimal(0);
@@ -68,13 +69,12 @@ public final class AircraftTableController {
 
         currentAircraft.addListener((observable, oldValue, newValue) -> {
             selectionModel.select(newValue);
-            if(Objects.nonNull(oldValue) && !oldValue.equals(newValue)) tableView.scrollTo(0);
+            if(Objects.nonNull(oldValue) && !oldValue.equals(newValue)) tableView.scrollTo(newValue);
         });
 
         tableView.setOnMouseClicked(event -> {
-            if(Objects.nonNull(currentAircraft.get()) && event.getClickCount() >= 2 &&
-                    event.getButton() == MouseButton.PRIMARY){
-
+            if(Objects.nonNull(currentAircraft.get()) && event.getButton() == MouseButton.PRIMARY &&
+                    event.getClickCount() == 2){
                 if (Objects.nonNull(consumer)) consumer.accept(currentAircraft.get());
             }
         });
@@ -159,7 +159,7 @@ public final class AircraftTableController {
 
         TableColumn<ObservableAircraftState,String> column = new TableColumn<>(name);
         column.getStyleClass().add("numeric");
-        column.setPrefWidth(85);
+        column.setPrefWidth(NUMERIC_COLUMN_WIDTH);
 
         column.setCellValueFactory(obs -> functionToApply.apply(obs.getValue()));
 
@@ -205,7 +205,7 @@ public final class AircraftTableController {
      * Accès au noeud à la racine du graphe du graphe de scène de la classe (table des informations des aéronefs)
      * @return le noeud à la racine de son graphe de scène
      */
-    public TableView pane(){
+    public TableView<ObservableAircraftState> pane(){
         return tableView;
     }
 
