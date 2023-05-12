@@ -73,7 +73,7 @@ public final class AircraftStateManager {
      * Prend un message et l'utilise pour mettre à jour l'état de l'aéronef qui l'a envoyé,
      * créant cet état lorsque le message est le premier reçu de cet aéronef
      * @param message : messaage reçu d'un aéronef
-     * @throws IOException
+     * @throws IOException : si erreur de lecture
      */
     public void updateWithMessage(Message message) throws IOException {
         if(message != null) {

@@ -54,6 +54,7 @@ public final class AircraftController {
     //===================================== Méthodes privées ===========================================================
 
     private void layoutVisibleAircrafts(){
+        //affiche sur la carte tous les avions visibles
         states.addListener((SetChangeListener<ObservableAircraftState>) change -> {
             if(change.wasAdded()){
                 pane.getChildren().add(groupForAircraft(change.getElementAdded()));
@@ -66,9 +67,9 @@ public final class AircraftController {
 
     private Group groupForAircraft(ObservableAircraftState aircraftState){
         Group trajectoryGroup = groupForTrajectory(aircraftState);
-        Group afficheAircraft = groupForAffichageAircraft(aircraftState);
+        Group informationsLabelGroup = groupForInformationsLabel(aircraftState);
 
-        Group annotatedAircraft = new Group(trajectoryGroup,afficheAircraft);
+        Group annotatedAircraft = new Group(trajectoryGroup,informationsLabelGroup);
 
         annotatedAircraft.setId(aircraftState.getIcaoAddress().string());
 
@@ -77,6 +78,7 @@ public final class AircraftController {
 
     private Group groupForTrajectory(ObservableAircraftState aircraftState){
         Group trajectoryGroup = new Group();
+
         trajectoryGroup.getStyleClass().add(TRAJECTORY_STYLECLASS);
         trajectoryGroup.visibleProperty().bind(Bindings.createBooleanBinding(() ->
                 Objects.nonNull(currentAircraft.get()) && aircraftState.equals(currentAircraft.get()),currentAircraft));
@@ -109,11 +111,14 @@ public final class AircraftController {
         for(int i = 1; i < trajView.size(); ++i) {
             GeoPos pos = trajView.get(i).position();
             GeoPos oldpos = trajView.get(i-1).position();
+
             double oldX = WebMercator.x(zoom, oldpos.longitude()) - minX - trajectoryGroup.getLayoutX();
             double oldY = WebMercator.y(zoom, oldpos.latitude()) - minY - trajectoryGroup.getLayoutY();
             double newX = WebMercator.x(zoom, pos.longitude()) - minX - trajectoryGroup.getLayoutX();
             double newY = WebMercator.y(zoom, pos.latitude()) - minY - trajectoryGroup.getLayoutY();
+
             Line newLine = new Line(oldX, oldY, newX, newY);
+
             double alt = trajView.get(i).altitude();
             double oldAlt = trajView.get(i-1).altitude();
 
@@ -128,13 +133,13 @@ public final class AircraftController {
         }
     }
 
-    private Group groupForAffichageAircraft(ObservableAircraftState aircraftState){
-        Group etiquette = nodeForLabel(aircraftState);
+    private Group groupForInformationsLabel(ObservableAircraftState aircraftState){
+        Group label = nodeForLabel(aircraftState);
         Node icone = nodeForIcone(aircraftState);
 
-        Group affichage = new Group(etiquette,icone);
+        Group layoutAircraft = new Group(label,icone);
 
-        affichage.layoutXProperty().bind(
+        layoutAircraft.layoutXProperty().bind(
                 Bindings.createDoubleBinding(() ->
                                 WebMercator.x(mapParameters.getZoom(), aircraftState.getPosition().longitude()) -
                                         mapParameters.getminX(),
@@ -142,7 +147,7 @@ public final class AircraftController {
                         mapParameters.zoomProperty(),
                         mapParameters.minXProperty()));
 
-        affichage.layoutYProperty().bind(
+        layoutAircraft.layoutYProperty().bind(
                 Bindings.createDoubleBinding(() ->
                                 WebMercator.y(mapParameters.getZoom(), aircraftState.getPosition().latitude()) -
                                         mapParameters.getminY(),
@@ -150,14 +155,15 @@ public final class AircraftController {
                         mapParameters.zoomProperty(),
                         mapParameters.minYProperty()));
 
-        affichage.viewOrderProperty().bind(aircraftState.altitudeProperty().negate());
+        layoutAircraft.viewOrderProperty().bind(aircraftState.altitudeProperty().negate());
 
-        return affichage;
+        return layoutAircraft;
     }
 
     private Node nodeForIcone(ObservableAircraftState aircraftState){
         AircraftData aircraftData = aircraftState.getAircraftData();
         if (aircraftData == null)return new Group();
+
         AircraftIcon aircraftIcon = AircraftIcon.iconFor(aircraftData.typeDesignator(),aircraftData.description(),
                 aircraftState.getCategory(),aircraftData.wakeTurbulenceCategory());
 
@@ -210,16 +216,16 @@ public final class AircraftController {
         rectangle.heightProperty().bind(txtInfo.layoutBoundsProperty().map(b -> b.getHeight() + LABEL_SIZE_FORMAT));
 
         //étiquette des infos de l'aéronef
-        Group etiquette = new Group(rectangle,txtInfo);
-        etiquette.getStyleClass().add(LABEL_STYLECLASS);
+        Group label = new Group(rectangle,txtInfo);
+        label.getStyleClass().add(LABEL_STYLECLASS);
 
-        etiquette.visibleProperty().bind(Bindings.createBooleanBinding(() ->
+        label.visibleProperty().bind(Bindings.createBooleanBinding(() ->
                         (mapParameters.zoomProperty().intValue() >= MIN_ZOOM_FOR_LABEL ||
                                 (Objects.nonNull(currentAircraft.get()) && currentAircraft.get().equals(aircraftState))),
                 mapParameters.zoomProperty(),currentAircraft));
 
         //retourne un groupe composé de tout ce qui est nécessaire pour l'étiquette
-        return etiquette;
+        return label;
     }
 
     private double colorRampValue(double altitude){

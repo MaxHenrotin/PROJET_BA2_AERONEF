@@ -4,11 +4,6 @@ import ch.epfl.javions.Math2;
 import ch.epfl.javions.Preconditions;
 import javafx.scene.paint.Color;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * Classe publique, finale et immuable, représentant un dégradé de couleurs.
  * Un tel dégradé est vu comme une fonction associant une couleur à un nombre réel.

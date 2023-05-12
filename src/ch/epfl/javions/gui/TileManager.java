@@ -1,5 +1,6 @@
 package ch.epfl.javions.gui;
 
+import ch.epfl.javions.Preconditions;
 import javafx.scene.image.Image;
 
 import java.io.*;
@@ -79,7 +80,6 @@ public class TileManager {
         return urlConnection;
     }
 
-
     //===================================== Méthodes publiques =========================================================
 
     /**
@@ -90,11 +90,27 @@ public class TileManager {
      */
     public record TileId(int zoomLevel, int x, int y){
 
+        /**
+         * Constructeur compact qui vérifie que la tuile soit valide
+         * @param zoomLevel : niveau de zoom de la tuile
+         * @param x : index X de la tuile
+         * @param y : index Y de la tuile
+         */
+        public TileId{
+            Preconditions.checkArgument(isValid(zoomLevel,x,y));
+        }
+
+        /**
+         * Méthode qui vérifie que une tuile est valide
+         * @param zoomLevel : niveau de zoom de la tuile
+         * @param x : index X de la tuile
+         * @param y : index Y de la tuile
+         * @return si la les caractéristiaues de la tuile sont valides
+         */
         public static boolean isValid(int zoomLevel, int x, int y){
             int indexMax = 1 << zoomLevel; //= 2^zoomLevel
             return zoomLevel >= MIN_ZOOM && zoomLevel <= MAX_ZOOM && x >=0 && x < indexMax && y >= 0 && y < indexMax;
         }
-
     }
 
     /**
