@@ -38,6 +38,7 @@ public final class AircraftTableController {
     private static final int DESCRIPTION_COLUMN_WIDTH = 70;
     private static final int NUMERIC_COLUMN_WIDTH = 85;
     private static final String TABLE_STYLESHEET = "table.css";
+    private static final String COLUMN_CLASSSHEET = "numeric";
     private static final NumberFormat positionNumberFormat = numberFormatOfMaxAndMinDecimal(4);
     private static final NumberFormat otherNumericCollumnNumberFormat = numberFormatOfMaxAndMinDecimal(0);
 
@@ -158,7 +159,7 @@ public final class AircraftTableController {
                             (String name, Function<ObservableAircraftState, ObservableValue<String>> functionToApply){
 
         TableColumn<ObservableAircraftState,String> column = new TableColumn<>(name);
-        column.getStyleClass().add("numeric");
+        column.getStyleClass().add(COLUMN_CLASSSHEET);
         column.setPrefWidth(NUMERIC_COLUMN_WIDTH);
 
         column.setCellValueFactory(obs -> functionToApply.apply(obs.getValue()));
