@@ -10,6 +10,7 @@ import javafx.collections.ObservableSet;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -40,7 +41,6 @@ public final class AircraftStateManager {
     private long lastMessageTimeStampsNs;
     private final AircraftDatabase aircraftDatabase;
     private final ObservableSet<ObservableAircraftState> observableAircraftStates;
-
     private final ObservableSet<ObservableAircraftState> viewOfObservableAircraftStates;
 
     //===================================== Méthodes publiques =========================================================
@@ -88,7 +88,6 @@ public final class AircraftStateManager {
                 AircraftStateAccumulator<ObservableAircraftState> newAccumulator =
                                                                 new AircraftStateAccumulator<>(observableAircraftState);
                 managementTable.put(messageAdress, newAccumulator);
-
             }
 
             ObservableAircraftState currentObservableStateSetter = managementTable
@@ -99,7 +98,6 @@ public final class AircraftStateManager {
 
             if(currentObservableStateSetter.getPosition() != null) observableAircraftStates
                                                                                     .add(currentObservableStateSetter);
-
             }
 
     }
@@ -110,7 +108,29 @@ public final class AircraftStateManager {
      * passé à updateWithMessage
      */
     public void purge(){
+        /*
+        //avant les modifications suggérées à l'étape 11
         observableAircraftStates.removeIf(observableAircraftState ->
                 lastMessageTimeStampsNs - observableAircraftState.getLastMessageTimeStampsNs() >= ONE_MINUTE);
+         */
+
+        Iterator<ObservableAircraftState> iterator = observableAircraftStates.iterator();
+        while (iterator.hasNext()) {
+            ObservableAircraftState state = iterator.next();
+            if (lastMessageTimeStampsNs - state.getLastMessageTimeStampsNs() >= ONE_MINUTE) {
+                iterator.remove();
+                managementTable.remove(state.getIcaoAddress());
+            }
+        }
+
+        /*
+        //fait des ConcurrentModificationExeptions ??
+        observableAircraftStates.forEach(state -> {
+            if(lastMessageTimeStampsNs - state.getLastMessageTimeStampsNs() >= ONE_MINUTE){
+                observableAircraftStates.remove(state);
+                managementTable.remove(state.getIcaoAddress());
+            }
+        });
+         */
     }
 }
