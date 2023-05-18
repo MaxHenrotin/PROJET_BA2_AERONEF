@@ -20,44 +20,38 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import org.w3c.dom.ls.LSOutput;
+
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+/**
+ * Contient le programme principal
+ *
+ * @author Julien Erbland (346893)
+ * @author Max Henrotin (341463)
+ */
+
 public final class Main extends Application {
 
-
+    /**
+     * Lance le programme (grâce à la méthode launch())
+     * @param args : arguments du programme
+     */
     public static void main(String[] args) {
         launch(args);
     }
 
-    /*static void readAllMessages(String fileName,LongProperty messageCount) throws IOException {
-        try (DataInputStream s = new DataInputStream(
-                new BufferedInputStream(
-                        new FileInputStream(fileName)))){
-
-            byte[] bytes = new byte[RawMessage.LENGTH];
-            while (true) {
-                long timeStampNs = s.readLong();
-                int bytesRead = s.readNBytes(bytes, 0, bytes.length);
-                assert bytesRead == RawMessage.LENGTH;
-                RawMessage rawMessage = RawMessage.of(timeStampNs,bytes);
-                if(rawMessage != null){
-                    allMessages.add(rawMessage);
-                    messageCount.set(messageCount.longValue() + 1);
-                }
-            }
-        }
-        catch (EOFException e) { }
-    }*/
-
     @Override
     public void start(Stage primaryStage) throws Exception {
-        getParameters().getRaw();
-        ConcurrentLinkedDeque<RawMessage> allMessages = new ConcurrentLinkedDeque<>();
+
+        //PREPARTION DES VARIABLES POUR LE FIL D'EXECUTION
+
         List<String> args = getParameters().getRaw();
+        ConcurrentLinkedDeque<RawMessage> allMessages = new ConcurrentLinkedDeque<>();
 
         // … à compléter (voir TestBaseMapController)
         Path tileCache = Path.of("tile-cache");
@@ -70,6 +64,8 @@ public final class Main extends Application {
         assert u != null;
         Path p = Path.of(u.toURI());
         AircraftDatabase db = new AircraftDatabase(p.toString());
+
+        //CREATION DU GRAPHE DE SCENE GRAPHIQUE
 
         //Crée la map avec les avions par-dessus
         AircraftStateManager asm = new AircraftStateManager(db);
@@ -101,38 +97,46 @@ public final class Main extends Application {
         primaryStage.setMinHeight(600);
         primaryStage.show();
 
-        new Thread(() -> {
-            try (DataInputStream s = new DataInputStream(
-                    new BufferedInputStream(
-                            new FileInputStream("resources\\messages_20230318_0915.bin")))){
+        //DEMARAGE DU FIL D'EXECUTION CHARGE D'OBTENIR LES MESSAGES
 
-                byte[] bytes = new byte[RawMessage.LENGTH];
-                while (true) {
-                    long timeStampNs = s.readLong();
-                    int bytesRead = s.readNBytes(bytes, 0, bytes.length);
-                    assert bytesRead == RawMessage.LENGTH;
-                    RawMessage rawMessage = RawMessage.of(timeStampNs,bytes);
-                    if(rawMessage != null){
-                        allMessages.add(rawMessage);
-                        messageCount.set(messageCount.longValue() + 1);
+        new Thread(() -> {
+
+            if(args.isEmpty()){     //ou bien is null ?
+                //lire depuis System.in
+            }else{
+                String fichierALire = args.get(0);  //ex : "resources\\messages_20230318_0915.bin"
+                try (DataInputStream s = new DataInputStream(
+                        new BufferedInputStream(
+                                new FileInputStream(fichierALire)))){
+
+                    byte[] bytes = new byte[RawMessage.LENGTH];
+                    while (true) {
+                        long timeStampNs = s.readLong();
+                        int bytesRead = s.readNBytes(bytes, 0, bytes.length);
+                        assert bytesRead == RawMessage.LENGTH;
+                        RawMessage rawMessage = RawMessage.of(timeStampNs,bytes);
+                        if(rawMessage != null){
+                            allMessages.add(rawMessage);
+                            messageCount.set(messageCount.longValue() + 1);
+                        }
                     }
                 }
-            }
-            catch (EOFException e) { /* nothing to do */ } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                catch (EOFException e) {} catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
-            var mi = allMessages.iterator();
+            var iteratorOfAllMessages = allMessages.iterator();
 
-            // Animation des aéronefs
+            //DEMARRAGE DU "MINUTEUR D'ANIMATION"
             new AnimationTimer() {
                 @Override
                 public void handle(long now) {
                     try {
                         for (int i = 0; i < 10; i += 1) {
-                            Message m = MessageParser.parse(mi.next());
+                            Message m = MessageParser.parse(iteratorOfAllMessages.next());
                             if (m != null) asm.updateWithMessage(m);
                         }
                     } catch (IOException e) {
@@ -141,6 +145,7 @@ public final class Main extends Application {
                     asm.purge();
                 }
             }.start();
-            });
+        }).start();
+
     }
 }

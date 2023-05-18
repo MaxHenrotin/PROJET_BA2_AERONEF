@@ -7,7 +7,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
 /**
- * Gère la ligne d'état du programme
+ * Gère la ligne d'état
  *
  * @author Julien Erbland (346893)
  * @author Max Henrotin (341463)
