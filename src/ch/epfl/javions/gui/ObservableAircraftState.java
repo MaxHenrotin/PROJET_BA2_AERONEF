@@ -49,6 +49,8 @@ public final class ObservableAircraftState implements AircraftStateSetter {
 
     //===================================== Méthodes privées ===========================================================
 
+    /* DESORMAIS INUTILISE (changé la méthodologie à l'étape 11)
+    //Méthode à appeler dans setAltitude et setPosition
     private void updateTrajectory(AirbornePosition airbornePosition){
         if(trajectory.isEmpty() || !Objects.equals(this.position.get(),airbornePosition.position())){
 
@@ -56,12 +58,12 @@ public final class ObservableAircraftState implements AircraftStateSetter {
             if(airbornePosition.position() != null){
                 trajectory.add(airbornePosition);
             }
-
         }else if(lastUpdateTrajectoryTimeStampsNs == lastMessageTimeStampNs.getValue()){
             trajectory.remove(trajectory.size() - 1);
             trajectory.add(airbornePosition);
         }
     }
+     */
 
 
     //===================================== Méthodes publiques =========================================================
@@ -181,7 +183,8 @@ public final class ObservableAircraftState implements AircraftStateSetter {
      */
     @Override
     public void setPosition(GeoPos position) {
-        updateTrajectory(new AirbornePosition(position,this.altitude.get()));
+        trajectory.add(new AirbornePosition(position,this.altitude.get()));
+        lastUpdateTrajectoryTimeStampsNs = lastMessageTimeStampNs.getValue();
 
         this.position.set(position);
     }
@@ -208,7 +211,15 @@ public final class ObservableAircraftState implements AircraftStateSetter {
      */
     @Override
     public void setAltitude(double altitude) {
-        updateTrajectory(new AirbornePosition(this.position.get(),altitude));
+        AirbornePosition airbornePosition = new AirbornePosition(this.position.get(), altitude);
+        if(trajectory == null) {
+            trajectory.add(airbornePosition);
+            lastUpdateTrajectoryTimeStampsNs = lastMessageTimeStampNs.getValue();
+        }
+        if(lastUpdateTrajectoryTimeStampsNs == lastMessageTimeStampNs.getValue()){
+            trajectory.remove(trajectory.size() - 1);
+            trajectory.add(airbornePosition);
+        }
 
         this.altitude.set(altitude);
     }
