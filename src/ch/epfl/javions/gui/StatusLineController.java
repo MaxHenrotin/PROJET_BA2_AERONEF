@@ -6,6 +6,13 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
+/**
+ * Gère la ligne d'état du programme
+ *
+ * @author Julien Erbland (346893)
+ * @author Max Henrotin (341463)
+ */
+
 public final class StatusLineController {
 
     //===================================== Attributs privées statiques ================================================
@@ -24,6 +31,9 @@ public final class StatusLineController {
 
     //===================================== Méthodes publiques =========================================================
 
+    /**
+     * Constructeur par défaut qui construit le graphe de scène
+     */
     public StatusLineController(){
         pane = new BorderPane();
         pane.getStylesheets().add(PANE_STYLESHEETS);
@@ -41,15 +51,22 @@ public final class StatusLineController {
         pane.setRight(messageCountText);
     }
 
-    public Pane pane(){
-        return pane;
-    }
+    /**
+     * Retourne le panneau contenant la ligne d'état
+     * @return : retourne le panneau contenant la ligne d'état
+     */
+    public Pane pane(){ return pane; }
 
-    public IntegerProperty aircraftCountPropertyProperty() {
-        return aircraftCountProperty;
-    }
+    /**
+     * Retourne la propriété (modifiable) contenant le nombre d'aéronefs actuellement visibles
+     * @return : la propriété contenant le nombre d'aéronefs actuellement visibles
+     */
+    public IntegerProperty aircraftCountPropertyProperty() { return aircraftCountProperty; }
 
-    public LongProperty messageCountProperty() {
-        return messageCountProperty;
-    }
+    /**
+     * Retourne la propriété (modifiable) contenant le nombre de messages
+     * reçus depuis le début de l'exécution du programme
+     * @return : la propriété contenant le nombre de messages reçus depuis le début de l'exécution du programme
+     */
+    public LongProperty messageCountProperty() { return messageCountProperty; }
 }
