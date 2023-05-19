@@ -133,7 +133,6 @@ public final class Main extends Application {
                             new FileInputStream(fichierALire)))) {
 
                     //pour lire un fichier non démodulé (format System.in)
-                    /*
                     AdsbDemodulator demodulateur = new AdsbDemodulator(s);  //si on a mis : "samples_20230304_1442.bin"   (fonctionne pas jsp pourquoi ??)
                     while(true){
                         RawMessage rawMessage = demodulateur.nextMessage();
@@ -141,7 +140,6 @@ public final class Main extends Application {
                             allMessages.addFirst(rawMessage);
                         }
                     }
-                     */
 
                     //Pour lire un fichier démodulé
                     /*
@@ -176,9 +174,9 @@ public final class Main extends Application {
                     if (!allMessages.isEmpty()) {
                         for (int i = 0; i < 10; i += 1) {       //bcp plus rapide et efficace avec cette ligne
                             Message m = MessageParser.parse(allMessages.getLast());
-                            messageCount.set(messageCount.longValue() + 1);
                             allMessages.removeLast();
                             if (m != null) {
+                                messageCount.set(messageCount.longValue() + 1);
                                 asm.updateWithMessage(m);
                                 asm.purge();    //à faire une fois par seconde (verifier COMMENT ??)
                             }
