@@ -16,7 +16,7 @@ class SamplesDecoderTest {
 
         short [] actual=new short[batchSize];
 
-        InputStream stream = new FileInputStream("resources\\samples.bin");
+        InputStream stream = new FileInputStream("samples.bin");
 
         SamplesDecoder sample = new SamplesDecoder(stream,batchSize);
 
@@ -34,7 +34,7 @@ class SamplesDecoderTest {
 
     @Test
     void samplesDecoderThrowIllegal() throws IOException {
-        InputStream stream = new FileInputStream("resources\\samples.bin");
+        InputStream stream = new FileInputStream("samples.bin");
         assertThrows(IllegalArgumentException.class,()->new SamplesDecoder(stream,-5));
     }
 
@@ -44,7 +44,7 @@ class SamplesDecoderTest {
 
         short [] actual=new short[batchSize+1];
 
-        InputStream stream = new FileInputStream("resources\\samples.bin");
+        InputStream stream = new FileInputStream("samples.bin");
 
         SamplesDecoder sample = new SamplesDecoder(stream,batchSize);
 

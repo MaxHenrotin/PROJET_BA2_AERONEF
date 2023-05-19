@@ -196,7 +196,7 @@ class AircraftStateAccumulatorTest {
 
     @Test
     void AircraftStateAccumulatorWorksOnSample() throws IOException {
-        String f = "resources\\samples_20230304_1442.bin";
+        String f = "samples_20230304_1442.bin";
         IcaoAddress expectedAddress = new IcaoAddress("4D2228");
         try (InputStream s = new FileInputStream(f)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
@@ -220,7 +220,7 @@ class AircraftStateAccumulatorTest {
             icaoAdresses[i] = new IcaoAddress(icaoAdressesString[i]);
         }
 
-        String f = "resources\\samples_20230304_1442.bin";
+        String f = "samples_20230304_1442.bin";
         IcaoAddress expectedAddress = icaoAdresses[4];
         try (InputStream s = new FileInputStream(f)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
