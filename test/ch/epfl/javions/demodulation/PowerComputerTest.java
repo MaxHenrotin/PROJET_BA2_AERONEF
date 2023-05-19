@@ -20,13 +20,13 @@ class PowerComputerTest {
 
     @Test
     void powerComputerThrowsIllegalUnder0() throws IOException{
-        InputStream stream = new FileInputStream("resources\\samples.bin");
+        InputStream stream = new FileInputStream("samples.bin");
         assertThrows(IllegalArgumentException.class,()->new PowerComputer(stream,-3));
     }
 
     @Test
     void powerComputerThrowsIllegalIfNotModulo8() throws IOException{
-        InputStream stream = new FileInputStream("resources\\samples.bin");
+        InputStream stream = new FileInputStream("samples.bin");
         assertThrows(IllegalArgumentException.class,()->new PowerComputer(stream,12));
     }
 
@@ -36,7 +36,7 @@ class PowerComputerTest {
 
         int [] actual=new int[expected.length];
 
-        InputStream stream = new FileInputStream("resources\\samples.bin");
+        InputStream stream = new FileInputStream("samples.bin");
 
         PowerComputer sample = new PowerComputer(stream, expected.length);
 
@@ -51,7 +51,7 @@ class PowerComputerTest {
     void readBatchWorksOn160Puissances() throws IOException{ //ce test donne les 160 premières puissances qu'on a pu vérifier à l'aide d'un tableur
         int [] actual=new int[160];
 
-        InputStream stream = new FileInputStream("resources\\samples.bin");
+        InputStream stream = new FileInputStream("samples.bin");
 
         PowerComputer sample = new PowerComputer(stream, actual.length);
 

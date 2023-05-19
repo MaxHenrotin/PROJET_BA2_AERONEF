@@ -26,27 +26,27 @@ class PowerWindowTest {
 
     @Test
     void powerWindowConstructCorrectly() throws IOException {
-        InputStream stream = new FileInputStream("resources\\samples.bin");
+        InputStream stream = new FileInputStream("samples.bin");
         assertDoesNotThrow(() -> new PowerWindow(stream, 5));
     }
 
     @Test
     void sizeWorks() throws IOException{
-        InputStream stream = new FileInputStream("resources\\samples.bin");
+        InputStream stream = new FileInputStream("samples.bin");
         PowerWindow window = new PowerWindow(stream, 5);
         assertEquals(5,window.size());
     }
 
     @Test
     void getWorksWhenWindowNotAdvanced() throws IOException{
-        InputStream stream = new FileInputStream("resources\\samples.bin");
+        InputStream stream = new FileInputStream("samples.bin");
         PowerWindow window = new PowerWindow(stream, 5);
         assertEquals(745,window.get(3));
     }
 
     @Test
     void getWorksWhenAdvance() throws IOException{
-        InputStream stream = new FileInputStream("resources\\samples.bin");
+        InputStream stream = new FileInputStream("samples.bin");
         PowerWindow window = new PowerWindow(stream, 5);
 
         int[] test ={4226, 12244, 25722, 36818, 23825};
@@ -55,7 +55,7 @@ class PowerWindowTest {
             assertEquals(test[i],window.get(i));
         }
 
-        InputStream stream2 = new FileInputStream("resources\\samples.bin");
+        InputStream stream2 = new FileInputStream("samples.bin");
         PowerWindow window2 = new PowerWindow(stream2, 5);
         window2.advanceBy(196);
         assertEquals(6893,window2.get(0));
@@ -68,7 +68,7 @@ class PowerWindowTest {
 
     @Test
     void advanceWorks() throws IOException{
-        InputStream stream = new FileInputStream("resources\\samples.bin");
+        InputStream stream = new FileInputStream("samples.bin");
         PowerWindow window = new PowerWindow(stream, 5);
         window.advance();
         assertEquals(98,window.get(3));
@@ -82,7 +82,7 @@ class PowerWindowTest {
 
     @Test
     void positionWorks() throws IOException{
-        InputStream stream = new FileInputStream("resources\\samples.bin");
+        InputStream stream = new FileInputStream("samples.bin");
         PowerWindow window = new PowerWindow(stream, 5);
         assertEquals(0,window.position());
         window.advance();
@@ -91,7 +91,7 @@ class PowerWindowTest {
     }
     @Test
     void isFullWorks() throws IOException{
-        InputStream stream = new FileInputStream("resources\\samples.bin");
+        InputStream stream = new FileInputStream("samples.bin");
         PowerWindow window = new PowerWindow(stream, 5);
         //sans advance
         assertTrue(window.isFull());

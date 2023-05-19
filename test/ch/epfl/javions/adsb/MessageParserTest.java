@@ -18,7 +18,7 @@ class MessageParserTest {
         int identificationCounter = 0;
         int nullCounter = 0;
 
-        String f = "resources\\samples_20230304_1442.bin";
+        String f = "samples_20230304_1442.bin";
         try (InputStream s = new FileInputStream(f)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
             RawMessage m;

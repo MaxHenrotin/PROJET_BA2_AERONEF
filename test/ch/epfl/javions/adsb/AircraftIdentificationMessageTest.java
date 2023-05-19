@@ -14,7 +14,7 @@ class AircraftIdentificationMessageTest {
     @Test
     void aircraftIdentificationMessageWorksOnSampleWithValidTypeCode() {
         int counter = 0;
-        String f = "resources\\samples_20230304_1442.bin";
+        String f = "samples_20230304_1442.bin";
         try (InputStream s = new FileInputStream(f)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
             RawMessage m;
@@ -34,7 +34,7 @@ class AircraftIdentificationMessageTest {
     @Test
     void aircraftIdentificationMessageWorksOnSampleWithoutValidTypeCode() {
         int counter = 0;
-        String f = "resources\\samples_20230304_1442.bin";
+        String f = "samples_20230304_1442.bin";
         try (InputStream s = new FileInputStream(f)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
             RawMessage m;

@@ -58,11 +58,12 @@ public final class Main extends Application {
         List<String> args = getParameters().getRaw();
         ConcurrentLinkedDeque<RawMessage> allMessages = new ConcurrentLinkedDeque<>();
 
-        // … à compléter (voir TestBaseMapController)
+        //Création de la map
         Path tileCache = Path.of("tile-cache");
         TileManager tileManager = new TileManager(tileCache, "tile.openstreetmap.org");  // "tile.openstreetmap.org"
         MapParameters mapParameters = new MapParameters(8, 33_530, 23_070);
         BaseMapController baseMapController = new BaseMapController(tileManager, mapParameters);
+
 
         // Création de la base de données
         URL u = getClass().getResource("/aircraft.zip");
