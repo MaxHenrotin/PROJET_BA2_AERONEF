@@ -67,19 +67,19 @@ public final class AircraftTableController {
         //gérer la sélection dans la  table d'un aircraft
         TableView.TableViewSelectionModel<ObservableAircraftState> selectionModel = tableView.getSelectionModel();
 
-        //pour connaitre la partie visible de la table
-        TableViewSkin<?> tableViewSkin = (TableViewSkin<?>) tableView.getSkin();
-        VirtualFlow<?> flow = (VirtualFlow<?>) tableViewSkin.getChildren().get(1);
-
         selectionModel.selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> currentAircraft.set(newValue));
 
         currentAircraft.addListener((observable, oldValue, newValue) -> {
             selectionModel.select(newValue);
+
+            TableViewSkin<?> tableViewSkin = (TableViewSkin<?>) tableView.getSkin();
+            VirtualFlow<?> flow = (VirtualFlow<?>) tableViewSkin.getChildren().get(1);
+
             int newIndex = tableView.getItems().indexOf(newValue);
 
             if (newIndex < flow.getFirstVisibleCell().getIndex() + 1 || newIndex > flow.getLastVisibleCell().getIndex() - 1) {  //+1 et -1 pour quand meme scroll si on voit qu'un tout petit bout de la ligne
-                tableView.scrollTo(newValue);
+                tableView.scrollTo(newValue);       //ATTENTION
             }
         });
 
