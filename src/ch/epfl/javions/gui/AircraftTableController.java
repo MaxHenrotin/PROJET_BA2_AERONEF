@@ -73,6 +73,7 @@ public final class AircraftTableController {
             if(Objects.nonNull(oldValue) && !oldValue.equals(newValue)) tableView.scrollTo(newValue);
         });
 
+        //utiliser setOnDoubleClic plutot non ?? et faire un centerOn
         tableView.setOnMouseClicked(event -> {
             if(Objects.nonNull(currentAircraft.get()) && event.getButton() == MouseButton.PRIMARY &&
                     event.getClickCount() == 2){

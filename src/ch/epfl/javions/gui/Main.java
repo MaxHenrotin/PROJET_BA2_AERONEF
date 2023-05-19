@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.function.Consumer;
 
 //VOIR TREAD 2170
 
@@ -88,6 +89,9 @@ public final class Main extends Application {
         //Crée la table des aéronefs visibles
         AircraftTableController aircraftTableController = new AircraftTableController(states, selectedAircraft);
         TableView<ObservableAircraftState> tableView = aircraftTableController.pane();
+        //liaison doubles clics sur table et centrage sur carte
+        //Consumer<ObservableAircraftState> DoubleClicConsumer = (state) -> baseMapController.centerOn(state.getPosition());
+        //aircraftTableController.setOnDoubleClick(DoubleClicConsumer);
 
         BorderPane statusAndTable = new BorderPane();
         statusAndTable.setTop(statusLine);
@@ -109,7 +113,7 @@ public final class Main extends Application {
             if(args.isEmpty()){     //peut etre aussi verifier si args == null mais je crois pas que ce soit necessaire
                 //LIRE DIRECT DEPUIS LA AIRSPY
                 try {
-                    AdsbDemodulator demodulateur = new AdsbDemodulator(System.in);
+                    AdsbDemodulator demodulateur = new AdsbDemodulator(System.in);  //pour simuler ca on a : "samples_20230304_1442.bin"   (fonctionne pas jsp pourquoi ??)
                     while(true){
                         RawMessage rawMessage = demodulateur.nextMessage();
                         if (rawMessage != null) {
@@ -122,13 +126,26 @@ public final class Main extends Application {
             }else{
                 //LIRE DEPUIS UN FICHIER .bin (mis en argument du programme)
                 String fichierALire = args.get(0);  //ex : "messages_20230318_0915.bin"  (à mettre dans Run puis edit configuration puis programm argument
-                                                    //     "samples_20230304_1442.bin"   (fonctionne pas jsp pourquoi ??)
+
                 try (DataInputStream s = new DataInputStream(
                     new BufferedInputStream(
                             new FileInputStream(fichierALire)))) {
 
+                    //pour lire un fichier non démodulé (format System.in)
+                    /*
+                    AdsbDemodulator demodulateur = new AdsbDemodulator(s);  //si on a mis : "samples_20230304_1442.bin"   (fonctionne pas jsp pourquoi ??)
+                    while(true){
+                        RawMessage rawMessage = demodulateur.nextMessage();
+                        if (rawMessage != null) {
+                            allMessages.addFirst(rawMessage);
+                        }
+                    }
+                     */
+
+                    //Pour lire un fichier démodulé
+                    /*
                     byte[] bytes = new byte[RawMessage.LENGTH];
-                    while (true) {
+                    while (true) {      // ?ou bien? : s.available() != 0
                         long timeStampNs = s.readLong();
                         int bytesRead = s.readNBytes(bytes, 0, bytes.length);
                         assert bytesRead == RawMessage.LENGTH;
@@ -137,6 +154,8 @@ public final class Main extends Application {
                             allMessages.addFirst(rawMessage);
                         }
                     }
+                     */
+
                 } catch (EOFException e) {
                 } catch (FileNotFoundException e) {
                     throw new RuntimeException(e);
