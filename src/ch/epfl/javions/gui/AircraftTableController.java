@@ -82,7 +82,7 @@ public final class AircraftTableController {
                 int lastVisibleIndex = flow.getLastVisibleCell().getIndex();
                 int newIndex = tableView.getItems().indexOf(newValue);
 
-                if (newIndex < firstVisibleIndex || newIndex > lastVisibleIndex) {
+                if (newIndex < firstVisibleIndex + 1 || newIndex > lastVisibleIndex - 1) {  //+1 et -1 pour quand meme scroll si on voit qu'un tout petit bout de la ligne
                     tableView.scrollTo(newValue);
                 }
             }
