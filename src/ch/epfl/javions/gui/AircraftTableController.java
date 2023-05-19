@@ -11,6 +11,8 @@ import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.skin.TableViewSkin;
+import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.MouseButton;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -70,10 +72,22 @@ public final class AircraftTableController {
 
         currentAircraft.addListener((observable, oldValue, newValue) -> {
             selectionModel.select(newValue);
-            if(Objects.nonNull(oldValue) && !oldValue.equals(newValue)) tableView.scrollTo(newValue);
+
+            if(Objects.nonNull(oldValue) && !oldValue.equals(newValue)){
+
+                TableViewSkin<?> tableViewSkin = (TableViewSkin<?>) tableView.getSkin();
+                VirtualFlow<?> flow = (VirtualFlow<?>) tableViewSkin.getChildren().get(1);
+
+                int firstVisibleIndex = flow.getFirstVisibleCell().getIndex();
+                int lastVisibleIndex = flow.getLastVisibleCell().getIndex();
+                int newIndex = tableView.getItems().indexOf(newValue);
+
+                if (newIndex < firstVisibleIndex || newIndex > lastVisibleIndex) {
+                    tableView.scrollTo(newValue);
+                }
+            }
         });
 
-        //utiliser setOnDoubleClic plutot non ?? et faire un centerOn
         tableView.setOnMouseClicked(event -> {
             if(Objects.nonNull(currentAircraft.get()) && event.getButton() == MouseButton.PRIMARY &&
                     event.getClickCount() == 2){

@@ -184,13 +184,6 @@ public class BaseMapController {
      * Déplace la portion visible de la carte afin qu'elle soit centrée en ce point
      * @param newCenter : un point à la surface de la Terre
      */
-    //pour tester la classe centerOn copier ce code par exemple à la fin de redraw()
-    /*
-    double longitude = 7.0349930;
-    double latitude = 46.4969666;
-    centerOn(new GeoPos((int) Units.convert(longitude, Units.Angle.DEGREE, Units.Angle.T32),
-                                                (int) Units.convert(latitude, Units.Angle.DEGREE, Units.Angle.T32)));
-    */
     public void centerOn(GeoPos newCenter){
         double centreX = WebMercator.x(mapParameters.getZoom(), newCenter.longitude());
         double centreY = WebMercator.y(mapParameters.getZoom(), newCenter.latitude());
