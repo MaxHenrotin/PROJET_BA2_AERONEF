@@ -112,7 +112,7 @@ public final class Main extends Application {
         Thread obtentionMessages = new Thread(() -> {
 
             if(args.isEmpty()){     //peut etre aussi verifier si args == null mais je crois pas que ce soit necessaire
-                //LIRE DIRECT DEPUIS LA AIRSPY
+                //LIRE DIRECT DEPUIS LA AIRSPY  (voir etape 11 Test pour comprendre comment faire fonctionner cette partie)
                 try {
                     AdsbDemodulator demodulateur = new AdsbDemodulator(System.in);  //pour simuler ca on a : "samples_20230304_1442.bin"   (fonctionne pas jsp pourquoi ??)
                     while(true){
@@ -130,18 +130,6 @@ public final class Main extends Application {
                 try (DataInputStream s = new DataInputStream(
                     new BufferedInputStream(
                             new FileInputStream(fichierALire)))) {
-
-                    //si on veut lire un fichier non démodulé (format System.in) (il faut donc commenter le bloc qui suit)
-                    //je crois pas qu'il faille rendre pour le rendu final
-                    /*
-                    AdsbDemodulator demodulateur = new AdsbDemodulator(s);  //si on a mis : "samples_20230304_1442.bin"   (fonctionne pas jsp pourquoi ??)
-                    while(true){
-                        RawMessage rawMessage = demodulateur.nextMessage();
-                        if (rawMessage != null) {
-                            allMessages.addFirst(rawMessage);
-                        }
-                    }
-                     */
 
                     //Pour lire un fichier démodulé
                     byte[] bytes = new byte[RawMessage.LENGTH];
