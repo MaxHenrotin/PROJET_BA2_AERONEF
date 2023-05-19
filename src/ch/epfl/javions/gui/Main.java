@@ -188,7 +188,6 @@ public final class Main extends Application {
                                 messageCount.set(messageCount.longValue() + 1);
                                 asm.updateWithMessage(m);
                                 if(now - lastPurgeTimestamps > Units.Time.SECOND/Units.NANO) {  //représente 10^9
-                                    System.out.println("purge");
                                     asm.purge();
                                     lastPurgeTimestamps = now;
                                 }
