@@ -68,7 +68,7 @@ public final class TestAircraftController extends Application {
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
 
-        var mi = readAllMessages("resources\\messages_20230318_0915.bin")
+        var mi = readAllMessages("messages_20230318_0915.bin")
                 .iterator();
 
         // Animation des aéronefs

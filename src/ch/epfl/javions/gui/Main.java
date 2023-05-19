@@ -109,10 +109,10 @@ public final class Main extends Application {
         //lire depuis System.in
         //}else{
 
-        //String fichierALire = args.get(0);  //ex : "resources\\messages_20230318_0915.bin"
+        //String fichierALire = args.get(0);  //ex : "messages_20230318_0915.bin"
         try (DataInputStream s = new DataInputStream(
                 new BufferedInputStream(
-                        new FileInputStream("resources\\messages_20230318_0915.bin")))) {
+                        new FileInputStream("messages_20230318_0915.bin")))) {
 
             byte[] bytes = new byte[RawMessage.LENGTH];
             while (true) {

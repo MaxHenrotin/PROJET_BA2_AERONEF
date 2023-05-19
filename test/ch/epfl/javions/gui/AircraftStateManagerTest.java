@@ -28,7 +28,7 @@ class AircraftStateManagerTest {
     public void testDeBase(){
         try (DataInputStream s = new DataInputStream(
                 new BufferedInputStream(
-                        new FileInputStream("resources\\messages_20230318_0915.bin")))){
+                        new FileInputStream("messages_20230318_0915.bin")))){
             byte[] bytes = new byte[RawMessage.LENGTH];
             while (true) {
                 long timeStampNs = s.readLong();
