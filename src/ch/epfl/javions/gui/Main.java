@@ -1,5 +1,6 @@
 package ch.epfl.javions.gui;
 
+import ch.epfl.javions.Units;
 import ch.epfl.javions.adsb.Message;
 import ch.epfl.javions.adsb.MessageParser;
 import ch.epfl.javions.adsb.RawMessage;
@@ -54,7 +55,6 @@ public final class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         //PREPARTION DES VARIABLES POUR LE FIL D'EXECUTION
-
         List<String> args = getParameters().getRaw();
         ConcurrentLinkedDeque<RawMessage> allMessages = new ConcurrentLinkedDeque<>();
 
@@ -117,22 +117,23 @@ public final class Main extends Application {
                     AdsbDemodulator demodulateur = new AdsbDemodulator(System.in);  //pour simuler ca on a : "samples_20230304_1442.bin"   (fonctionne pas jsp pourquoi ??)
                     while(true){
                         RawMessage rawMessage = demodulateur.nextMessage();
-                        if (rawMessage != null) {
-                            allMessages.addFirst(rawMessage);
-                        }
+                        if (rawMessage != null) allMessages.addFirst(rawMessage);
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }else{
+                long timestampsLastMessage = -1;
                 //LIRE DEPUIS UN FICHIER .bin (mis en argument du programme)
-                String fichierALire = args.get(0);  //ex : "messages_20230318_0915.bin"  (à mettre dans Run puis edit configuration puis programm argument
+                String fichierALire = args.get(0);  //ex : "messages_20230318_0915.bin" (à mettre dans Run puis edit configuration puis programm argument
 
                 try (DataInputStream s = new DataInputStream(
                     new BufferedInputStream(
                             new FileInputStream(fichierALire)))) {
 
-                    //pour lire un fichier non démodulé (format System.in)
+                    //si on veut lire un fichier non démodulé (format System.in) (il faut donc commenter le bloc qui suit)
+                    //je crois pas qu'il faille rendre pour le rendu final
+                    /*
                     AdsbDemodulator demodulateur = new AdsbDemodulator(s);  //si on a mis : "samples_20230304_1442.bin"   (fonctionne pas jsp pourquoi ??)
                     while(true){
                         RawMessage rawMessage = demodulateur.nextMessage();
@@ -140,9 +141,9 @@ public final class Main extends Application {
                             allMessages.addFirst(rawMessage);
                         }
                     }
+                     */
 
                     //Pour lire un fichier démodulé
-                    /*
                     byte[] bytes = new byte[RawMessage.LENGTH];
                     while (true) {      // ?ou bien? : s.available() != 0
                         long timeStampNs = s.readLong();
@@ -150,15 +151,21 @@ public final class Main extends Application {
                         assert bytesRead == RawMessage.LENGTH;
                         RawMessage rawMessage = RawMessage.of(timeStampNs, bytes);
                         if (rawMessage != null) {
+                            if(timestampsLastMessage>=0) {
+                                long tempsAttenteMillisecond = (long) ((rawMessage.timeStampNs() - timestampsLastMessage) * Units.MICRO);    //micro représente la conversion entre nano et mili
+                                if (tempsAttenteMillisecond > 0) Thread.sleep(tempsAttenteMillisecond);   //car sleep prend des millisecondes en argument et non des nanosecondes
+                            }
                             allMessages.addFirst(rawMessage);
+                            timestampsLastMessage = rawMessage.timeStampNs();
                         }
                     }
-                     */
 
                 } catch (EOFException e) {
                 } catch (FileNotFoundException e) {
                     throw new RuntimeException(e);
                 } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -178,7 +185,9 @@ public final class Main extends Application {
                             if (m != null) {
                                 messageCount.set(messageCount.longValue() + 1);
                                 asm.updateWithMessage(m);
+
                                 asm.purge();
+                                //Utilisez le paramètre now de la méthode handle, qui vous donne une notion de temps écoulé en nanosecondes. Dès que plus qu'une seconde s'est écoulée depuis le dernier appel à purge, appelez-la.
                             }
                         } else {
                             break;

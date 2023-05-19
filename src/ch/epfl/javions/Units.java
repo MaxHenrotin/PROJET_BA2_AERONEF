@@ -12,13 +12,26 @@ public final class Units {
 
     //===================================== Attributs publiques statiques ==============================================
     /**
+     * Préfixe kilo utile aux calculs d'unités
+     */
+    public static final double KILO = 1e3;
+    /**
      * Préfixe centi utile aux calculs d'unités
      */
     public static final double CENTI = 1e-2;
     /**
-     * Préfixe kilo utile aux calculs d'unités
+     * Préfixe mili utile aux calculs d'unités
      */
-    public static final double KILO = 1e3;
+    public static final double MILI = 1e-3;
+    /**
+     * Préfixe micro utile aux calculs d'unités
+     */
+    public static final double MICRO = 1e-6;
+    /**
+     * Préfixe nano utile aux calculs d'unités
+     */
+    public static final double NANO = 1e-9;
+
 
     //===================================== Méthodes publiques statiques ===============================================
 
