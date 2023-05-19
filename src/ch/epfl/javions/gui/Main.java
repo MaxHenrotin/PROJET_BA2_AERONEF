@@ -105,33 +105,34 @@ public final class Main extends Application {
 
         Thread obtentionMessages = new Thread(() -> {
 
-        //if(args == null || args.isEmpty()){     //pas sur que ==null soit necessaire
-        //lire depuis System.in
-        //}else{
+            if(args == null || args.isEmpty()){     //pas sur que ==null soit necessaire
+                //lire depuis System.in
+            }else{
 
-        //String fichierALire = args.get(0);  //ex : "messages_20230318_0915.bin"
-        try (DataInputStream s = new DataInputStream(
-                new BufferedInputStream(
-                        new FileInputStream("messages_20230318_0915.bin")))) {
+                String fichierALire = args.get(0);  //ex : "messages_20230318_0915.bin"  (à mettre dans Run puis edit configuration puis programm argument
+                                                    //     "samples_20230304_1442.bin"   (fonctionne pas jsp pourquoi ??)
+                try (DataInputStream s = new DataInputStream(
+                    new BufferedInputStream(
+                            new FileInputStream(fichierALire)))) {
+                            //new FileInputStream("samples_20230304_1442.bin")))){
 
-            byte[] bytes = new byte[RawMessage.LENGTH];
-            while (true) {
-                long timeStampNs = s.readLong();
-                int bytesRead = s.readNBytes(bytes, 0, bytes.length);
-                assert bytesRead == RawMessage.LENGTH;
-                RawMessage rawMessage = RawMessage.of(timeStampNs, bytes);
-                if (rawMessage != null) {
-                    allMessages.addFirst(rawMessage);
+                    byte[] bytes = new byte[RawMessage.LENGTH];
+                    while (true) {
+                        long timeStampNs = s.readLong();
+                        int bytesRead = s.readNBytes(bytes, 0, bytes.length);
+                        assert bytesRead == RawMessage.LENGTH;
+                        RawMessage rawMessage = RawMessage.of(timeStampNs, bytes);
+                        if (rawMessage != null) {
+                            allMessages.addFirst(rawMessage);
+                        }
+                    }
+                } catch (EOFException e) {
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
-        } catch (EOFException e) {
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        // }
         });
         obtentionMessages.setDaemon(true);
         obtentionMessages.start();
@@ -142,13 +143,14 @@ public final class Main extends Application {
             public void handle(long now) {
                 try {
                     for (int i = 0; i < 10; i += 1) {       //bcp plus rapide et efficace avec cette ligne
-                        Message m = MessageParser.parse(allMessages.getLast());
-                        allMessages.removeLast();
+                        if (!allMessages.isEmpty()) {
+                            Message m = MessageParser.parse(allMessages.getLast());
+                            allMessages.removeLast();
                             if (m != null) {
                                 asm.updateWithMessage(m);
-                                messageCount.set(messageCount.longValue() + 1);
                                 asm.purge();
                             }
+                        }
                     }
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
