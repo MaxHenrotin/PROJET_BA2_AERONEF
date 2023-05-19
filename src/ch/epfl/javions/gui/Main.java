@@ -103,7 +103,7 @@ public final class Main extends Application {
 
         //DEMARAGE DU FIL D'EXECUTION CHARGE D'OBTENIR LES MESSAGES
 
-        //Thread obtentionMessages = new Thread(() -> {
+        Thread obtentionMessages = new Thread(() -> {
 
         //if(args == null || args.isEmpty()){     //pas sur que ==null soit necessaire
         //lire depuis System.in
@@ -121,7 +121,7 @@ public final class Main extends Application {
                 assert bytesRead == RawMessage.LENGTH;
                 RawMessage rawMessage = RawMessage.of(timeStampNs, bytes);
                 if (rawMessage != null) {
-                    allMessages.add(rawMessage);
+                    allMessages.addFirst(rawMessage);
                 }
             }
         } catch (EOFException e) {
@@ -132,32 +132,32 @@ public final class Main extends Application {
         }
 
         // }
-        //});
-        //obtentionMessages.setDaemon(true);
-        //obtentionMessages.start();
+        });
+        obtentionMessages.setDaemon(true);
+        obtentionMessages.start();
 
-
-        var iteratorOfAllMessages = allMessages.iterator();
         //DEMARRAGE DU "MINUTEUR D'ANIMATION"
         new AnimationTimer() {
             @Override
             public void handle(long now) {
                 try {
-                    for (int i = 0; i < 10; i += 1) {
-                        if (iteratorOfAllMessages.hasNext()) {   //pas sur que ce soit necessaire
-                            Message m = MessageParser.parse(iteratorOfAllMessages.next());
+                    for (int i = 0; i < 10; i += 1) {       //bcp plus rapide et efficace avec cette ligne
+                        Message m = MessageParser.parse(allMessages.getLast());
+                        allMessages.removeLast();
                             if (m != null) {
                                 asm.updateWithMessage(m);
                                 messageCount.set(messageCount.longValue() + 1);
                                 asm.purge();
                             }
-                        }
                     }
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
                 }
             }
         }.start();
+
+
+
 
 //utiliser thread sleep pour attendre la publication des messages depuis le ficher
 
