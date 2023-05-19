@@ -188,14 +188,17 @@ public class BaseMapController {
     /*
     double longitude = 7.0349930;
     double latitude = 46.4969666;
-    centerOn(new GeoPos((int) Units.convert(longitude, Units.Angle.DEGREE, Units.Angle.T32), (int) Units.convert(latitude, Units.Angle.DEGREE, Units.Angle.T32)));
+    centerOn(new GeoPos((int) Units.convert(longitude, Units.Angle.DEGREE, Units.Angle.T32),
+                                                (int) Units.convert(latitude, Units.Angle.DEGREE, Units.Angle.T32)));
     */
     public void centerOn(GeoPos newCenter){
         double centreX = WebMercator.x(mapParameters.getZoom(), newCenter.longitude());
         double centreY = WebMercator.y(mapParameters.getZoom(), newCenter.latitude());
 
-        mapParameters = new MapParameters(mapParameters.getZoom(),
-                                    centreX - canvas.getWidth() / 2.0, centreY - canvas.getHeight() / 2.0);
+        double minX = centreX - canvas.getWidth() / 2.0;
+        double minY = centreY - canvas.getHeight() / 2.0;
+
+        mapParameters.scroll(minX - mapParameters.getminX(),minY-mapParameters.getminY());
 
         redrawOnNextPulse();
     }

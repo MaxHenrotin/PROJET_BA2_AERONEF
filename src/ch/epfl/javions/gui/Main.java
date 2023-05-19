@@ -69,12 +69,12 @@ public final class Main extends Application {
         URL u = getClass().getResource("/aircraft.zip");
         assert u != null;
         Path p = Path.of(u.toURI());
-        AircraftDatabase db = new AircraftDatabase(p.toString());
+        AircraftDatabase database = new AircraftDatabase(p.toString());
 
         //CREATION DU GRAPHE DE SCENE GRAPHIQUE
 
         //Crée la map avec les avions par-dessus
-        AircraftStateManager asm = new AircraftStateManager(db);
+        AircraftStateManager asm = new AircraftStateManager(database);
         ObjectProperty<ObservableAircraftState> selectedAircraft = new SimpleObjectProperty<>();
         ObservableSet<ObservableAircraftState> states = asm.states();
         AircraftController ac = new AircraftController(mapParameters, states, selectedAircraft);
@@ -91,8 +91,8 @@ public final class Main extends Application {
         AircraftTableController aircraftTableController = new AircraftTableController(states, selectedAircraft);
         TableView<ObservableAircraftState> tableView = aircraftTableController.pane();
         //liaison doubles clics sur table et centrage sur carte
-        //Consumer<ObservableAircraftState> DoubleClicConsumer = (state) -> baseMapController.centerOn(state.getPosition());
-        //aircraftTableController.setOnDoubleClick(DoubleClicConsumer);
+        Consumer<ObservableAircraftState> DoubleClicConsumer = (state) -> baseMapController.centerOn(state.getPosition());
+        aircraftTableController.setOnDoubleClick(DoubleClicConsumer);
 
         BorderPane statusAndTable = new BorderPane();
         statusAndTable.setTop(statusLine);
@@ -151,6 +151,7 @@ public final class Main extends Application {
                         assert bytesRead == RawMessage.LENGTH;
                         RawMessage rawMessage = RawMessage.of(timeStampNs, bytes);
                         if (rawMessage != null) {
+                            //pour que les avions se déplacent à vitesse réelle
                             if(timestampsLastMessage>=0) {
                                 long tempsAttenteMillisecond = (long) ((rawMessage.timeStampNs() - timestampsLastMessage) * Units.MICRO);    //micro représente la conversion entre nano et mili
                                 if (tempsAttenteMillisecond > 0) Thread.sleep(tempsAttenteMillisecond);   //car sleep prend des millisecondes en argument et non des nanosecondes
