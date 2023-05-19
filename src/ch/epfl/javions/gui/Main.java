@@ -153,14 +153,14 @@ public final class Main extends Application {
             @Override
             public void handle(long now) {
                 try {
-                    for (int i = 0; i < 10; i += 1) {       //bcp plus rapide et efficace avec cette ligne
-                        if (!allMessages.isEmpty()) {
+                    if (!allMessages.isEmpty()) {
+                        for (int i = 0; i < 10; i += 1) {       //bcp plus rapide et efficace avec cette ligne
                             Message m = MessageParser.parse(allMessages.getLast());
+                            messageCount.set(messageCount.longValue() + 1);
                             allMessages.removeLast();
                             if (m != null) {
                                 asm.updateWithMessage(m);
-                                messageCount.set(messageCount.longValue() + 1);
-                                asm.purge();    //à faire une fois par seconde (verifier)
+                                asm.purge();    //à faire une fois par seconde (verifier COMMENT ??)
                             }
                         }
                     }
@@ -171,11 +171,11 @@ public final class Main extends Application {
         }.start();
 
 
-        //utiliser thread sleep pour attendre la publication des messages depuis le ficher (dans animationTimer
+        //utiliser thread sleep pour attendre la publication des messages depuis le ficher (au moment de l'ajout dans la queue
 
 
 
-        }
+    }
 
 
 }
