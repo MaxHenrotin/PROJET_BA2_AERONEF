@@ -25,8 +25,11 @@ import org.w3c.dom.ls.LSOutput;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
+
+//VOIR TREAD 2170
 
 /**
  * Contient le programme principal
@@ -43,7 +46,7 @@ public final class Main extends Application {
      */
     public static void main(String[] args) {
         launch(args);
-    }
+    }   //DEMARAGE DU FIL D'EXECUTION JAVAFX
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -89,7 +92,7 @@ public final class Main extends Application {
         statusAndTable.setTop(statusLine);
         statusAndTable.setCenter(tableView);
 
-        SplitPane finalPane = new SplitPane(mapWithAircrafts,statusAndTable);
+        SplitPane finalPane = new SplitPane(mapWithAircrafts, statusAndTable);
         finalPane.setOrientation(Orientation.VERTICAL);
         primaryStage.setScene(new Scene(finalPane));
         primaryStage.setTitle("Javions");
@@ -97,55 +100,70 @@ public final class Main extends Application {
         primaryStage.setMinHeight(600);
         primaryStage.show();
 
+
         //DEMARAGE DU FIL D'EXECUTION CHARGE D'OBTENIR LES MESSAGES
 
-        new Thread(() -> {
+        //Thread obtentionMessages = new Thread(() -> {
 
-            if(args.isEmpty()){     //ou bien is null ?
-                //lire depuis System.in
-            }else{
-                String fichierALire = args.get(0);  //ex : "resources\\messages_20230318_0915.bin"
-                try (DataInputStream s = new DataInputStream(
-                        new BufferedInputStream(
-                                new FileInputStream(fichierALire)))){
+        //if(args == null || args.isEmpty()){     //pas sur que ==null soit necessaire
+        //lire depuis System.in
+        //}else{
 
-                    byte[] bytes = new byte[RawMessage.LENGTH];
-                    while (true) {
-                        long timeStampNs = s.readLong();
-                        int bytesRead = s.readNBytes(bytes, 0, bytes.length);
-                        assert bytesRead == RawMessage.LENGTH;
-                        RawMessage rawMessage = RawMessage.of(timeStampNs,bytes);
-                        if(rawMessage != null){
-                            allMessages.add(rawMessage);
-                            messageCount.set(messageCount.longValue() + 1);
-                        }
-                    }
-                }
-                catch (EOFException e) {} catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+        //String fichierALire = args.get(0);  //ex : "resources\\messages_20230318_0915.bin"
+        try (DataInputStream s = new DataInputStream(
+                new BufferedInputStream(
+                        new FileInputStream("resources\\messages_20230318_0915.bin")))) {
+
+            byte[] bytes = new byte[RawMessage.LENGTH];
+            while (true) {
+                long timeStampNs = s.readLong();
+                int bytesRead = s.readNBytes(bytes, 0, bytes.length);
+                assert bytesRead == RawMessage.LENGTH;
+                RawMessage rawMessage = RawMessage.of(timeStampNs, bytes);
+                if (rawMessage != null) {
+                    allMessages.add(rawMessage);
                 }
             }
+        } catch (EOFException e) {
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-            var iteratorOfAllMessages = allMessages.iterator();
+        // }
+        //});
+        //obtentionMessages.setDaemon(true);
+        //obtentionMessages.start();
 
-            //DEMARRAGE DU "MINUTEUR D'ANIMATION"
-            new AnimationTimer() {
-                @Override
-                public void handle(long now) {
-                    try {
-                        for (int i = 0; i < 10; i += 1) {
+
+        var iteratorOfAllMessages = allMessages.iterator();
+        //DEMARRAGE DU "MINUTEUR D'ANIMATION"
+        new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                try {
+                    for (int i = 0; i < 10; i += 1) {
+                        if (iteratorOfAllMessages.hasNext()) {   //pas sur que ce soit necessaire
                             Message m = MessageParser.parse(iteratorOfAllMessages.next());
-                            if (m != null) asm.updateWithMessage(m);
+                            if (m != null) {
+                                asm.updateWithMessage(m);
+                                messageCount.set(messageCount.longValue() + 1);
+                                asm.purge();
+                            }
                         }
-                    } catch (IOException e) {
-                        throw new UncheckedIOException(e);
                     }
-                    asm.purge();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
                 }
-            }.start();
-        }).start();
+            }
+        }.start();
 
-    }
+//utiliser thread sleep pour attendre la publication des messages depuis le ficher
+
+
+
+        }
+
+
 }

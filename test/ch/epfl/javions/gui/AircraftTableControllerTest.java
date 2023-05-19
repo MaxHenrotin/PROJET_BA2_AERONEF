@@ -40,7 +40,7 @@ public final class AircraftTableControllerTest extends Application {
                 }
             }
         }
-        catch (EOFException e) { /* nothing to do */ }
+        catch (EOFException e) { }
 
         return allMessages;
     }
@@ -84,5 +84,6 @@ public final class AircraftTableControllerTest extends Application {
                 asm.purge();
             }
         }.start();
+
     }
 }
