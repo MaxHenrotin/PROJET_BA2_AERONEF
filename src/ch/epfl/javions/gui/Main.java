@@ -171,15 +171,17 @@ public final class Main extends Application {
             @Override
             public void handle(long now) {
                 try {
-                    if (!allMessages.isEmpty()) {
-                        for (int i = 0; i < 10; i += 1) {       //bcp plus rapide et efficace avec cette ligne
+                    for (int i = 0; i < 10; i += 1) {
+                        if (!allMessages.isEmpty()) {  // Vérification supplémentaire
                             Message m = MessageParser.parse(allMessages.getLast());
                             allMessages.removeLast();
                             if (m != null) {
                                 messageCount.set(messageCount.longValue() + 1);
                                 asm.updateWithMessage(m);
-                                asm.purge();    //à faire une fois par seconde (verifier COMMENT ??)
+                                asm.purge();
                             }
+                        } else {
+                            break;
                         }
                     }
                 } catch (IOException e) {
