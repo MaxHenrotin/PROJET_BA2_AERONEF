@@ -4,6 +4,7 @@ import ch.epfl.javions.adsb.Message;
 import ch.epfl.javions.adsb.MessageParser;
 import ch.epfl.javions.adsb.RawMessage;
 import ch.epfl.javions.aircraft.AircraftDatabase;
+import ch.epfl.javions.demodulation.AdsbDemodulator;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -105,16 +106,26 @@ public final class Main extends Application {
 
         Thread obtentionMessages = new Thread(() -> {
 
-            if(args == null || args.isEmpty()){     //pas sur que ==null soit necessaire
-                //lire depuis System.in
+            if(args.isEmpty()){     //peut etre aussi verifier si args == null mais je crois pas que ce soit necessaire
+                //LIRE DIRECT DEPUIS LA AIRSPY
+                try {
+                    AdsbDemodulator demodulateur = new AdsbDemodulator(System.in);
+                    while(true){
+                        RawMessage rawMessage = demodulateur.nextMessage();
+                        if (rawMessage != null) {
+                            allMessages.addFirst(rawMessage);
+                        }
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }else{
-
+                //LIRE DEPUIS UN FICHIER .bin (mis en argument du programme)
                 String fichierALire = args.get(0);  //ex : "messages_20230318_0915.bin"  (à mettre dans Run puis edit configuration puis programm argument
                                                     //     "samples_20230304_1442.bin"   (fonctionne pas jsp pourquoi ??)
                 try (DataInputStream s = new DataInputStream(
                     new BufferedInputStream(
                             new FileInputStream(fichierALire)))) {
-                            //new FileInputStream("samples_20230304_1442.bin")))){
 
                     byte[] bytes = new byte[RawMessage.LENGTH];
                     while (true) {
@@ -148,7 +159,8 @@ public final class Main extends Application {
                             allMessages.removeLast();
                             if (m != null) {
                                 asm.updateWithMessage(m);
-                                asm.purge();
+                                messageCount.set(messageCount.longValue() + 1);
+                                asm.purge();    //à faire une fois par seconde (verifier)
                             }
                         }
                     }
@@ -159,9 +171,7 @@ public final class Main extends Application {
         }.start();
 
 
-
-
-//utiliser thread sleep pour attendre la publication des messages depuis le ficher
+        //utiliser thread sleep pour attendre la publication des messages depuis le ficher (dans animationTimer
 
 
 
