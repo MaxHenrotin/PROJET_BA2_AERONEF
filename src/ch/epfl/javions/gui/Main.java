@@ -176,6 +176,7 @@ public final class Main extends Application {
 
         //DEMARRAGE DU "MINUTEUR D'ANIMATION"
         new AnimationTimer() {
+            long lastPurgeTimestamps = 0;
             @Override
             public void handle(long now) {
                 try {
@@ -186,9 +187,11 @@ public final class Main extends Application {
                             if (m != null) {
                                 messageCount.set(messageCount.longValue() + 1);
                                 asm.updateWithMessage(m);
-
-                                asm.purge();
-                                //Utilisez le paramètre now de la méthode handle, qui vous donne une notion de temps écoulé en nanosecondes. Dès que plus qu'une seconde s'est écoulée depuis le dernier appel à purge, appelez-la.
+                                if(now - lastPurgeTimestamps > Units.Time.SECOND/Units.NANO) {  //représente 10^9
+                                    System.out.println("purge");
+                                    asm.purge();
+                                    lastPurgeTimestamps = now;
+                                }
                             }
                         } else {
                             break;
