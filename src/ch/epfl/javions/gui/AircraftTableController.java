@@ -95,7 +95,10 @@ public final class AircraftTableController {
         });
     }
 
-    private void setUpTable(){
+    private TableView<ObservableAircraftState> setUpTable(){
+
+        TableView<ObservableAircraftState> tableView = new TableView<>();
+
         TableColumn<ObservableAircraftState,String> oaciColumn = getDataColumnOf("OACI", OACI_COLUMN_WIDTH,
                 oas -> new ReadOnlyObjectWrapper<>(oas.getIcaoAddress().string()));
 
@@ -155,6 +158,8 @@ public final class AircraftTableController {
             }
         });
 
+        return tableView;
+
     }
 
     //pour les colones non numériques
@@ -205,13 +210,12 @@ public final class AircraftTableController {
         this.states = states;
         this.currentAircraft = currentAicraftState;
 
-        tableView = new TableView<>();
+        tableView = setUpTable();
 
         tableView.getStylesheets().add(TABLE_STYLESHEET);
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
         tableView.setTableMenuButtonVisible(true);
 
-        setUpTable();
         setSelectedAircraftHandler();
     }
 
