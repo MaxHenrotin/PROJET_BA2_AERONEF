@@ -28,14 +28,6 @@ public record AirbornePositionMessage
         (long timeStampNs, IcaoAddress icaoAddress,double altitude, int parity, double x, double y) implements Message{
 
     //===================================== Attributs privées statiques ================================================
-    //===================================== Attributs publiques statiques ==============================================
-    //===================================== Méthodes privées statiques =================================================
-    //===================================== Méthodes publiques statiques ===============================================
-    //===================================== Attributs privées ==========================================================
-    //===================================== Attributs publiques ========================================================
-    //===================================== Méthodes privées ===========================================================
-    //===================================== Méthodes publiques =========================================================
-    //--module-path "$JFX_PATH$" --add-modules javafx.controls
 
     //valeur utilisé pour transmettre l'information que l'altitude calculée est invalide
     private static final int INVALID_ALTITUDE_VALUE = -1;

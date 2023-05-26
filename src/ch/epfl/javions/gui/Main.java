@@ -43,6 +43,12 @@ import java.util.function.Consumer;
 
 public final class Main extends Application {
 
+    //===================================== Attributs privées statiques ================================================
+
+    private final static String DISK_CACHE_REPERTORY = "tile-cache";
+
+    //===================================== Méthodes publiques =========================================================
+
     /**
      * Lance le programme (grâce à la méthode launch())
      * @param args : arguments du programme
@@ -51,6 +57,12 @@ public final class Main extends Application {
         launch(args);
     }   //DEMARAGE DU FIL D'EXECUTION JAVAFX
 
+    /**
+     * Méthode appelée par le fil d'exécution JavaFX au démarrage de l'application s'occupant de la gestion des données
+     * du programme pour le bon fonctionnement de l'application Javion
+     * @param primaryStage : fenêtre principale de l'application
+     * @throws Exception : exception lancée si un problème survient lors de l'exécution de la méthode
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
 
@@ -59,8 +71,8 @@ public final class Main extends Application {
         ConcurrentLinkedDeque<RawMessage> allMessages = new ConcurrentLinkedDeque<>();
 
         //Création de la map
-        Path tileCache = Path.of("tile-cache");
-        TileManager tileManager = new TileManager(tileCache, "tile.openstreetmap.org");  // "tile.openstreetmap.org"
+        Path tileCache = Path.of(DISK_CACHE_REPERTORY);
+        TileManager tileManager = new TileManager(tileCache, "tile.openstreetmap.org");
         MapParameters mapParameters = new MapParameters(8, 33_530, 23_070);
         BaseMapController baseMapController = new BaseMapController(tileManager, mapParameters);
 
@@ -91,7 +103,7 @@ public final class Main extends Application {
         AircraftTableController aircraftTableController = new AircraftTableController(states, selectedAircraft);
         TableView<ObservableAircraftState> tableView = aircraftTableController.pane();
         //liaison doubles clics sur table et centrage sur carte
-        Consumer<ObservableAircraftState> DoubleClicConsumer = (state) -> baseMapController.centerOn(state.getPosition());
+        Consumer<ObservableAircraftState> DoubleClicConsumer = (state)->baseMapController.centerOn(state.getPosition());
         aircraftTableController.setOnDoubleClick(DoubleClicConsumer);
 
         BorderPane statusAndTable = new BorderPane();
@@ -111,10 +123,10 @@ public final class Main extends Application {
 
         Thread obtentionMessages = new Thread(() -> {
 
-            if(args.isEmpty()){     //peut etre aussi verifier si args == null mais je crois pas que ce soit necessaire
-                //LIRE DIRECT DEPUIS LA AIRSPY  (voir etape 11 Test pour comprendre comment faire fonctionner cette partie)
+            if(args.isEmpty()){
+                //LIRE DIRECT DEPUIS LA AIRSPY (voir etape 11 Test pour faire fonctionner cette partie)
                 try {
-                    AdsbDemodulator demodulateur = new AdsbDemodulator(System.in);  //pour simuler ca on a : "samples_20230304_1442.bin"   (fonctionne pas jsp pourquoi ??)
+                    AdsbDemodulator demodulateur = new AdsbDemodulator(System.in);
                     while(true){
                         RawMessage rawMessage = demodulateur.nextMessage();
                         if (rawMessage != null) allMessages.addFirst(rawMessage);
@@ -124,16 +136,16 @@ public final class Main extends Application {
                 }
             }else{
                 long timestampsLastMessage = -1;
-                //LIRE DEPUIS UN FICHIER .bin (mis en argument du programme)
-                String fichierALire = args.get(0);  //ex : "messages_20230318_0915.bin" (à mettre dans Run puis edit configuration puis programm argument
+                //LIRE DEPUIS UN FICHIER .bin (mis en argument du programme : choisi dans Run puis edit configuration)
+                String fileToRead = args.get(0);
 
                 try (DataInputStream s = new DataInputStream(
                     new BufferedInputStream(
-                            new FileInputStream(fichierALire)))) {
+                            new FileInputStream(fileToRead)))) {
 
                     //Pour lire un fichier démodulé
                     byte[] bytes = new byte[RawMessage.LENGTH];
-                    while (true) {      // true ?ou bien? : s.available() !=
+                    while (s.available() != 0) {      // true ?ou bien? : s.available() != 0
                         long timeStampNs = s.readLong();
                         int bytesRead = s.readNBytes(bytes, 0, bytes.length);
                         assert bytesRead == RawMessage.LENGTH;
@@ -141,12 +153,16 @@ public final class Main extends Application {
                         if (rawMessage != null) {
                             //pour que les avions se déplacent à vitesse réelle
                             if(timestampsLastMessage>=0) {
-                                long tempsAttenteMillisecond = (long) ((rawMessage.timeStampNs() - timestampsLastMessage) * Units.MICRO);    //micro représente la conversion entre nano et mili
-                                try {   //commenter ce bloc try catch pour que les avions se déplacent à la vitesse de lecture du fichier par le programme
-                                    if (tempsAttenteMillisecond > 0) Thread.sleep(tempsAttenteMillisecond);   //car sleep prend des millisecondes en argument et non des nanosecondes
+
+                                //MICRO représente la conversion entre nano et mili
+                                long tempsAttenteMillisecond =
+                                        (long) ((rawMessage.timeStampNs() - timestampsLastMessage) * Units.MICRO);
+                                try {   //commenter ce bloc try pour que les avions se déplacent en accéléré
+                                    if (tempsAttenteMillisecond > 0) Thread.sleep(tempsAttenteMillisecond);
                                 } catch (InterruptedException e) {
                                     throw new RuntimeException(e);
                                 }
+
                             }
                             allMessages.addFirst(rawMessage);
                             timestampsLastMessage = rawMessage.timeStampNs();
