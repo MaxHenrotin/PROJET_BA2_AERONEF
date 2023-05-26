@@ -67,7 +67,9 @@ public final class AircraftTableControllerTest extends Application {
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
 
-        var mi = readAllMessages("messages_20230318_0915.bin").iterator();
+        //"messages_20230318_0915.bin"
+        //"samples_20230304_1442.bin"
+        var mi = readAllMessages("samples_20230304_1442.bin").iterator();
 
         // Animation des aéronefs
         new AnimationTimer() {

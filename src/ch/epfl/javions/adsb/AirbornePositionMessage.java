@@ -35,6 +35,7 @@ public record AirbornePositionMessage
     //===================================== Attributs publiques ========================================================
     //===================================== Méthodes privées ===========================================================
     //===================================== Méthodes publiques =========================================================
+    //--module-path "$JFX_PATH$" --add-modules javafx.controls
 
     //valeur utilisé pour transmettre l'information que l'altitude calculée est invalide
     private static final int INVALID_ALTITUDE_VALUE = -1;

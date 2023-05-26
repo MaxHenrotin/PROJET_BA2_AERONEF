@@ -3,6 +3,9 @@ package ch.epfl.javions.gui;
         import ch.epfl.javions.Units;
         import ch.epfl.javions.WebMercator;
         import ch.epfl.javions.aircraft.AircraftData;
+        import ch.epfl.javions.aircraft.AircraftDescription;
+        import ch.epfl.javions.aircraft.AircraftTypeDesignator;
+        import ch.epfl.javions.aircraft.WakeTurbulenceCategory;
         import javafx.beans.binding.Bindings;
         import javafx.beans.binding.StringBinding;
         import javafx.beans.property.ObjectProperty;
@@ -162,10 +165,14 @@ public final class AircraftController {
 
     private Node nodeForIcone(ObservableAircraftState aircraftState){
         AircraftData aircraftData = aircraftState.getAircraftData();
-        if (aircraftData == null)return new Group();
-
-        AircraftIcon aircraftIcon = AircraftIcon.iconFor(aircraftData.typeDesignator(),aircraftData.description(),
-                aircraftState.getCategory(),aircraftData.wakeTurbulenceCategory());
+        AircraftIcon aircraftIcon;
+        if (aircraftData == null) {
+            aircraftIcon = AircraftIcon.iconFor( new AircraftTypeDesignator(""),new AircraftDescription(""),
+                                                    aircraftState.getCategory(), WakeTurbulenceCategory.UNKNOWN);
+        }else {
+            aircraftIcon = AircraftIcon.iconFor(aircraftData.typeDesignator(),aircraftData.description(),
+                                                    aircraftState.getCategory(),aircraftData.wakeTurbulenceCategory());
+        }
 
         SVGPath iconSVG = new SVGPath();
         iconSVG.setContent(aircraftIcon.svgPath());
@@ -195,18 +202,20 @@ public final class AircraftController {
             String registration;
             if(aircraftState.getAircraftData() != null) {
                 registration = aircraftState.getAircraftData().registration().string();
-                return String.format(LABEL_TEXT_FORMATTING,
-                        (registration != null) ?
-                                registration : ((aircraftState.getCallSign() != null) ?
-                                aircraftState.getCallSign().string() : aircraftState.getIcaoAddress().string()),
-                        (Double.isNaN(aircraftState.getVelocity())) ?
-                                UNKNOWN_INFORMATION_TEXT : String.valueOf((int)Units.convertTo(aircraftState.getVelocity(),
-                                Units.Speed.KILOMETER_PER_HOUR)),
-                        (Double.isNaN(aircraftState.getAltitude())) ?
-                                UNKNOWN_INFORMATION_TEXT : String.valueOf((int)aircraftState.getAltitude()));
-            }else{
-                return UNKNOWN_INFORMATION_TEXT;
+            }else {
+                registration = null;
             }
+
+            return String.format(LABEL_TEXT_FORMATTING,
+                    (registration != null) ?
+                            registration : ((aircraftState.getCallSign() != null) ?
+                            aircraftState.getCallSign().string() : aircraftState.getIcaoAddress().string()),
+                    (Double.isNaN(aircraftState.getVelocity())) ?
+                            UNKNOWN_INFORMATION_TEXT : String.valueOf((int)Units.convertTo(aircraftState.getVelocity(),
+                            Units.Speed.KILOMETER_PER_HOUR)),
+                    (Double.isNaN(aircraftState.getAltitude())) ?
+                            UNKNOWN_INFORMATION_TEXT : String.valueOf((int)aircraftState.getAltitude()));
+
         }, aircraftState.altitudeProperty(),aircraftState.velocityProperty());
         txtInfo.textProperty().bind(stringBinding);
 
