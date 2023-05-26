@@ -70,7 +70,7 @@ public final class ColorRamp {
      * @return la couleur correspondant au nombre reçu en paramètre
      */
     public Color colorAt(double colorRange){
-        int firstColorIndex = (int) Math.floor(colorRange/ecart);
+        int firstColorIndex = Math2.clamp(0, (int) Math.floor(colorRange/ecart), tabOfColors.length-1);
         int secondColorIndex = Math2.clamp(0,firstColorIndex+1,tabOfColors.length-1);
 
         double upperBound = ecart*secondColorIndex;

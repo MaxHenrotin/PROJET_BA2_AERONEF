@@ -142,7 +142,7 @@ public final class Main extends Application {
                             //pour que les avions se déplacent à vitesse réelle
                             if(timestampsLastMessage>=0) {
                                 long tempsAttenteMillisecond = (long) ((rawMessage.timeStampNs() - timestampsLastMessage) * Units.MICRO);    //micro représente la conversion entre nano et mili
-                                if (tempsAttenteMillisecond > 0) Thread.sleep(tempsAttenteMillisecond);   //car sleep prend des millisecondes en argument et non des nanosecondes
+                                //if (tempsAttenteMillisecond > 0) Thread.sleep(tempsAttenteMillisecond);   //car sleep prend des millisecondes en argument et non des nanosecondes
                             }
                             allMessages.addFirst(rawMessage);
                             timestampsLastMessage = rawMessage.timeStampNs();
@@ -154,8 +154,8 @@ public final class Main extends Application {
                     throw new RuntimeException(e);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                //} catch (InterruptedException e) {
+                  //  throw new RuntimeException(e);
                 }
             }
         });
