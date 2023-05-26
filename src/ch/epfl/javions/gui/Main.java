@@ -133,7 +133,7 @@ public final class Main extends Application {
 
                     //Pour lire un fichier démodulé
                     byte[] bytes = new byte[RawMessage.LENGTH];
-                    while (true) {      // ?ou bien? : s.available() != 0
+                    while (true) {      // true ?ou bien? : s.available() !=
                         long timeStampNs = s.readLong();
                         int bytesRead = s.readNBytes(bytes, 0, bytes.length);
                         assert bytesRead == RawMessage.LENGTH;
@@ -142,20 +142,18 @@ public final class Main extends Application {
                             //pour que les avions se déplacent à vitesse réelle
                             if(timestampsLastMessage>=0) {
                                 long tempsAttenteMillisecond = (long) ((rawMessage.timeStampNs() - timestampsLastMessage) * Units.MICRO);    //micro représente la conversion entre nano et mili
-                                //if (tempsAttenteMillisecond > 0) Thread.sleep(tempsAttenteMillisecond);   //car sleep prend des millisecondes en argument et non des nanosecondes
+                                try {   //commenter ce bloc try catch pour que les avions se déplacent à la vitesse de lecture du fichier par le programme
+                                    if (tempsAttenteMillisecond > 0) Thread.sleep(tempsAttenteMillisecond);   //car sleep prend des millisecondes en argument et non des nanosecondes
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
                             }
                             allMessages.addFirst(rawMessage);
                             timestampsLastMessage = rawMessage.timeStampNs();
                         }
                     }
-
-                } catch (EOFException e) {
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
-                //} catch (InterruptedException e) {
-                  //  throw new RuntimeException(e);
                 }
             }
         });
@@ -189,13 +187,5 @@ public final class Main extends Application {
                 }
             }
         }.start();
-
-
-        //utiliser thread sleep pour attendre la publication des messages depuis le ficher (au moment de l'ajout dans la queue
-
-
-
     }
-
-
 }
