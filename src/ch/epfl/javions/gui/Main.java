@@ -13,7 +13,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ObservableSet;
+import javafx.collections.*;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
@@ -22,6 +22,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
@@ -42,7 +43,16 @@ public final class Main extends Application {
 
     //===================================== Attributs privées statiques ================================================
 
-    private final static String DISK_CACHE_REPERTORY = "tile-cache";
+    private static final String DISK_CACHE_REPERTORY = "tile-cache";
+    private static final  String TILES_WEBSITE = "tile.openstreetmap.org";
+    private static final int START_ZOOM = 8;
+    private static final int START_MIN_X = 33_530;
+    private static final int START_MIN_Y = 23_070;
+    private static final String DATABASE_DIRECTORY_PATH = "/aircraft.zip";
+    private static final String PRIMARY_STAGE_NAME = "Javions";
+    private static final int WINDOW_STARTING_WIDTH = 800;
+    private static final int WINDOW_STARTING_HEIGHT = 600;
+    private static final int UNSTARTED_TIMESTAMPS = -1;
 
     //===================================== Méthodes publiques =========================================================
 
@@ -69,13 +79,13 @@ public final class Main extends Application {
 
         //Création de la map
         Path tileCache = Path.of(DISK_CACHE_REPERTORY);
-        TileManager tileManager = new TileManager(tileCache, "tile.openstreetmap.org");
-        MapParameters mapParameters = new MapParameters(8, 33_530, 23_070);
+        TileManager tileManager = new TileManager(tileCache, TILES_WEBSITE);
+        MapParameters mapParameters = new MapParameters(START_ZOOM, START_MIN_X, START_MIN_Y);
         BaseMapController baseMapController = new BaseMapController(tileManager, mapParameters);
 
 
         // Création de la base de données
-        URL u = getClass().getResource("/aircraft.zip");
+        URL u = getClass().getResource(DATABASE_DIRECTORY_PATH);
         assert u != null;
         Path p = Path.of(u.toURI());
         AircraftDatabase database = new AircraftDatabase(p.toString());
@@ -110,9 +120,9 @@ public final class Main extends Application {
         SplitPane finalPane = new SplitPane(mapWithAircrafts, statusAndTable);
         finalPane.setOrientation(Orientation.VERTICAL);
         primaryStage.setScene(new Scene(finalPane));
-        primaryStage.setTitle("Javions");
-        primaryStage.setMinWidth(800);
-        primaryStage.setMinHeight(600);
+        primaryStage.setTitle(PRIMARY_STAGE_NAME);
+        primaryStage.setMinWidth(WINDOW_STARTING_WIDTH);
+        primaryStage.setMinHeight(WINDOW_STARTING_HEIGHT);
         primaryStage.show();
 
 
@@ -132,6 +142,7 @@ public final class Main extends Application {
                     throw new RuntimeException(e);
                 }
             }else{
+                long timestampsLastMessage = UNSTARTED_TIMESTAMPS;
                 //LIRE DEPUIS UN FICHIER .bin (mis en argument du programme : choisi dans Run puis edit configuration)
                 String fileToRead = args.get(0);
 
@@ -148,7 +159,7 @@ public final class Main extends Application {
                         RawMessage rawMessage = RawMessage.of(timeStampNs, bytes);
                         if (rawMessage != null) {
                             //pour que les avions se déplacent à vitesse réelle
-                            /*if(timestampsLastMessage>=0) {
+                            if(timestampsLastMessage>=0) {
 
                                 //MICRO représente la conversion entre nano et mili
                                 long tempsAttenteMillisecond =
@@ -159,8 +170,9 @@ public final class Main extends Application {
                                     throw new RuntimeException(e);
                                 }
 
-                            }*/
+                            }
                             allMessages.addFirst(rawMessage);
+                            timestampsLastMessage = rawMessage.timeStampNs();
                         }
                     }
                 } catch (IOException e) {
@@ -177,7 +189,7 @@ public final class Main extends Application {
             @Override
             public void handle(long now) {
                 try {
-                    for (int i = 0; i < 10; i += 1) {
+                    for (int i = 0; i < 10; i += 1) {   //permet de rendre le programme plus fluide
                         if (!allMessages.isEmpty()) {  // Vérification supplémentaire
                             Message m = MessageParser.parse(allMessages.getLast());
                             allMessages.removeLast();
