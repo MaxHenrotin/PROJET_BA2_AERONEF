@@ -35,7 +35,7 @@ public class BaseMapController {
 
     private final Pane pane;
 
-    private MapParameters mapParameters;
+    private final MapParameters mapParameters;
 
     //===================================== Méthodes privées ===========================================================
 

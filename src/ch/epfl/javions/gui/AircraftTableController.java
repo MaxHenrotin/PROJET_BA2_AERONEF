@@ -67,9 +67,7 @@ public final class AircraftTableController {
         //gérer la sélection dans la  table d'un aircraft
         TableView.TableViewSelectionModel<ObservableAircraftState> selectionModel = tableView.getSelectionModel();
 
-        selectionModel.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            currentAircraft.set(newValue);
-        });
+        selectionModel.selectedItemProperty().addListener((observable, oldValue, newValue) -> currentAircraft.set(newValue));
 
         currentAircraft.addListener((observable, oldValue, newValue) -> {
             selectionModel.select(newValue);

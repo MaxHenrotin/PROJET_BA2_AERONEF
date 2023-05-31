@@ -13,7 +13,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.*;
+import javafx.collections.ObservableSet;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
@@ -22,12 +22,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import org.w3c.dom.ls.LSOutput;
-
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.Consumer;
@@ -135,7 +132,6 @@ public final class Main extends Application {
                     throw new RuntimeException(e);
                 }
             }else{
-                long timestampsLastMessage = -1;
                 //LIRE DEPUIS UN FICHIER .bin (mis en argument du programme : choisi dans Run puis edit configuration)
                 String fileToRead = args.get(0);
 
@@ -152,7 +148,7 @@ public final class Main extends Application {
                         RawMessage rawMessage = RawMessage.of(timeStampNs, bytes);
                         if (rawMessage != null) {
                             //pour que les avions se déplacent à vitesse réelle
-                            if(timestampsLastMessage>=0) {
+                            /*if(timestampsLastMessage>=0) {
 
                                 //MICRO représente la conversion entre nano et mili
                                 long tempsAttenteMillisecond =
@@ -163,9 +159,8 @@ public final class Main extends Application {
                                     throw new RuntimeException(e);
                                 }
 
-                            }
+                            }*/
                             allMessages.addFirst(rawMessage);
-                            timestampsLastMessage = rawMessage.timeStampNs();
                         }
                     }
                 } catch (IOException e) {

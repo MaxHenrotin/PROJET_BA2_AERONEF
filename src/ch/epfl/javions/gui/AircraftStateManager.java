@@ -108,12 +108,6 @@ public final class AircraftStateManager {
      * passé à updateWithMessage
      */
     public void purge(){
-        /*
-        //avant les modifications suggérées à l'étape 11
-        observableAircraftStates.removeIf(observableAircraftState ->
-                lastMessageTimeStampsNs - observableAircraftState.getLastMessageTimeStampsNs() >= ONE_MINUTE);
-         */
-
         Iterator<ObservableAircraftState> iterator = observableAircraftStates.iterator();
         while (iterator.hasNext()) {
             ObservableAircraftState state = iterator.next();
@@ -122,15 +116,5 @@ public final class AircraftStateManager {
                 managementTable.remove(state.getIcaoAddress());
             }
         }
-
-        /*
-        //fait des ConcurrentModificationExeptions ??
-        observableAircraftStates.forEach(state -> {
-            if(lastMessageTimeStampsNs - state.getLastMessageTimeStampsNs() >= ONE_MINUTE){
-                observableAircraftStates.remove(state);
-                managementTable.remove(state.getIcaoAddress());
-            }
-        });
-         */
     }
 }
