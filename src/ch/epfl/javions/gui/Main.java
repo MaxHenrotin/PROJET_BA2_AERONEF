@@ -72,10 +72,7 @@ public final class Main extends Application {
      */
     @Override
     public void start(Stage primaryStage) throws Exception {
-
-        //PREPARTION DES VARIABLES POUR LE FIL D'EXECUTION
-        List<String> args = getParameters().getRaw();
-        ConcurrentLinkedDeque<RawMessage> allMessages = new ConcurrentLinkedDeque<>();
+        //***************************** Création du graphe de scène ****************************************************
 
         //Création de la map
         Path tileCache = Path.of(DISK_CACHE_REPERTORY);
@@ -90,7 +87,6 @@ public final class Main extends Application {
         Path p = Path.of(u.toURI());
         AircraftDatabase database = new AircraftDatabase(p.toString());
 
-        //CREATION DU GRAPHE DE SCENE GRAPHIQUE
 
         //Crée la map avec les avions par-dessus
         AircraftStateManager asm = new AircraftStateManager(database);
@@ -113,12 +109,16 @@ public final class Main extends Application {
         Consumer<ObservableAircraftState> DoubleClicConsumer = (state)->baseMapController.centerOn(state.getPosition());
         aircraftTableController.setOnDoubleClick(DoubleClicConsumer);
 
+        //Crée la partie du graphe de scène contenant la table et la ligne de statut
         BorderPane statusAndTable = new BorderPane();
         statusAndTable.setTop(statusLine);
         statusAndTable.setCenter(tableView);
 
+        //Crée le panneau graphique final
         SplitPane finalPane = new SplitPane(mapWithAircrafts, statusAndTable);
         finalPane.setOrientation(Orientation.VERTICAL);
+
+        //Met en place le graphe de scène avec la fenêtre principale
         primaryStage.setScene(new Scene(finalPane));
         primaryStage.setTitle(PRIMARY_STAGE_NAME);
         primaryStage.setMinWidth(WINDOW_STARTING_WIDTH);
@@ -126,11 +126,17 @@ public final class Main extends Application {
         primaryStage.show();
 
 
-        //DEMARAGE DU FIL D'EXECUTION CHARGE D'OBTENIR LES MESSAGES
+        //******************************* Création du fil d'exécution **************************************************
 
+        //Préparation des variables pour le fil d'exécution
+        List<String> args = getParameters().getRaw();
+        ConcurrentLinkedDeque<RawMessage> allMessages = new ConcurrentLinkedDeque<>();
+
+        //DEMARAGE DU FIL D'EXECUTION CHARGE D'OBTENIR LES MESSAGES
         Thread obtentionMessages = new Thread(() -> {
 
             if(args.isEmpty()){
+
                 //LIRE DIRECT DEPUIS LA AIRSPY (voir etape 11 Test pour faire fonctionner cette partie)
                 try {
                     AdsbDemodulator demodulateur = new AdsbDemodulator(System.in);
@@ -142,8 +148,8 @@ public final class Main extends Application {
                     throw new RuntimeException(e);
                 }
             }else{
-                long timestampsLastMessage = UNSTARTED_TIMESTAMPS;
                 //LIRE DEPUIS UN FICHIER .bin (mis en argument du programme : choisi dans Run puis edit configuration)
+                long timestampsLastMessage = UNSTARTED_TIMESTAMPS;
                 String fileToRead = args.get(0);
 
                 try (DataInputStream s = new DataInputStream(
@@ -180,17 +186,23 @@ public final class Main extends Application {
                 }
             }
         });
+
+        //Pour que le fil d'exécution s'arrête quand la fenêtre principale est fermée
         obtentionMessages.setDaemon(true);
+        //lançage du fil d'exécution
         obtentionMessages.start();
 
-        //DEMARRAGE DU "MINUTEUR D'ANIMATION"
+        //******************************* Démarrage du "Minuteur" d'animations *****************************************
         new AnimationTimer() {
             long lastPurgeTimestamps = 0;
             @Override
             public void handle(long now) {
                 try {
-                    for (int i = 0; i < 10; i += 1) {   //permet de rendre le programme plus fluide
-                        if (!allMessages.isEmpty()) {  // Vérification supplémentaire
+                    //permet de rendre le programme plus fluide
+                    for (int i = 0; i < 10; i += 1) {
+
+                        // Vérification supplémentaire pour éviter les erreurs
+                        if (!allMessages.isEmpty()) {
                             Message m = MessageParser.parse(allMessages.getLast());
                             allMessages.removeLast();
                             if (m != null) {

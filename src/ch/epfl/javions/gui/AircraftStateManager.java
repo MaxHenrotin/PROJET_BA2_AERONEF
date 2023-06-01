@@ -1,13 +1,13 @@
 package ch.epfl.javions.gui;
 //  Author:    Max Henrotin
 
+import ch.epfl.javions.Units;
 import ch.epfl.javions.adsb.AircraftStateAccumulator;
 import ch.epfl.javions.adsb.Message;
 import ch.epfl.javions.aircraft.AircraftDatabase;
 import ch.epfl.javions.aircraft.IcaoAddress;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,7 +24,7 @@ import java.util.Map;
 public final class AircraftStateManager {
 
     //===================================== Attributs privées statiques ================================================
-    private final static long ONE_MINUTE = (long) 60e9;
+    private final static long ONE_MINUTE = (long) Units.convert(1,Units.Time.MINUTE,Units.Time.NANO_SECOND);
 
     //===================================== Attributs privées ==========================================================
 
@@ -33,15 +33,13 @@ public final class AircraftStateManager {
      *  dont un message a été reçu
      */
     private final Map<IcaoAddress, AircraftStateAccumulator<ObservableAircraftState>> managementTable;
-
-    /**
-     * Ensemble (observable) des états de tous les aéronefs dont la position est connue
-     * (en gros représente la liste de tous les aéronefs avec lesquels on est en train d'intéragir)
-     */
-    private long lastMessageTimeStampsNs;
     private final AircraftDatabase aircraftDatabase;
+
+    //Ensemble observable des états des aéronefs dont la position est connue
     private final ObservableSet<ObservableAircraftState> observableAircraftStates;
+    //Vue non modifiable de l'ensemble observable des états des aéronefs dont la position est connue
     private final ObservableSet<ObservableAircraftState> viewOfObservableAircraftStates;
+    private long lastMessageTimeStampsNs;
 
     //===================================== Méthodes publiques =========================================================
 
@@ -77,27 +75,27 @@ public final class AircraftStateManager {
      */
     public void updateWithMessage(Message message) throws IOException {
         if(message != null) {
-            IcaoAddress messageAdress = message.icaoAddress();
+            IcaoAddress icaoAddress = message.icaoAddress();
             lastMessageTimeStampsNs = message.timeStampNs();
 
-            if (!managementTable.containsKey(messageAdress)) {
+            //si l'aéronef n'est pas dans la table, on le rajoute et on crée un accumulateur d'état pour lui
+            if (!managementTable.containsKey(icaoAddress)) {
                 ObservableAircraftState observableAircraftState = new ObservableAircraftState
-                                                                        (messageAdress,
-                                                                            aircraftDatabase.get(messageAdress));
+                                                                        (icaoAddress,
+                                                                                aircraftDatabase.get(icaoAddress));
 
                 AircraftStateAccumulator<ObservableAircraftState> newAccumulator =
                                                                 new AircraftStateAccumulator<>(observableAircraftState);
-                managementTable.put(messageAdress, newAccumulator);
+                managementTable.put(icaoAddress, newAccumulator);
             }
 
-            ObservableAircraftState currentObservableStateSetter = managementTable
-                                                                    .get(messageAdress)
-                                                                    .stateSetter();
+            //on met à jour l'état de l'aéronef avec le message
+            ObservableAircraftState currentObservableStateSetter = managementTable.get(icaoAddress).stateSetter();
+            managementTable.get(icaoAddress).update(message);
 
-            managementTable.get(messageAdress).update(message);
-
-            if(currentObservableStateSetter.getPosition() != null) observableAircraftStates
-                                                                                    .add(currentObservableStateSetter);
+            //si l'aéronef a une position, on l'ajoute à l'ensemble des états observables
+            if(currentObservableStateSetter.getPosition() != null)
+                observableAircraftStates.add(currentObservableStateSetter);
             }
 
     }

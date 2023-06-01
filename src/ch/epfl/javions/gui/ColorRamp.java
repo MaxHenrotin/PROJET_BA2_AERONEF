@@ -47,7 +47,7 @@ public final class ColorRamp {
 
     private final Color[] tabOfColors;
 
-    private final double ecart;
+    private final double gap;
 
 
     //===================================== Méthodes publiques =========================================================
@@ -61,7 +61,7 @@ public final class ColorRamp {
         Preconditions.checkArgument(tabOfColors.length >= NBR_MIN_COLOR);
 
         this.tabOfColors = tabOfColors.clone();
-        ecart = 1d / (tabOfColors.length-1);
+        gap = 1d / (tabOfColors.length-1);
     }
 
     /**
@@ -70,12 +70,12 @@ public final class ColorRamp {
      * @return la couleur correspondant au nombre reçu en paramètre
      */
     public Color colorAt(double colorRange){
-        int firstColorIndex = Math2.clamp(0, (int) Math.floor(colorRange/ecart), tabOfColors.length-1);
+        int firstColorIndex = Math2.clamp(0, (int) Math.floor(colorRange/ gap), tabOfColors.length-1);
         int secondColorIndex = Math2.clamp(0,firstColorIndex+1,tabOfColors.length-1);
 
-        double upperBound = ecart*secondColorIndex;
-        double gap = upperBound - colorRange;
+        double upperBound = gap * secondColorIndex;
+        double difference = upperBound - colorRange;
 
-        return tabOfColors[firstColorIndex].interpolate(tabOfColors[secondColorIndex],gap/ecart);
+        return tabOfColors[firstColorIndex].interpolate(tabOfColors[secondColorIndex],difference / gap);
     }
 }

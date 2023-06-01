@@ -73,7 +73,7 @@ public class BaseMapController {
                     graphicsContext.drawImage(tileManager.imageOfTile(tabOfTileId[i][j]),
                                         TILE_SIZE_IN_PIXEL * i - decalageX, TILE_SIZE_IN_PIXEL * j - decalageY);
                 }catch (IOException e) {
-                    //fait rien
+                    e.printStackTrace();
                 }
             }
         }

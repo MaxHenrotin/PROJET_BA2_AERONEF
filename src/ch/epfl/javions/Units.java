@@ -122,6 +122,11 @@ public final class Units {
          */
         public static final double HOUR = 60 * MINUTE;
 
+        /**
+         * Unité de la nano seconde
+         */
+        public static final double NANO_SECOND = NANO * SECOND;
+
         private Time(){} //classe non instanciable
 
     }

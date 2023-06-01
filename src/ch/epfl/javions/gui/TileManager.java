@@ -40,8 +40,8 @@ public class TileManager {
 
     private final Path filePath;
     private final String serverName;    //p.ex : "tile.openstreetmap.org"
-    private final Map<TileId, Image> cacheMemory = new LinkedHashMap<>(
-            CACHE_MEMORY_CAPACITY, DEFAULT_LOAD_FACTOR, CACHE_MEMORY_LINKED_IN_ACCESS_ORDER);
+    private final Map<TileId, Image> cacheMemory = new LinkedHashMap<>
+                                    (CACHE_MEMORY_CAPACITY, DEFAULT_LOAD_FACTOR, CACHE_MEMORY_LINKED_IN_ACCESS_ORDER);
 
 
     //===================================== Méthodes privées ===========================================================
@@ -56,27 +56,30 @@ public class TileManager {
 
     private Path DiscPathOfTile(TileId tileId) {
         return filePath
-                .resolve(String.valueOf(tileId.zoomLevel()))
-                .resolve(String.valueOf(tileId.x()))
-                .resolve(tileId.y() + FILE_EXTENSION);
+                    .resolve(String.valueOf(tileId.zoomLevel()))
+                    .resolve(String.valueOf(tileId.x()))
+                    .resolve(tileId.y() + FILE_EXTENSION);
     }
 
     private void createDirectoryForTile(TileId tileId) throws IOException{
         Path directoryPath = filePath
-                .resolve(String.valueOf(tileId.zoomLevel))
-                .resolve(String.valueOf(tileId.x));
+                            .resolve(String.valueOf(tileId.zoomLevel))
+                            .resolve(String.valueOf(tileId.x));
         Files.createDirectories(directoryPath);
     }
 
     private URLConnection serverConnectionForTile(TileId tileId) throws IOException {
         StringJoiner urlAdress = new StringJoiner("/", HTTPS_PROTOCOL_CONSTANT, FILE_EXTENSION);
+
         urlAdress.add(serverName)
                 .add(String.valueOf(tileId.zoomLevel()))
                 .add(String.valueOf(tileId.x()))
                 .add(String.valueOf(tileId.y()));
+
         URL url = new URL(urlAdress.toString());
         URLConnection urlConnection = url.openConnection();
         urlConnection.setRequestProperty(URL_CONNECTION_REQUEST_KEY, URL_CONNECTION_REQUEST_VALUE);
+
         return urlConnection;
     }
 

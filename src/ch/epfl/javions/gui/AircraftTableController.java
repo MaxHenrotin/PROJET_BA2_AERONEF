@@ -40,9 +40,9 @@ public final class AircraftTableController {
     private static final int DESCRIPTION_COLUMN_WIDTH = 70;
     private static final int NUMERIC_COLUMN_WIDTH = 85;
     private static final String TABLE_STYLESHEET = "table.css";
-    private static final String COLUMN_CLASSSHEET = "numeric";
+    private static final String COLUMN_CLASS_SHEET = "numeric";
     private static final NumberFormat positionNumberFormat = numberFormatOfMaxAndMinDecimal(4);
-    private static final NumberFormat otherNumericCollumnNumberFormat = numberFormatOfMaxAndMinDecimal(0);
+    private static final NumberFormat otherNumericColumnNumberFormat = numberFormatOfMaxAndMinDecimal(0);
 
 
     //===================================== Méthodes privées statiques =================================================
@@ -56,18 +56,17 @@ public final class AircraftTableController {
 
     //===================================== Attributs privées ==========================================================
     private final TableView<ObservableAircraftState> tableView;
-    private final ObservableSet<ObservableAircraftState> states;
-    private final ObjectProperty<ObservableAircraftState> currentAircraft;
     private Consumer<ObservableAircraftState> consumer;
 
     //===================================== Méthodes privées ===========================================================
 
-    private void setSelectedAircraftHandler(){
+    private void setSelectedAircraftHandler(ObjectProperty<ObservableAircraftState> currentAircraft){
 
         //gérer la sélection dans la  table d'un aircraft
         TableView.TableViewSelectionModel<ObservableAircraftState> selectionModel = tableView.getSelectionModel();
 
-        selectionModel.selectedItemProperty().addListener((observable, oldValue, newValue) -> currentAircraft.set(newValue));
+        selectionModel.selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> currentAircraft.set(newValue));
 
         currentAircraft.addListener((observable, oldValue, newValue) -> {
             selectionModel.select(newValue);
@@ -75,67 +74,80 @@ public final class AircraftTableController {
             //selectionModel.clearSelection();  --si on veut quil n'y ai plus rien de selectionné
 
 
-            //pour pas que lors d'un double click il y ai ambiguité sur l'avion sélectionné à cause d'un scroll automatique
+            //pour pas que lors d'un double click il y ai ambiguité sur l'avion sélectionné
+            //à cause d'un scroll automatique
             TableViewSkin<?> tableViewSkin = (TableViewSkin<?>) tableView.getSkin();
             VirtualFlow<?> flow = (VirtualFlow<?>) tableViewSkin.getChildren().get(1);
             int newIndex = tableView.getItems().indexOf(newValue);
-            if (newIndex < flow.getFirstVisibleCell().getIndex() + 1 || newIndex > flow.getLastVisibleCell().getIndex() - 1) {  //+1 et -1 pour quand meme scroll si on voit qu'un tout petit bout de la ligne
+
+            //+1 et -1 pour quand meme scroll si on voit qu'un tout petit bout de la ligne
+            if (newIndex < flow.getFirstVisibleCell().getIndex() + 1
+                    || newIndex > flow.getLastVisibleCell().getIndex() - 1) {
                 tableView.scrollTo(newValue);       //ATTENTION
             }
-
         });
 
         tableView.setOnMouseClicked(event -> {
             if(Objects.nonNull(currentAircraft.get()) && event.getButton() == MouseButton.PRIMARY &&
-                    event.getClickCount() == 2){
-                if (Objects.nonNull(consumer)) consumer.accept(currentAircraft.get());
+                                                                                            event.getClickCount() == 2){
+                consumer.accept(currentAircraft.get());
             }
         });
     }
 
-    private TableView<ObservableAircraftState> setUpTable(){
+    private TableView<ObservableAircraftState> setUpTable(ObservableSet<ObservableAircraftState> states){
 
         TableView<ObservableAircraftState> tableView = new TableView<>();
 
+        //colonne de l'OACI
         TableColumn<ObservableAircraftState,String> oaciColumn = getDataColumnOf("OACI", OACI_COLUMN_WIDTH,
                 oas -> new ReadOnlyObjectWrapper<>(oas.getIcaoAddress().string()));
 
+        //colonne de l'indicatif
         TableColumn<ObservableAircraftState,String> callsignColumn = getDataColumnOf("Indicatif",
                 CALLSIGN_COLUMN_WIDTH,
                 oas -> oas.callSignProperty().map(CallSign::string));
 
+        //colonne de l'immatriculation
         TableColumn<ObservableAircraftState,String> registrationColumn = getDataColumnOf("Immatriculation",
                 IMMAT_COLUMN_WIDTH,
                 oas -> new ReadOnlyObjectWrapper<>(oas.getAircraftData()).map(data -> data.registration().string()));
 
+        //colonne du modèle
         TableColumn<ObservableAircraftState,String> modelColumn = getDataColumnOf("Modèle", MODEL_COLUMN_WIDTH,
                 oas -> new ReadOnlyObjectWrapper<>(oas.getAircraftData()).map(AircraftData::model));
 
+        //colonne du type
         TableColumn<ObservableAircraftState,String> typeColumn = getDataColumnOf("Type", TYPE_COLUMN_WIDTH,
                 oas -> new ReadOnlyObjectWrapper<>(oas.getAircraftData()).map(data -> data.typeDesignator().string()));
 
+        //colonne de la description
         TableColumn<ObservableAircraftState,String> descriptionColumn = getDataColumnOf("Description",
                 DESCRIPTION_COLUMN_WIDTH,
                 oas -> new ReadOnlyObjectWrapper<>(oas.getAircraftData()).map(data -> data.description().string()));
 
+        //colonne de la longitude
         TableColumn<ObservableAircraftState,String> longitudeColumn = getNumericColumnOf("Longitude (°)",
                 obs -> obs.positionProperty().map(pos ->
                         positionNumberFormat.format(Units.convertTo(pos.longitude(),Units.Angle.DEGREE))));
 
+        //colonne de la latitude
         TableColumn<ObservableAircraftState,String> latitudeColumn = getNumericColumnOf("Latitude (°)",
                 obs -> obs.positionProperty().map(pos ->
                         positionNumberFormat.format(Units.convertTo(pos.latitude(),Units.Angle.DEGREE))));
 
+        //colonne de l'altitude
         TableColumn<ObservableAircraftState,String> altitudeColumn = getNumericColumnOf("Altitude (m)",
                 obs -> obs.altitudeProperty().map(alt ->
                         (Double.isNaN(alt.doubleValue())) ?
-                                "" : otherNumericCollumnNumberFormat.format(alt.doubleValue())
+                                "" : otherNumericColumnNumberFormat.format(alt.doubleValue())
                         ));
 
+        //colonne de la vitesse
         TableColumn<ObservableAircraftState,String> speedColumn = getNumericColumnOf("Vitesse (km/h)",
                 obs -> obs.velocityProperty().map(speed ->
                                 (Double.isNaN(speed.doubleValue())) ?
-                                        "" : otherNumericCollumnNumberFormat.format
+                                        "" : otherNumericColumnNumberFormat.format
                                                 (Units.convertTo(speed.doubleValue(),Units.Speed.KILOMETER_PER_HOUR))));
 
 
@@ -147,7 +159,7 @@ public final class AircraftTableController {
 
 
         //met à jour la table en fonction de la liste des aéronefs visibles
-        this.states.addListener((SetChangeListener<ObservableAircraftState>) change -> {
+        states.addListener((SetChangeListener<ObservableAircraftState>) change -> {
             if(change.wasAdded()){
                 tableView.getItems().add(change.getElementAdded());
                 tableView.sort();
@@ -176,7 +188,7 @@ public final class AircraftTableController {
                             (String name, Function<ObservableAircraftState, ObservableValue<String>> functionToApply){
 
         TableColumn<ObservableAircraftState,String> column = new TableColumn<>(name);
-        column.getStyleClass().add(COLUMN_CLASSSHEET);
+        column.getStyleClass().add(COLUMN_CLASS_SHEET);
         column.setPrefWidth(NUMERIC_COLUMN_WIDTH);
 
         column.setCellValueFactory(obs -> functionToApply.apply(obs.getValue()));
@@ -205,16 +217,13 @@ public final class AircraftTableController {
      */
     public AircraftTableController(ObservableSet<ObservableAircraftState> states,
                                    ObjectProperty<ObservableAircraftState> currentAicraftState){
-        this.states = states;
-        this.currentAircraft = currentAicraftState;
-
-        tableView = setUpTable();
+        tableView = setUpTable(states);
 
         tableView.getStylesheets().add(TABLE_STYLESHEET);
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
         tableView.setTableMenuButtonVisible(true);
 
-        setSelectedAircraftHandler();
+        setSelectedAircraftHandler(currentAicraftState);
     }
 
 

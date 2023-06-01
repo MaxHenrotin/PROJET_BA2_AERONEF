@@ -9,7 +9,6 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.util.Objects;
 
 
 /**
@@ -45,26 +44,6 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     private final ObservableList<AirbornePosition> viewOfTrajectory;
 
     private long lastUpdateTrajectoryTimeStampsNs;
-
-
-    //===================================== Méthodes privées ===========================================================
-
-    /* DESORMAIS INUTILISE (changé la méthodologie à l'étape 11)
-    //Méthode à appeler dans setAltitude et setPosition
-    private void updateTrajectory(AirbornePosition airbornePosition){
-        if(trajectory.isEmpty() || !Objects.equals(this.position.get(),airbornePosition.position())){
-
-            lastUpdateTrajectoryTimeStampsNs = lastMessageTimeStampNs.getValue();
-            if(airbornePosition.position() != null){
-                trajectory.add(airbornePosition);
-            }
-        }else if(lastUpdateTrajectoryTimeStampsNs == lastMessageTimeStampNs.getValue()){
-            trajectory.remove(trajectory.size() - 1);
-            trajectory.add(airbornePosition);
-        }
-    }
-     */
-
 
     //===================================== Méthodes publiques =========================================================
 
@@ -183,6 +162,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
      */
     @Override
     public void setPosition(GeoPos position) {
+        //met à jour la trajectoire
         trajectory.add(new AirbornePosition(position,this.altitude.get()));
         lastUpdateTrajectoryTimeStampsNs = lastMessageTimeStampNs.getValue();
 
@@ -212,10 +192,13 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     @Override
     public void setAltitude(double altitude) {
         AirbornePosition airbornePosition = new AirbornePosition(this.position.get(), altitude);
-        if(trajectory == null) {
+        if(trajectory == null) { //si la trajectoire est vide, on ajoute la position actuelle
             trajectory.add(airbornePosition);
             lastUpdateTrajectoryTimeStampsNs = lastMessageTimeStampNs.getValue();
         }
+
+        //si les deux derniers points de la trajectoire ont le même horodatage,
+        //on remplace le dernier point par la nouvelle position
         if(lastUpdateTrajectoryTimeStampsNs == lastMessageTimeStampNs.getValue()){
             trajectory.remove(trajectory.size() - 1);
             trajectory.add(airbornePosition);
