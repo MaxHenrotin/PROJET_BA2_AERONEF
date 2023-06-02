@@ -10,7 +10,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 
-
 /**
  * représente l'état d'un aeronef (observable au sens du patron de conception Observer)
  *
@@ -192,7 +191,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     @Override
     public void setAltitude(double altitude) {
         AirbornePosition airbornePosition = new AirbornePosition(this.position.get(), altitude);
-        if(trajectory == null) { //si la trajectoire est vide, on ajoute la position actuelle
+        if (trajectory.isEmpty()) { //si la trajectoire est vide, on ajoute la position actuelle
             trajectory.add(airbornePosition);
             lastUpdateTrajectoryTimeStampsNs = lastMessageTimeStampNs.getValue();
         }

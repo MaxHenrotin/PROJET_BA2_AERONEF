@@ -120,7 +120,11 @@ public final class AircraftController {
 
         for(int i = 1; i < trajView.size(); ++i) {
             GeoPos pos = trajView.get(i).position();
-            GeoPos oldpos = trajView.get(i-1).position();
+
+            //créé des problèmes induit de setAltitude (programme plus performant ???)
+            //GeoPos oldpos = trajView.get(i-1).position();
+
+            GeoPos oldpos = Objects.isNull(trajView.get(i-1).position()) ? pos : trajView.get(i-1).position();
 
             double oldX = WebMercator.x(zoom, oldpos.longitude()) - minX - trajectoryGroup.getLayoutX();
             double oldY = WebMercator.y(zoom, oldpos.latitude()) - minY - trajectoryGroup.getLayoutY();
@@ -202,6 +206,8 @@ public final class AircraftController {
         return iconSVG;
     }
 
+    //Si on voulait mettre à jour l'Icone d'un aicraft pendant le vol on devrait "écouter" la categoryProperty
+    //comme le suggère le bout de code ci dessous
     /*private ObservableValue<AircraftIcon> aircraftIconFor(ObservableAircraftState aircraftState){
         aircraftState.categoryProperty().addListener(
                 (category) ->

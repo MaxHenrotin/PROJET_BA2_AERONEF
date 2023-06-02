@@ -157,5 +157,4 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
         Objects.requireNonNull(icaoAddress);
         Preconditions.checkArgument(timeStampNs>=0 && speed>=0 && trackOrHeading>=0);
     }
-
 }

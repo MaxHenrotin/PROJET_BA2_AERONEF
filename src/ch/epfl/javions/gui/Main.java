@@ -175,7 +175,6 @@ public final class Main extends Application {
                                 } catch (InterruptedException e) {
                                     throw new RuntimeException(e);
                                 }
-
                             }
                             allMessages.addFirst(rawMessage);
                             timestampsLastMessage = rawMessage.timeStampNs();

@@ -173,7 +173,6 @@ public class BaseMapController {
         eventHandler();
     }
 
-
     /**
      * Retourne le panneau JavaFX affichant le fond de carte
      * @return : le panneau JavaFX
