@@ -14,7 +14,11 @@ The app extracts data from the binary signal like aircraft position, speed, and 
 ---
 
 ## FULL OVERVIEW AND USAGE
-Please explore the **/Project_instructions** folder for a complete, step-by-step guide to the elaboration of this project (in French). You will also find there all the information on using the project, installing dependencies such as JavaFX, and running the application.
+Please explore the folder
+
+**`/Project_instructions`**
+
+It contains full presentation of the project and a step-by-step guide to the elaboration of this project (in French). You will also find there all the information on using the project, installing dependencies such as JavaFX, and running the application.
 
 ---
 
